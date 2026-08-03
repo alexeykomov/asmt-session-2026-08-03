@@ -249,6 +249,8 @@ GCP is not eliminated on capability — mature health API, best confidential-com
 - Volume, corrected: naive 1 Hz heart-rate assumptions are wrong for this product — HealthKit samples roughly every 5 minutes at rest, near-continuously only during workouts. Realistic estimate: ~3–5k samples/day/active user, ~15B/day at 3M wearable-connected users, compressing to 5–16 TB/year in ClickHouse. Large, tractable, not the number a naive estimate produces.
 - **Two-plane separation, two AWS accounts:** PHI account (Aurora + ClickHouse #1, health telemetry) and Analytics account (ClickHouse #2, pseudonymous product events). CH#2 needs a wide, growing audience — analysts, PMs, BI. **CH#1 needs almost none.** Access that broad next to data that sensitive is where grants drift; a leaked analyst credential or a wildcard policy cannot cross an account boundary the way it can cross a permission boundary within one account.
 
+**The target production architecture and the PoC-to-production delta are drawn out in `docs/architecture-diagrams.md`, diagrams 4 and 5** — the streaming ingest / async-generation / read-path split this store layout serves, and what changes versus what survives unchanged getting there.
+
 **Speaker notes:** The test for whether this separation is real: "health data lives in a separate account analysts have no path into" survives follow-up questioning; "health data is separated by database permissions" does not. This is deliberately not built (Bucket C, slide 18) but the account topology is a design decision we want validated before build starts, not after.
 
 ---
