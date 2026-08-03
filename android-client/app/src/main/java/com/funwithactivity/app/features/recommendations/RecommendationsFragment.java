@@ -167,9 +167,9 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
 
         progressBar.setVisibility(View.GONE);
         swipeRefreshLayout.setRefreshing(false);
-        renderStatusBanners(response.getStatusesList());
 
         List<Recommendation> recommendations = response.getRecommendationsList();
+        renderStatusBanners(response.getStatusesList(), recommendations.isEmpty());
         // adapter.setItems() runs either way — an empty list must actually
         // clear previously-rendered cards, not just be skipped, or a
         // refetch that legitimately returns nothing (e.g. every provider
@@ -194,13 +194,52 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
         errorView.setText(getString(R.string.request_failed, e.getMessage()));
     }
 
-    private void renderStatusBanners(List<ProviderStatus> statuses) {
+    /**
+     * @param recommendationsEmpty whether {@code GetRecommendationsResponse}
+     *     carried zero recommendations. Does NOT re-derive skipped-vs-failed
+     *     — {@link ProviderStatusPresentation#forStatuses} still owns that.
+     *     This only decides how zero results get worded, because a
+     *     DEGRADED provider's own "showing partial results" text is false
+     *     once nothing survived: see task-empty-state-copy.
+     */
+    private void renderStatusBanners(List<ProviderStatus> statuses, boolean recommendationsEmpty) {
         statusBannerContainer.setVisibility(View.VISIBLE);
         statusBannerContainer.removeAllViews();
 
         LayoutInflater inflater = LayoutInflater.from(requireContext());
-        for (ProviderStatus status : statuses) {
-            ProviderStatusPresentation presentation = ProviderStatusPresentation.forStatus(status);
+        List<ProviderStatusPresentation> presentations = ProviderStatusPresentation.forStatuses(statuses);
+
+        if (recommendationsEmpty) {
+            boolean hasDegraded = false;
+            boolean hasInfo = false;
+            for (ProviderStatusPresentation presentation : presentations) {
+                if (presentation.getSeverity() == ProviderStatusPresentation.Severity.DEGRADED) hasDegraded = true;
+                if (presentation.getSeverity() == ProviderStatusPresentation.Severity.INFO) hasInfo = true;
+            }
+
+            if (hasDegraded && !hasInfo) {
+                // All providers failed, zero results: one red summary
+                // banner, not a per-provider list each falsely promising
+                // partial results.
+                addBanner(inflater, getString(R.string.status_all_failed),
+                    R.color.colorStatusDegradedBg, R.color.colorStatusDegradedText);
+                return;
+            }
+            if (hasInfo && !hasDegraded) {
+                // All providers skipped, zero results: a deliberate privacy
+                // outcome, not an outage — stays blue/informational, never
+                // red.
+                addBanner(inflater, getString(R.string.status_all_skipped),
+                    R.color.colorStatusSkippedBg, R.color.colorStatusSkippedText);
+                return;
+            }
+            // Mixed (hasDegraded && hasInfo), or neither (all OK providers
+            // that simply returned 0 items each) — falls through to the
+            // per-provider loop below, which says both plainly without
+            // claiming partial results.
+        }
+
+        for (ProviderStatusPresentation presentation : presentations) {
             switch (presentation.getSeverity()) {
                 case INFO:
                     addBanner(inflater, getString(R.string.status_skipped_format,
@@ -208,7 +247,10 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
                         R.color.colorStatusSkippedBg, R.color.colorStatusSkippedText);
                     break;
                 case DEGRADED:
-                    addBanner(inflater, getString(R.string.status_error_format,
+                    int format = recommendationsEmpty
+                        ? R.string.status_error_format_no_partial
+                        : R.string.status_error_format;
+                    addBanner(inflater, getString(format,
                         presentation.getProviderName(), presentation.getError()),
                         R.color.colorStatusDegradedBg, R.color.colorStatusDegradedText);
                     break;

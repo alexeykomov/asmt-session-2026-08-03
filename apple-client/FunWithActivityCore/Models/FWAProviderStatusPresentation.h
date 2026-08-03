@@ -41,6 +41,18 @@ typedef NS_ENUM(NSInteger, FWAProviderStatusSeverity) {
 /// omitted — they need no banner.
 + (NSArray<FWAProviderStatusPresentation *> *)presentationsForStatuses:(NSArray<ProviderStatus *> *)statuses;
 
+/// Builds a presentation that is NOT derived from a wire `ProviderStatus` —
+/// for callers (FWARecommendationsViewController) that need to show a
+/// combined banner once they know the empty-results condition
+/// (recommendations.count == 0) that this class deliberately has no opinion
+/// on. Does not participate in, and must never be used to re-derive, the
+/// skipped-vs-degraded classification above — callers must obtain `severity`
+/// from a presentation this class already classified via
+/// +presentationsForStatuses:, never invent one.
++ (instancetype)presentationWithProviderName:(NSString *)providerName
+                                     severity:(FWAProviderStatusSeverity)severity
+                                      message:(NSString *)message;
+
 @end
 
 NS_ASSUME_NONNULL_END

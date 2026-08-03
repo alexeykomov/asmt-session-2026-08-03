@@ -182,13 +182,73 @@ typedef NS_ENUM(NSInteger, FWARecsSection) {
 
     self.connectionErrorMessage = nil;
     self.recommendations = [response.recommendationsArray copy] ?: @[];
-    self.banners = [FWAProviderStatusPresentation presentationsForStatuses:response.statusesArray ?: @[]];
+    NSArray<FWAProviderStatusPresentation *> *presentations =
+        [FWAProviderStatusPresentation presentationsForStatuses:response.statusesArray ?: @[]];
+    self.banners = [self bannersForPresentations:presentations
+                              recommendationCount:self.recommendations.count];
     [self.appState recordResponse:response];
     [self.appState clearDirty];
 #if DEBUG
     [self logRenderedContentForDemoVerification];
 #endif
     [self.tableView reloadData];
+}
+
+// Zero recommendations makes every degraded provider's own "showing partial
+// results" claim false — that is the whole bug this method exists to fix.
+// It does NOT re-derive skipped-vs-degraded: `presentations` is taken as-is
+// from FWAProviderStatusPresentation, already classified. This only decides
+// how to GROUP/WORD what's shown once recommendations.count == 0, per four
+// distinct cases:
+//   - some results survived            -> unchanged, per-provider banners
+//   - all providers failed, zero results        -> one red summary banner
+//   - all providers skipped, zero results       -> one blue summary banner
+//     (a deliberate privacy outcome, never a failure — must stay blue)
+//   - mixed skipped+failed, zero results        -> keep the per-provider
+//     banners (they already say both plainly) but drop the false "showing
+//     partial results" claim from the failed one(s)
+- (NSArray<FWAProviderStatusPresentation *> *)bannersForPresentations:(NSArray<FWAProviderStatusPresentation *> *)presentations
+                                                    recommendationCount:(NSUInteger)recommendationCount {
+    if (recommendationCount > 0 || presentations.count == 0) {
+        return presentations;
+    }
+
+    BOOL hasDegraded = NO;
+    BOOL hasInfo = NO;
+    for (FWAProviderStatusPresentation *presentation in presentations) {
+        if (presentation.severity == FWAProviderStatusSeverityDegraded) hasDegraded = YES;
+        if (presentation.severity == FWAProviderStatusSeverityInfo) hasInfo = YES;
+    }
+
+    if (hasDegraded && !hasInfo) {
+        return @[[FWAProviderStatusPresentation
+            presentationWithProviderName:@"all"
+                                 severity:FWAProviderStatusSeverityDegraded
+                                  message:@"No recommendations available — all providers are unavailable"]];
+    }
+
+    if (hasInfo && !hasDegraded) {
+        return @[[FWAProviderStatusPresentation
+            presentationWithProviderName:@"all"
+                                 severity:FWAProviderStatusSeverityInfo
+                                  message:@"No recommendations — no provider had the data it needs"]];
+    }
+
+    // Mixed: say both plainly, just without the "partial results" claim
+    // that's no longer true.
+    NSMutableArray<FWAProviderStatusPresentation *> *adjusted = [NSMutableArray arrayWithCapacity:presentations.count];
+    for (FWAProviderStatusPresentation *presentation in presentations) {
+        if (presentation.severity == FWAProviderStatusSeverityDegraded) {
+            NSString *message = [NSString stringWithFormat:@"%@ unavailable", presentation.providerName];
+            [adjusted addObject:[FWAProviderStatusPresentation
+                presentationWithProviderName:presentation.providerName
+                                     severity:FWAProviderStatusSeverityDegraded
+                                      message:message]];
+        } else {
+            [adjusted addObject:presentation];
+        }
+    }
+    return [adjusted copy];
 }
 
 #if DEBUG

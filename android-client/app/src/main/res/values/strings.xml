@@ -28,6 +28,21 @@
     <string name="status_error_format">%1$s unavailable — showing partial results (%2$s)</string>
     <string name="status_ok_format">%1$s: %2$s in %3$d ms</string>
 
+    <!-- Zero-recommendations banner wording (task-empty-state-copy). Only
+         used when getRecommendationsList() is empty, so the per-provider
+         "showing partial results" claim above would be false. Does not
+         re-derive skipped-vs-degraded — ProviderStatusPresentation still
+         does that; these only cover how zero results get worded/grouped.
+         status_all_failed/status_all_skipped replace the whole per-provider
+         list with one summary banner (red / blue respectively — skipped
+         stays blue, it is a data-minimisation outcome, never a failure).
+         status_error_format_no_partial is used instead of status_error_format
+         in the mixed skipped+failed case, to say both plainly without
+         claiming partial results. -->
+    <string name="status_all_failed">No recommendations available — all providers are unavailable</string>
+    <string name="status_all_skipped">No recommendations — no provider had the data it needs</string>
+    <string name="status_error_format_no_partial">%1$s unavailable (%2$s)</string>
+
     <!-- Pluralised recommendation count for the OK status banner
          (status_ok_format's %2$s) — avoids the "recommendation(s)"
          placeholder-ism. -->

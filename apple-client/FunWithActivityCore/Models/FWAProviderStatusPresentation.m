@@ -52,4 +52,10 @@
     return result;
 }
 
++ (instancetype)presentationWithProviderName:(NSString *)providerName
+                                     severity:(FWAProviderStatusSeverity)severity
+                                      message:(NSString *)message {
+    return [[self alloc] initWithProviderName:providerName severity:severity message:message];
+}
+
 @end
