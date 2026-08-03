@@ -65,7 +65,11 @@
     <string name="source_detail_label_latency">Latency</string>
     <string name="source_detail_label_last_error">Last error</string>
     <string name="source_detail_value_none">None</string>
-    <string name="source_detail_base_url_value">Configured at deployment time</string>
+    <!-- Shown when ProviderStatus.base_url is empty: a server predating
+         field 7, or a provider with nothing configured. Never fabricate a
+         URL here — this is the honest "we don't have one" state, same dash
+         convention as source_latency_dash. -->
+    <string name="source_detail_base_url_not_exposed">— not exposed</string>
     <string name="source_detail_type_builtin">REST</string>
     <string name="source_detail_builtin_footer">Built-in sources are configured at deployment time. There is nothing here to edit.</string>
     <string name="source_detail_copied_format">%1$s copied</string>

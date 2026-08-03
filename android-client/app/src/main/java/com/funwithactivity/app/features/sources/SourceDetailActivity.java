@@ -50,6 +50,7 @@ public class SourceDetailActivity extends AppCompatActivity {
     private static final String EXTRA_ERROR = "error";
     private static final String EXTRA_COUNT = "count";
     private static final String EXTRA_LATENCY_MS = "latency_ms";
+    private static final String EXTRA_BASE_URL = "base_url";
 
     public static Intent createIntent(Context context, ProviderStatus status) {
         Intent intent = new Intent(context, SourceDetailActivity.class);
@@ -59,6 +60,7 @@ public class SourceDetailActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_ERROR, status.getError());
         intent.putExtra(EXTRA_COUNT, status.getCount());
         intent.putExtra(EXTRA_LATENCY_MS, status.getLatencyMs());
+        intent.putExtra(EXTRA_BASE_URL, status.getBaseUrl());
         return intent;
     }
 
@@ -74,6 +76,7 @@ public class SourceDetailActivity extends AppCompatActivity {
             .setError(safe(getIntent().getStringExtra(EXTRA_ERROR)))
             .setCount(getIntent().getIntExtra(EXTRA_COUNT, 0))
             .setLatencyMs(getIntent().getLongExtra(EXTRA_LATENCY_MS, 0))
+            .setBaseUrl(safe(getIntent().getStringExtra(EXTRA_BASE_URL)))
             .build();
         ProviderStatusPresentation presentation = ProviderStatusPresentation.forStatus(status);
 
@@ -85,27 +88,41 @@ public class SourceDetailActivity extends AppCompatActivity {
         }
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        bindConfiguration(presentation);
+        bindConfiguration(presentation, status.getBaseUrl());
         bindStatus(presentation);
     }
 
     /**
      * CONFIGURATION section. This client only ever has the two built-in
      * providers (service1/service2 — see ProfileFragment's Javadoc on why
-     * their names aren't hardcoded elsewhere), so "type" and "base URL"
-     * aren't on the wire (ProviderStatus carries only name/ok/skipped/
-     * error/count/latency_ms — see recommendations.proto) and must not be
-     * fabricated from the raw error text, which is exactly the vendor-URL
-     * leak this pass is removing from the list. Both fields show the same
-     * "configured at deployment time" explanation as the footer.
+     * their names aren't hardcoded elsewhere). "Type" is a genuine property
+     * of the adapter (REST) that is not on the wire and stays static text.
+     * "Base URL" IS on the wire as of {@code ProviderStatus.base_url}
+     * (field 7, recommendations.proto) — the provider's real configured
+     * endpoint, populated server-side from PROVIDER1_URL/PROVIDER2_URL.
+     * A server predating this field, or a provider with nothing
+     * configured, yields an empty string; that renders as an honest
+     * "not exposed" dash rather than a fabricated value — see
+     * {@link #baseUrlDisplayValue}.
      */
-    private void bindConfiguration(ProviderStatusPresentation presentation) {
+    private void bindConfiguration(ProviderStatusPresentation presentation, String baseUrl) {
         setText(R.id.source_detail_name_value, presentation.getProviderName());
         setText(R.id.source_detail_type_value, getString(R.string.source_detail_type_builtin));
-        setText(R.id.source_detail_base_url_value, getString(R.string.source_detail_base_url_value));
+        setText(R.id.source_detail_base_url_value, baseUrlDisplayValue(baseUrl));
         // Long-press to copy: useful for whoever needs to hand the exact
         // value to someone else mid-incident, e.g. pasting it into a ticket.
         makeCopyable(R.id.source_detail_base_url_value, R.string.source_detail_label_base_url);
+    }
+
+    /**
+     * Never fabricate a URL: an empty {@code base_url} (old server, or a
+     * provider with nothing configured) must render as an honest "not
+     * exposed" placeholder, not as invented text implying a real endpoint.
+     */
+    private String baseUrlDisplayValue(String baseUrl) {
+        return (baseUrl == null || baseUrl.isEmpty())
+            ? getString(R.string.source_detail_base_url_not_exposed)
+            : baseUrl;
     }
 
     private void bindStatus(ProviderStatusPresentation presentation) {
