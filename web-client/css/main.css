@@ -73,7 +73,14 @@ main {
  * than directly inside `main`.
  */
 .screen-container {
-  padding: 0 2rem 1.5rem;
+  /*
+   * Top padding is not optional. `.fwa-tabbar-mount` pads ABOVE the tab
+   * row; nothing padded below it, so a screen's first element started at
+   * exactly the tab bar's bottom border — measured at the same y to the
+   * pixel. Buttons in the screen header (Refresh, +) therefore sat flush
+   * against the hairline and read as colliding with it.
+   */
+  padding: 1.25rem 2rem 1.5rem;
 }
 
 /*
