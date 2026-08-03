@@ -19,5 +19,10 @@
     <a class="fwa-tab" id="tab-sources" href="/sources">Sources</a>
     <a class="fwa-tab" id="tab-profile" href="/profile">Profile</a>
   </nav>
-  <main id="screen" class="fwa-screen"></main>
+  /*
+   * A div, not a <main>: base.soy already wraps page content in
+   * <main id="main-content">. Nesting a second <main> is invalid HTML and
+   * gives assistive technology two competing top-level landmarks.
+   */
+  <div id="screen" class="fwa-screen"></div>
 {/template}
