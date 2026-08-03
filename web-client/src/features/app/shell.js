@@ -44,6 +44,13 @@ funwithactivity.app.Shell = function() {
    */
   this.currentScreen_ = null;
 
+  /**
+   * Route token of the currently mounted screen, so mountScreen_ can skip a
+   * redundant remount. See the note there.
+   * @private {?string}
+   */
+  this.currentRoute_ = null;
+
   /** @private {?goog.events.Key} */
   this.routeChangedKey_ = null;
 
@@ -134,6 +141,15 @@ funwithactivity.app.Shell.prototype.handleRouteChanged_ = function() {
  * @private
  */
 funwithactivity.app.Shell.prototype.mountScreen_ = function(route) {
+  // Remounting the route that is already mounted is never useful, and it is
+  // actively harmful: it disposes a live screen and builds a replacement,
+  // which for Recs means a second identical fetch. That happens on boot —
+  // decorate() mounts the initial route, then Html5History.setEnabled(true)
+  // fires NAVIGATE for the same path — so without this guard every cold
+  // load issued two requests to the vendors.
+  if (this.currentRoute_ === route && this.currentScreen_) return;
+  this.currentRoute_ = route;
+
   if (this.currentScreen_) {
     this.currentScreen_.dispose();
     this.currentScreen_ = null;

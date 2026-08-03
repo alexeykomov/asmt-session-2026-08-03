@@ -148,11 +148,57 @@ funwithactivity.recs.RecsComponent.prototype.handleRefreshClick_ = function() {
  * @private
  */
 funwithactivity.recs.RecsComponent.prototype.maybeFetch_ = function(force) {
+  // Nothing to ask for until height and weight exist. AppState starts at
+  // zero, web-proxy rejects a non-positive measurement with 400
+  // invalid_measurements, and the old behaviour was therefore to open the
+  // app on a red "unable to fetch" banner — reporting a user error as a
+  // system failure, on the very first screen anyone sees.
+  //
+  // Deliberately checked before shouldFetch(): an invalid state must not
+  // consume the first-visit fetch, or a later visit with real measurements
+  // would look like a revisit and skip the fetch entirely.
+  if (!this.hasUsableMeasurements_()) {
+    this.renderNeedsMeasurements_();
+    return;
+  }
+
   if (!force && !funwithactivity.recs.shouldFetch(
       funwithactivity.recs.RecsComponent.hasFetched_, this.state_.isDirty())) {
     return;
   }
   this.fetch_();
+};
+
+
+/**
+ * Mirrors web-proxy's parseMeasurements guard: height and weight must both
+ * be finite and positive. Birth date is deliberately NOT required — leaving
+ * it out is the data-minimisation choice the product exists to demonstrate.
+ * @return {boolean}
+ * @private
+ */
+funwithactivity.recs.RecsComponent.prototype.hasUsableMeasurements_ =
+    function() {
+  const m = this.state_.getMeasurements();
+  return isFinite(m.heightCm) && m.heightCm > 0 &&
+      isFinite(m.weightKg) && m.weightKg > 0;
+};
+
+
+/**
+ * Informational prompt shown instead of a fetch when no measurements have
+ * been entered yet. Styled as guidance, not as an error: nothing has gone
+ * wrong, the app simply has nothing to ask about yet.
+ * @private
+ */
+funwithactivity.recs.RecsComponent.prototype.renderNeedsMeasurements_ =
+    function() {
+  const banner = goog.dom.getElement('degradation-banner');
+  if (!banner) return;
+  goog.dom.removeChildren(banner);
+  goog.dom.appendChild(banner, goog.dom.createDom(
+      goog.dom.TagName.P, {'class': 'recs-banner-skipped'},
+      'Add your height and weight in Profile to get recommendations.'));
 };
 
 
