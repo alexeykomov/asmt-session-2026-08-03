@@ -331,3 +331,25 @@ main {
   font-family: var(--font-mono);
   font-size: 0.85rem;
 }
+
+/* Recs screen (funwithactivity.recs.RecsComponent) */
+
+.recs-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 1rem;
+}
+
+.recs-refresh {
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.recs-refresh:hover {
+  background: var(--color-bg-alt);
+}

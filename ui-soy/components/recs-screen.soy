@@ -1,0 +1,29 @@
+{namespace funwithactivity.components.recsScreen}
+
+/**
+ * Static structure for the Recommendations screen: a refresh control, the
+ * degradation-banner mount, and the results-table mount. Rendered exactly
+ * once by funwithactivity.recs.RecsComponent#createDom; the banner and
+ * table mounts are then rewritten in place (via funwithactivity.render)
+ * on every fetch, so this template's own {call} below only supplies the
+ * empty-state markup for the moment between mount and first fetch.
+ *
+ * The refresh button forces a fetch regardless of AppState's dirty flag —
+ * see RecsComponent.prototype.handleRefreshClick_ — for a presenter who
+ * wants to retry a flaky vendor call without first dirtying Profile.
+ */
+{template .screen}
+  <section class="recs-section">
+    <div class="recs-toolbar">
+      <button type="button" id="recs-refresh" class="recs-refresh">Refresh</button>
+    </div>
+
+    <div id="degradation-banner" role="alert"></div>
+
+    <div id="recs-table-mount">
+      {call funwithactivity.components.recommendationsTable.table}
+        {param recommendations: [] /}
+      {/call}
+    </div>
+  </section>
+{/template}

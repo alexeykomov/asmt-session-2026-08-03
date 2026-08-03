@@ -3,6 +3,7 @@ goog.provide('funwithactivity.app.Shell');
 goog.require('funwithactivity.app.AppState');
 goog.require('funwithactivity.app.Router');
 goog.require('funwithactivity.pages.shell');
+goog.require('funwithactivity.recs.RecsComponent');
 goog.require('funwithactivity.render');
 goog.require('goog.Disposable');
 goog.require('goog.dom');
@@ -148,14 +149,15 @@ funwithactivity.app.Shell.prototype.mountScreen_ = function(route) {
 
 
 /**
- * Screen construction is a switch on the route token. Tasks 5-7 have not
- * landed yet, so every case below mounts a
- * funwithactivity.app.PlaceholderScreen_ instead of the real screen
- * component — goog.require'ing funwithactivity.recs.RecsComponent (etc.)
- * before it exists would fail PRUNE dependency resolution and break the
- * build for everyone until all three land simultaneously. Replace each
- * case with the real component as its task lands; the intended final shape
- * (per the Task 4 brief) is:
+ * Screen construction is a switch on the route token. Task 5 has landed
+ * (default/'recs' mounts the real funwithactivity.recs.RecsComponent);
+ * Tasks 6-7 have not, so 'sources'/'add-source'/'profile' still mount a
+ * funwithactivity.app.PlaceholderScreen_ instead of their real screen
+ * components — goog.require'ing e.g. funwithactivity.profile.
+ * ProfileComponent before it exists would fail PRUNE dependency
+ * resolution and break the build for everyone until both land. Replace
+ * each remaining case with the real component as its task lands; the
+ * intended final shape (per the Task 4 brief) is:
  *
  *   case 'sources':
  *     return new funwithactivity.sources.SourcesComponent(this.router_);
@@ -182,8 +184,7 @@ funwithactivity.app.Shell.prototype.createScreen_ = function(route) {
       return new funwithactivity.app.PlaceholderScreen_('Profile',
           'Task 6 mounts funwithactivity.profile.ProfileComponent here.');
     default:
-      return new funwithactivity.app.PlaceholderScreen_('Recommendations',
-          'Task 5 mounts funwithactivity.recs.RecsComponent here.');
+      return new funwithactivity.recs.RecsComponent(this.state_);
   }
 };
 
