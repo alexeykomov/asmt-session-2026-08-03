@@ -1,61 +1,125 @@
 # FunWithActivity
 
-Recommendations-aggregation skeleton for the EPAM pre-sale demo. Fans out to multiple provider adapters and exposes a merged, ranked recommendation set. Target architecture: Go gRPC app-server + Node web-proxy + Closure web-client.
+A health/activity recommendation proof of concept, built for an EPAM pre-sale
+architecture assessment. It fans out a user's measurements to two independent
+third-party recommendation providers, merges and deduplicates what comes
+back, ranks the result, and renders it — the same backend, on **web, iOS,
+and Android**.
 
-## Architecture (one-liner)
+The product is a three-tab app on all three clients:
+
+- **Recommendations** — the ranked, merged table, fetched in the background
+  and refreshed automatically when something relevant changed (a manual
+  Refresh control is also available).
+- **Sources** — the two providers with live status and latency, each
+  drilling into a read-only detail screen; a `+` control shows the seam for
+  adding a new provider.
+- **Profile** — height, weight, and a clearable birth date, plus a
+  developer-only section of per-provider fault toggles used for demoing
+  resilience.
+
+## Architecture, in a few lines
 
 ```
-Browser ──HTTP/JSON──► web-proxy ──gRPC──► app-server ──► provider adapters
+Browser ──HTTP/JSON──► web-proxy ──gRPC──► app-server ──HTTP/JSON──► provider adapters
+iOS/Android ──gRPC + bearer token──► nginx edge ──gRPC (h2c)──► app-server
 ```
 
-- `app-server/` (Go 1.23) — provider fan-out + ranking, gRPC server on `:50051`, HTTP `/health` sidecar on `:50052`.
-- `web-proxy/` (Node + Express) — public REST façade, calls app-server over gRPC.
-- `web-client/` — Closure Library SPA (planned).
-- `api/proto/` — single proto contract (`recommendations.proto`) for the internal gRPC API; `generate_all.sh` drives Go + JS codegen.
+- **`app-server/`** (Go) — fans out to both providers in parallel, classifies
+  each result as `ok` / `skipped` (data-minimisation gate) / `degraded`
+  (timed out or errored), deduplicates and ranks the merged set, and serves
+  it over gRPC.
+- **`web-proxy/`** (Node/Express) — the public REST façade browsers talk to;
+  the only client that goes through it, since browsers can't speak gRPC
+  without a proxy.
+- **`web-client/`** — Closure Library SPA, compiled ADVANCED-mode, served as
+  static files by `web-proxy`.
+- **`apple-client/`** — Objective-C/UIKit, talks gRPC directly to the edge.
+- **`android-client/`** — Java/AppCompat, same gRPC contract as iOS.
+- **`api/proto/`** — the single proto contract (`recommendations.proto`)
+  every internal gRPC caller shares; `generate_all.sh` drives Go and JS
+  codegen.
 
-## Status
+A full breakdown — system topology (and why mobile bypasses `web-proxy`
+entirely), the request flow for one recommendation call, and the five
+extension seams the architecture is built around — is in
+**[`docs/architecture-diagrams.md`](docs/architecture-diagrams.md)**.
 
-This is Task 1 of the build plan: repository scaffold and the proto contract only. No server implementation, no web-proxy, no web-client yet — those land in later tasks.
+Design decisions worth reading before changing client rendering behaviour
+are recorded as ADRs in `docs/decisions/`:
 
-## Prerequisites
+- [`0001-replace-not-accumulate.md`](docs/decisions/0001-replace-not-accumulate.md) — each response replaces the rendered result set; clients never accumulate results across requests.
+- [`0002-property-names-never-cross-the-wire.md`](docs/decisions/0002-property-names-never-cross-the-wire.md) — why the wire format is packed positional arrays, not named JSON fields, and where plain objects are still fine.
+
+## The two vendor integrations
+
+Both recommendation providers are external services this project does not
+control. Their corrected wire contracts — reverse-engineered against the
+live endpoints, since the documented brief and the deployed behaviour
+disagree in several places — are written up in
+[`docs/integrations/service1.md`](docs/integrations/service1.md) and
+[`docs/integrations/service2.md`](docs/integrations/service2.md). Adding a
+third provider means implementing the same adapter interface; see
+[`docs/integrations/_template.md`](docs/integrations/_template.md).
+
+## Running it locally
+
+### Prerequisites
 
 - Go 1.23+
 - Node 18+
-- `protoc` 3+ and the Go plugins (`protoc-gen-go` v1.31.0, `protoc-gen-go-grpc` v1.3.0) for proto codegen
+- `protoc` 3+ with the Go plugins (`protoc-gen-go` v1.31.0,
+  `protoc-gen-go-grpc` v1.3.0) for proto codegen
+- A JRE (Java 17+) on `PATH` — needed only to *build* the web client (the
+  Soy-to-JS and Closure compilers are jars); never needed to run it
 
-## Codegen
+### Configuration
 
+Copy `.env.example` to `.env` at the repo root and fill in real values —
+vendor provider URLs, a shared gRPC bearer token, and the gRPC host the
+mobile clients dial. `.env` is git-ignored and never committed; every value
+in `.env.example` is a placeholder. See the comments in that file for what
+each variable does and which component reads it.
+
+### Build and run
+
+```bash
+make setup    # installs Go modules + npm deps for app-server, web-proxy, web-client
+make codegen  # generates Go + JS proto stubs into api/gen/ (git-ignored)
+make build    # builds the app-server binary and the web-client bundle
+make dev      # docker compose up --build — app-server + web-proxy together
+make test     # go test ./... + web-proxy's mocha suite + web-client's mocha suite
 ```
-make codegen
-ls api/gen/go/funwithactivity/api/   # recommendations.pb.go, recommendations_grpc.pb.go
+
+Or run the pieces individually:
+
+```bash
+cd app-server && go run ./cmd/server   # gRPC on :50051, HTTP /health on :50052
 ```
 
-`api/gen/` is generated output and is git-ignored — regenerate it locally with `make codegen`.
-
-## Local development
-
-`web-client` is a Closure Library SPA: `ui-soy/` templates are compiled to
-JS and then bundled with Closure Compiler into a single ADVANCED-mode
-`web-client/public/main.min.js`, served as a static file.
-
+```bash
+cd web-proxy && npm install && npm test
+PORT=3000 APP_SERVER_URL=localhost:50051 npm start
 ```
-cd web-client
-npm install
-npm run build   # scripts/compile-soy.js, then scripts/compile.js
+
+```bash
+cd web-client && npm install
+npm run build   # scripts/build-css.js, scripts/compile-soy.js, then scripts/compile.js
 npm run lint
 ```
 
-**Java is needed only to build the client, never to run it.** Both build
-steps shell out to a jar (the Soy-to-JS compiler, and Closure Compiler's
-own `compiler.jar`), so a JRE (Java 17+) must be on `PATH` wherever
-`npm run build` runs. Once `web-client/public/` exists, `web-proxy` serves
-it as plain static files — it has no Soy/Java dependency at build or run
-time, and `web-proxy/Dockerfile`'s runtime stage has no JRE installed; only
-its `client-builder` stage does.
+Once `web-client/public/` exists, `web-proxy` serves it as static files — it
+has no Soy/Java dependency at build or run time.
 
-```
-cd web-proxy
-npm install
-npm test
-PORT=3000 APP_SERVER_URL=localhost:50051 npm start
-```
+The iOS and Android clients build from `apple-client/` and `android-client/`
+respectively, via their normal platform toolchains (Xcode / Gradle); both
+read `GRPC_HOST` (and `INTERNAL_GRPC_TOKEN` where applicable) from the same
+`.env` file at build time.
+
+## Status
+
+This is a proof of concept built for a graded pre-sale technical
+assessment, not a production system. What's built, what's designed but not
+built, and what's genuinely not done is tracked honestly in the assessment
+deck (`docs/deck/funwithactivity-architecture.md`, slide 18) rather than
+implied by omission here.
