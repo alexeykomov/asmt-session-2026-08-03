@@ -20,7 +20,7 @@
 # Region: fra (Frankfurt) — EU residency, consistent with the GDPR position
 # in the design document. Fallback: ams (Amsterdam).
 
-name: funwithactivity
+name: funwithactivity2
 region: fra
 
 services:
