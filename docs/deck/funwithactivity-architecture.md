@@ -28,6 +28,29 @@
 
 ---
 
+## 2a. Your four answers, and what they settle
+
+We asked four questions. The answers moved the architecture more than the brief did, and two of them together invalidate our own PoC's central mechanic — which we would rather say out loud than have you find.
+
+| We asked | You answered |
+|---|---|
+| Was the lawsuit a breach or a durability failure? | **Both concerns are valid** |
+| Expected load, average and peak? | **500 / 2000 concurrent RPS** |
+| Would an API standard suit new services and devices? | **Limited or no control over third-party APIs** |
+| Do the tiers imply payment? | **Yes — paid subscriptions are key** |
+
+**2000 RPS peak makes per-request fan-out impossible.** Two providers at peak is 4,000 outbound third-party calls per second, over APIs you have told us you cannot renegotiate, from a vendor we have measured failing about one call in three. So the request path cannot call vendors in production. Ingest and recommendation generation move off it, vendor calls become a cached background refresh with an explicit staleness budget, and reads are served from our own store. **This is why persistence is not a feature we would add later — it is the production read path.**
+
+**No control over their APIs makes adapters permanent.** Not a transitional step toward an interface we define. The open question becomes *who writes the adapter* — you, or the vendor against our SDK — and that single answer decides whether provider integration stays in-process or becomes out-of-process services with a certification path.
+
+**Paid tiers make routing entitlement-aware.** Today our gate routes on *what data the user supplied*. Production routes on that **and** *what they pay for* — same seam, one more input, with premium providers reserved for premium tiers because third-party calls are billed per call.
+
+**"Both concerns are valid" means two separate answers, not one.** Durability and confidentiality have different remedies, and we present them separately at slides 13 and 14 rather than blurring them into "we take security seriously."
+
+**Speaker notes:** This is the slide that proves we did arithmetic rather than pattern-matching. The 2000 RPS figure turns the rest of the deck from preference into derivation — every later choice traces back to a number they gave us. Expect the pushback "so your demo doesn't scale?" — the answer is yes, deliberately, because the brief asked for input collected in the UI; the demo shows the merge, ranking and degradation logic, and the trigger for that logic is what moves. Do not be defensive here; it lands better as a finding than as an apology.
+
+---
+
 ## 3. High-level architecture, and the five extension seams
 
 **Diagrams for this slide and the next four architecture-heavy slides are in
