@@ -1,7 +1,26 @@
 # 1.2.0 stack — deployment
 
-The 1.2.0 work runs on its own App Platform app, fully isolated from the
-1.1.x stack. Nothing is shared between them except the two vendor endpoints.
+The 1.2.0 **web** stack runs on its own App Platform app, isolated from the
+1.1.x web stack. The two share only the vendor endpoints.
+
+**Mobile is not isolated, and this is worth being precise about.** Both
+stacks' iOS and Android clients point at the same droplet edge
+(`<ip>.sslip.io:443`), because App Platform's HTTP/1.1-only ingress cannot
+carry gRPC and there is exactly one droplet. That droplet now runs the 1.2.0
+`app-server`. So:
+
+| | Fallback to 1.1.x available? |
+|---|---|
+| Web | **Yes** — the 1.1.x App Platform app is untouched and still serving |
+| iOS / Android | **No** — one droplet, now on 1.2.0 |
+
+This is survivable rather than alarming, and only because the wire contract
+was kept byte-identical: `base_url` went on as field 7 of `ProviderStatus`
+rather than reshaping the message, so a 1.1.x binary ignores the field it
+does not know and keeps working against the 1.2.0 server. That is the
+append-only slot discipline doing the job it exists for. But it is a
+property we should verify rather than assume if a mobile fallback is ever
+actually needed.
 
 | | value |
 |---|---|
