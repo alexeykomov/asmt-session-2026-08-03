@@ -353,3 +353,128 @@ main {
 .recs-refresh:hover {
   background: var(--color-bg-alt);
 }
+
+/*
+ * Profile screen (funwithactivity.profile.ProfileComponent) — a system
+ * settings-table look: grouped sections with an uppercase header label,
+ * rows with a left label / right control split, a hairline separator
+ * between rows but not after the last one, and rounded corners on the
+ * whole group (via overflow:hidden clipping the header/last-row corners
+ * to the group's own border-radius rather than rounding each row).
+ */
+
+.settings-group {
+  margin: 0 0 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.settings-group:last-child { margin-bottom: 0; }
+
+.settings-group-header {
+  padding: 0.55rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.settings-row:last-child { border-bottom: none; }
+
+.settings-label {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.settings-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings-number-input,
+.settings-date-input {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.settings-number-input { width: 6rem; }
+.settings-date-input { width: 9rem; }
+
+/*
+ * The Clear button (goog.ui.Button, NativeButtonRenderer — a real
+ * <button>) matches .recs-refresh's outline styling so both of this
+ * screen's actionable controls read as the same affordance.
+ */
+.settings-control-birth-date button {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--color-accent);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.settings-control-birth-date button:hover {
+  background: var(--color-bg-alt);
+}
+
+.settings-control-fault {
+  min-width: 11rem;
+}
+
+/*
+ * goog.ui.Select (rendered via goog.ui.MenuButtonRenderer) ships its own
+ * goog-menu-button/goog-menu/goog-menuitem styling from the stock
+ * Closure sheets build-css.js concatenates; this only pins its width so
+ * "Error"/"Timeout"/"Malformed" don't reflow the row width as the
+ * selection changes.
+ */
+.settings-select-mount .goog-menu-button {
+  min-width: 7rem;
+}
+
+/*
+ * The stock goog-checkbox-checked/-undetermined rules (closure/goog/css/
+ * checkbox.css, concatenated above by build-css.js) point their sprite at
+ * `//ssl.gstatic.com/closure/check-sprite.gif` — an external host this
+ * app's CSP deliberately does not allow (img-src is 'self' data: only;
+ * see web-proxy/src/server.js). Left as-is, the checked state renders as
+ * only a border-color change with no checkmark glyph: the exact "present
+ * in the DOM but not actually painted" failure this task's brief warns
+ * about for goog.ui widgets in general, just for an image instead of a
+ * missing stylesheet. Overridden here with a self-contained data: URI
+ * checkmark (which the same CSP explicitly permits) so the checked state
+ * is unambiguous without any network dependency.
+ */
+.goog-checkbox-checked {
+  background-color: var(--color-accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.8' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 9px 9px;
+  border-color: var(--color-accent);
+}
+
+.goog-checkbox-undetermined {
+  background-color: var(--color-muted);
+  background-image: none;
+  border-color: var(--color-muted);
+}

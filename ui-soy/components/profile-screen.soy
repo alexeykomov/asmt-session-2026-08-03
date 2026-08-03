@@ -1,0 +1,78 @@
+{namespace funwithactivity.components.profileScreen}
+
+/**
+ * Static structure for the Profile screen: two settings-table style
+ * sections (MEASUREMENTS, DEVELOPER), each row carrying a stable id.
+ * funwithactivity.profile.ProfileComponent decorates these ids with
+ * goog.ui widgets in enterDocument() rather than generating markup in
+ * JS, matching the decorate convention the rest of this codebase uses
+ * (funwithactivity.recs.RecsComponent#attachTableSorter_ decorates the
+ * table the same way).
+ *
+ * Height/weight stay native <input type="number"> — see the doc on
+ * ProfileComponent for why. The birth date input is decorated by a
+ * goog.ui.InputDatePicker; the adjacent button is a goog.ui.Button that
+ * clears it in one click, independent of whether the calendar popup is
+ * even open — that is the one-gesture data-minimisation demo beat.
+ *
+ * The fault rows only provide a checkbox-decoration target
+ * (`fault-<provider>`) and an empty mount div for the mode
+ * goog.ui.Select (`fault-<provider>-mode`) — ProfileComponent builds
+ * the Select's goog.ui.Menu/goog.ui.MenuItem tree in JS and renders it
+ * into that mount rather than decorating hand-authored menu markup:
+ * goog.ui.MenuButtonRenderer's decorate() path expects an exact nested
+ * .goog-menu/.goog-menuitem DOM shape, and getting that wrong by hand
+ * reproduces the "present in the DOM but invisible" failure mode this
+ * task exists to avoid. The checkbox and date input, by contrast, each
+ * decorate a single existing element with a well-defined shape, so
+ * those are still authored here and decorated in place.
+ */
+{template .screen}
+  <section class="profile-section">
+    <div class="settings-group">
+      <div class="settings-group-header">Measurements</div>
+
+      <div class="settings-row">
+        <label class="settings-label" for="profile-height">Height (cm)</label>
+        <div class="settings-control">
+          <input type="number" id="profile-height" class="settings-number-input" min="0" step="0.1">
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <label class="settings-label" for="profile-weight">Weight (kg)</label>
+        <div class="settings-control">
+          <input type="number" id="profile-weight" class="settings-number-input" min="0" step="0.1">
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <label class="settings-label" for="profile-birth-date">Birth date</label>
+        <div class="settings-control settings-control-birth-date">
+          <input type="text" id="profile-birth-date" class="settings-date-input" placeholder="yyyy-mm-dd" autocomplete="off">
+          <button type="button" id="profile-birth-date-clear">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-header">Developer</div>
+
+      <div class="settings-row">
+        <span class="settings-label">Service 1 fault</span>
+        <div class="settings-control settings-control-fault">
+          <span id="fault-service1"></span>
+          <div id="fault-service1-mode" class="settings-select-mount"></div>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <span class="settings-label">Service 2 fault</span>
+        <div class="settings-control settings-control-fault">
+          <span id="fault-service2"></span>
+          <div id="fault-service2-mode" class="settings-select-mount"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+{/template}

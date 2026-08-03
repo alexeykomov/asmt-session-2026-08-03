@@ -3,6 +3,7 @@ goog.provide('funwithactivity.app.Shell');
 goog.require('funwithactivity.app.AppState');
 goog.require('funwithactivity.app.Router');
 goog.require('funwithactivity.pages.shell');
+goog.require('funwithactivity.profile.ProfileComponent');
 goog.require('funwithactivity.recs.RecsComponent');
 goog.require('funwithactivity.render');
 goog.require('goog.Disposable');
@@ -149,14 +150,15 @@ funwithactivity.app.Shell.prototype.mountScreen_ = function(route) {
 
 
 /**
- * Screen construction is a switch on the route token. Task 5 has landed
- * (default/'recs' mounts the real funwithactivity.recs.RecsComponent);
- * Tasks 6-7 have not, so 'sources'/'add-source'/'profile' still mount a
+ * Screen construction is a switch on the route token. Tasks 5 and 6 have
+ * landed (default/'recs' mounts funwithactivity.recs.RecsComponent;
+ * 'profile' mounts funwithactivity.profile.ProfileComponent). Task 7 has
+ * not, so 'sources'/'add-source' still mount a
  * funwithactivity.app.PlaceholderScreen_ instead of their real screen
- * components — goog.require'ing e.g. funwithactivity.profile.
- * ProfileComponent before it exists would fail PRUNE dependency
- * resolution and break the build for everyone until both land. Replace
- * each remaining case with the real component as its task lands; the
+ * components — goog.require'ing e.g. funwithactivity.sources.
+ * SourcesComponent before it exists would fail PRUNE dependency
+ * resolution and break the build for everyone until it lands. Replace
+ * the remaining cases with the real components as that task lands; the
  * intended final shape (per the Task 4 brief) is:
  *
  *   case 'sources':
@@ -181,8 +183,7 @@ funwithactivity.app.Shell.prototype.createScreen_ = function(route) {
       return new funwithactivity.app.PlaceholderScreen_('Add Source',
           'Task 7 mounts funwithactivity.sources.AddSourceComponent here.');
     case 'profile':
-      return new funwithactivity.app.PlaceholderScreen_('Profile',
-          'Task 6 mounts funwithactivity.profile.ProfileComponent here.');
+      return new funwithactivity.profile.ProfileComponent(this.state_);
     default:
       return new funwithactivity.recs.RecsComponent(this.state_);
   }
