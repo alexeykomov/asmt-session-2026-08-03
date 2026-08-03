@@ -18,13 +18,26 @@ goog.require('goog.events.EventTarget');
 funwithactivity.app.AppState = function() {
   funwithactivity.app.AppState.base(this, 'constructor');
 
+  /**
+   * Height and weight start at plausible defaults — matching iOS
+   * (FWAAppState.m) and Android (AppState.java) — so the app opens on real
+   * recommendations rather than an empty state. Birth date deliberately
+   * does NOT: see below.
+   * @private {number}
+   */
+  this.heightCm_ = funwithactivity.app.AppState.DEFAULT_HEIGHT_CM;
   /** @private {number} */
-  this.heightCm_ = 0;
-  /** @private {number} */
-  this.weightKg_ = 0;
+  this.weightKg_ = funwithactivity.app.AppState.DEFAULT_WEIGHT_KG;
   /**
    * Unix seconds, or 0 for "not supplied" — a deliberate GDPR Art. 5(1)(c)
    * data-minimisation choice, matching the wire convention web-proxy uses.
+   *
+   * Unset by default, and that default is load-bearing rather than
+   * incidental: the app opens with service2 already skipped, so supplying
+   * an age visibly UNLOCKS a provider instead of withholding one. Stating
+   * the minimisation rule that way round — you get more by sharing more,
+   * and the product works either way — reads as a product decision rather
+   * than as a degraded mode.
    * @private {number}
    */
   this.birthDateUnix_ = 0;
@@ -34,6 +47,28 @@ funwithactivity.app.AppState = function() {
   this.dirty_ = false;
 };
 goog.inherits(funwithactivity.app.AppState, goog.events.EventTarget);
+
+
+/**
+ * Default measurements, kept identical to iOS FWAAppState.m and Android
+ * AppState.java so all three clients open on the same result set.
+ * @const {number}
+ */
+funwithactivity.app.AppState.DEFAULT_HEIGHT_CM = 175;
+
+
+/** @const {number} */
+funwithactivity.app.AppState.DEFAULT_WEIGHT_KG = 70;
+
+
+/**
+ * Where the birth-date picker opens when nothing is set. The field itself
+ * stays unset — this only positions the wheel somewhere plausible instead
+ * of at an arbitrary epoch, so picking a date on stage is one gesture
+ * rather than thirty years of scrolling.
+ * @const {string}
+ */
+funwithactivity.app.AppState.PICKER_DEFAULT_DATE = '1983-05-29';
 
 
 /** @const {string} */
