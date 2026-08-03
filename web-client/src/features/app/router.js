@@ -35,9 +35,28 @@ funwithactivity.app.Router.ROUTE_CHANGED = 'route-changed';
 
 
 /**
+ * Matches `/sources/<name>` for any name other than literal 'add' (that
+ * exact path is handled as its own case in normalize(), below, and never
+ * reaches this pattern). `[^/]+` deliberately does not allow a further
+ * path segment — `/sources/foo/bar` falls through to the 'recs' default
+ * like any other unrecognized path, rather than silently truncating to
+ * 'foo'.
+ * @const {!RegExp}
+ * @private
+ */
+funwithactivity.app.Router.SOURCE_DETAIL_RE_ = /^\/sources\/([^/]+)$/;
+
+
+/**
  * Maps a URL path to a route token. Unknown paths fall back to 'recs'
  * rather than rendering nothing — a blank screen on a typo'd deep link is
  * worse than a sensible default.
+ *
+ * `/sources/<name>` (any name but 'add') maps to the token
+ * `'sources/' + name`, carrying the provider name straight through so
+ * Shell.prototype.createScreen_ can mount the detail screen for it without
+ * a second lookup — see that method's `route.indexOf('sources/') === 0`
+ * branch.
  * @param {string} path
  * @return {string}
  */
@@ -48,7 +67,14 @@ funwithactivity.app.Router.normalize = function(path) {
     case '/sources': return 'sources';
     case '/profile': return 'profile';
     case '/recs': return 'recs';
-    default: return 'recs';
+    default: {
+      const match = funwithactivity.app.Router.SOURCE_DETAIL_RE_.exec(clean);
+      if (match) {
+        const name = decodeURIComponent(match[1]);
+        if (name) return 'sources/' + name;
+      }
+      return 'recs';
+    }
   }
 };
 

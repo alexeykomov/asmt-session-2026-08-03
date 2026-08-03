@@ -14,11 +14,13 @@
 {/template}
 
 {template .body}
-  <nav class="fwa-tabs" id="fwa-tabs">
-    <a class="fwa-tab" id="tab-recs" href="/recs">Recommendations</a>
-    <a class="fwa-tab" id="tab-sources" href="/sources">Sources</a>
-    <a class="fwa-tab" id="tab-profile" href="/profile">Profile</a>
-  </nav>
+  /*
+   * Empty on purpose: funwithactivity.app.Shell#buildTabBar_ renders a
+   * real goog.ui.TabBar (goog.ui.Tab children) into this mount element
+   * rather than decorating hand-authored anchors — see that method's doc
+   * for why decoration was rejected in favor of programmatic construction.
+   */
+  <div id="fwa-tabs" class="fwa-tabbar-mount"></div>
   /*
    * A div, not a <main>: base.soy already wraps page content in
    * <main id="main-content">. Nesting a second <main> is invalid HTML and

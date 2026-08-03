@@ -35,6 +35,13 @@ const CLOSURE_SHEETS = [
   'popupdatepicker.css',
   'inputdatepicker.css',
   'tablesorter.css',
+  // goog.ui.TabBar / goog.ui.Tab (funwithactivity.app.Shell). Missing
+  // these produces the exact "present in the DOM but invisible" failure
+  // this whole list exists to prevent: the tab bar would render, clicks
+  // would land on real Tab elements, but nothing would be visibly
+  // painted — no error anywhere.
+  'tab.css',
+  'tabbar.css',
 ];
 
 /** Strips Closure Stylesheets directives that are not valid CSS. */

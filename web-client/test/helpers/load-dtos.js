@@ -58,6 +58,7 @@ function loadClassifier() {
 
   ns.ProviderStatus = sandbox.funwithactivity.dto.ProviderStatus;
   ns.classify = sandbox.funwithactivity.features.recommendations.classify;
+  ns.shortReason = sandbox.funwithactivity.features.recommendations.shortReason;
   return ns;
 }
 

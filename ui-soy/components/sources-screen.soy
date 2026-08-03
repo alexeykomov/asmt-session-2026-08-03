@@ -1,0 +1,52 @@
+{namespace funwithactivity.components.sourcesScreen}
+
+/**
+ * Sources screen: one row per provider from the most recent
+ * POST /api/recommendations response's `statuses[]`
+ * (funwithactivity.app.LastStatuses), each linking to `/sources/<name>`
+ * for the read-only detail screen.
+ *
+ * The list NEVER prints `status.error` verbatim — that raw text can embed
+ * a full vendor URL (see funwithactivity.features.recommendations.
+ * shortReason's doc). Only classify()'s status pill and shortReason()'s
+ * short phrase render here; the full text is reserved for the Source
+ * detail screen's STATUS section, where an operator needs it.
+ *
+ * `.screen` renders the static shell (heading, the `+` button's decoration
+ * target, and the list mount); funwithactivity.sources.SourcesComponent
+ * populates `#sources-list-mount` via `.list` after every fetch/cache
+ * read, mirroring the recs-screen.soy / recommendations-table.soy split
+ * (static shell template + separate data-driven template re-rendered into
+ * a mount element).
+ */
+{template .screen}
+  <section class="sources-section">
+    <div class="sources-toolbar">
+      <h2 class="sources-heading">Sources</h2>
+      <button type="button" id="sources-add" class="sources-add" title="Add source">+</button>
+    </div>
+    <div id="sources-list-mount" class="sources-list">Loading source status…</div>
+  </section>
+{/template}
+
+/**
+ * Data-driven rows. Each entry in `$rows` is built by
+ * funwithactivity.sources.SourcesComponent#toRow_ from a
+ * funwithactivity.dto.ProviderStatus — see that method for the exact
+ * shape (name, href, statusClass, statusLabel, reason, latencyDisplay).
+ */
+{template .list}
+  {@param rows: list<?>}
+  {if length($rows) == 0}
+    <p class="sources-empty">No sources reported yet.</p>
+  {else}
+    {foreach $row in $rows}
+      <a class="sources-row" href="{$row.href}">
+        <span class="sources-row-name">{$row.name}</span>
+        <span class="status-pill status-pill-{$row.statusClass}">{$row.statusLabel}</span>
+        <span class="sources-row-reason">{$row.reason ?: ''}</span>
+        <span class="sources-row-latency">{$row.latencyDisplay}</span>
+      </a>
+    {/foreach}
+  {/if}
+{/template}

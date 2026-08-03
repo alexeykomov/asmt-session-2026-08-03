@@ -2,6 +2,7 @@ goog.provide('funwithactivity.recs.RecsComponent');
 goog.provide('funwithactivity.recs.shouldFetch');
 
 goog.require('funwithactivity.app.AppState');
+goog.require('funwithactivity.app.LastStatuses');
 goog.require('funwithactivity.components.recommendationsTable');
 goog.require('funwithactivity.components.recsScreen');
 goog.require('funwithactivity.dto.ProviderStatus');
@@ -236,6 +237,11 @@ funwithactivity.recs.RecsComponent.prototype.renderSuccess_ = function(
   // api.js. Its fields are real, typed class fields, so the compiler
   // renames the definition and every access below together — plain
   // dotted property access is correct here.
+  //
+  // Cached for the Sources/Source-detail screens (funwithactivity.app.
+  // LastStatuses) so they can show "the most recent response's statuses[]"
+  // without spending a second vendor call for data this fetch already has.
+  funwithactivity.app.LastStatuses.set(response.statuses);
   this.renderTable_(response.recommendations);
   this.renderBanner_(response.statuses);
 };

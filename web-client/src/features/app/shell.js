@@ -6,25 +6,29 @@ goog.require('funwithactivity.pages.shell');
 goog.require('funwithactivity.profile.ProfileComponent');
 goog.require('funwithactivity.recs.RecsComponent');
 goog.require('funwithactivity.render');
+goog.require('funwithactivity.sources.AddSourceComponent');
+goog.require('funwithactivity.sources.SourceDetailComponent');
+goog.require('funwithactivity.sources.SourcesComponent');
 goog.require('goog.Disposable');
 goog.require('goog.dom');
-goog.require('goog.dom.TagName');
-goog.require('goog.dom.classlist');
 goog.require('goog.events');
-goog.require('goog.events.EventType');
 goog.require('goog.ui.Component');
+goog.require('goog.ui.Tab');
+goog.require('goog.ui.TabBar');
 
 
 /**
  * Application shell: owns the Router and the shared AppState, renders the
- * three-tab header once, and — on every route change — disposes whatever
- * screen was mounted and constructs the one the new route names.
+ * three-tab header once (as a real goog.ui.TabBar, not hand-authored
+ * anchors — see decorate() and buildTabBar_), and — on every route
+ * change — disposes whatever screen was mounted and constructs the one
+ * the new route names.
  *
  * NOT a goog.ui.Component itself: it decorates a document that
  * funwithactivity.Main already rendered (via funwithactivity.render.element)
  * rather than rendering itself, so goog.Disposable is the right base — it
- * needs disposal bookkeeping (event keys, the current screen) but no DOM
- * lifecycle of its own.
+ * needs disposal bookkeeping (event keys, the tab bar, the current screen)
+ * but no DOM lifecycle of its own.
  * @constructor
  * @extends {goog.Disposable}
  */
@@ -51,28 +55,46 @@ funwithactivity.app.Shell = function() {
    */
   this.currentRoute_ = null;
 
+  /**
+   * Owned and disposed by Shell (see disposeInternal): built once in
+   * decorate(), holding one goog.ui.Tab child per entry in TAB_DEFS_.
+   * Disposing the TabBar disposes its Tab children too — goog.ui.Component
+   * disposes every child added via addChild() — so there is nothing extra
+   * to tear down for the tabs themselves.
+   * @private {?goog.ui.TabBar}
+   */
+  this.tabBar_ = null;
+
+  /**
+   * Route token (TAB_DEFS_[i].route) -> the goog.ui.Tab built for it, so
+   * markActiveTab_ can find which Tab to select without a linear scan of
+   * the TabBar's children on every navigation.
+   * @private {!Object<string, !goog.ui.Tab>}
+   */
+  this.tabsByRoute_ = {};
+
   /** @private {?goog.events.Key} */
   this.routeChangedKey_ = null;
 
   /** @private {?goog.events.Key} */
-  this.tabClickKey_ = null;
+  this.tabActionKey_ = null;
 };
 goog.inherits(funwithactivity.app.Shell, goog.Disposable);
 
 
 /**
- * Maps a normalized route token to the id of the tab anchor that should be
- * marked active for it. 'add-source' has no tab of its own — it is reached
- * from the Sources screen, so the Sources tab stays highlighted.
- * @const {!Object<string, string>}
+ * The three tabs, in display order. `path` is what gets passed to
+ * router.go() on a genuine user click (see handleTabAction_); `route` is
+ * the normalized token markActiveTab_ matches against to decide which tab
+ * to visually select.
+ * @const {!Array<{route: string, path: string, label: string}>}
  * @private
  */
-funwithactivity.app.Shell.TAB_ID_BY_ROUTE_ = {
-  'recs': 'tab-recs',
-  'sources': 'tab-sources',
-  'add-source': 'tab-sources',
-  'profile': 'tab-profile',
-};
+funwithactivity.app.Shell.TAB_DEFS_ = [
+  {route: 'recs', path: '/recs', label: 'Recommendations'},
+  {route: 'sources', path: '/sources', label: 'Sources'},
+  {route: 'profile', path: '/profile', label: 'Profile'},
+];
 
 
 /** @return {!funwithactivity.app.Router} */
@@ -82,7 +104,7 @@ funwithactivity.app.Shell.prototype.getRouter = function() {
 
 
 /**
- * Binds the tab bar and mounts the screen for the current URL. Does not
+ * Builds the tab bar and mounts the screen for the current URL. Does not
  * start the router — funwithactivity.Main calls router.start() itself,
  * after decorate(), so the first ROUTE_CHANGED (if any fires on start)
  * lands on an already-listening Shell.
@@ -92,35 +114,55 @@ funwithactivity.app.Shell.prototype.decorate = function() {
       funwithactivity.app.Router.ROUTE_CHANGED, this.handleRouteChanged_,
       false, this);
 
-  const tabs = goog.dom.getElement('fwa-tabs');
-  if (tabs) {
-    this.tabClickKey_ = goog.events.listen(
-        tabs, goog.events.EventType.CLICK, this.handleTabClick_, false, this);
-  }
-
+  this.buildTabBar_();
   this.handleRouteChanged_();
 };
 
 
 /**
- * Intercepts clicks on a `.fwa-tab` anchor and routes them through
- * router.go() instead of letting the browser perform a full navigation —
- * that full navigation would work (web-proxy serves index.html for every
- * tab route too), but it would reload the whole app instead of just
- * swapping the mounted screen.
- * @param {!goog.events.BrowserEvent} e
+ * Builds a real goog.ui.TabBar with one goog.ui.Tab child per TAB_DEFS_
+ * entry and renders it into `#fwa-tabs` (an empty mount div — see
+ * ui-soy/pages/shell.soy — decorated rather than hand-authoring the
+ * `.goog-tab`/`.goog-tab-bar` DOM: same reasoning as ProfileComponent's
+ * Select widgets, applied to the single most visible control in the app).
+ *
+ * Routing is wired to Component.EventType.ACTION, not SELECT: ACTION
+ * fires only on a genuine user click or keyboard activation (see
+ * goog.ui.Control#performActionInternal), whereas SELECT also fires from
+ * a programmatic setSelectedTab() call — which markActiveTab_ makes on
+ * every route change, including ones that originated from a tab click
+ * itself. Wiring routing to SELECT would re-invoke router.go() for the
+ * path the router just navigated to; ACTION does not have that problem,
+ * so no re-entrancy guard is needed here at all.
  * @private
  */
-funwithactivity.app.Shell.prototype.handleTabClick_ = function(e) {
-  const anchor = goog.dom.getAncestor(/** @type {?Node} */ (e.target),
-      function(node) {
-        return node.nodeType == 1 &&
-            goog.dom.classlist.contains(/** @type {!Element} */ (node),
-                'fwa-tab');
-      }, true);
-  if (!anchor) return;
-  e.preventDefault();
-  this.router_.go(anchor.getAttribute('href'));
+funwithactivity.app.Shell.prototype.buildTabBar_ = function() {
+  this.tabBar_ = new goog.ui.TabBar();
+
+  funwithactivity.app.Shell.TAB_DEFS_.forEach(function(def) {
+    const tab = new goog.ui.Tab(def.label);
+    tab.setModel(def.path);
+    this.tabBar_.addChild(tab, true);
+    this.tabsByRoute_[def.route] = tab;
+  }, this);
+
+  const mount = goog.dom.getElement('fwa-tabs');
+  if (mount) this.tabBar_.render(mount);
+
+  this.tabActionKey_ = goog.events.listen(this.tabBar_,
+      goog.ui.Component.EventType.ACTION, this.handleTabAction_, false,
+      this);
+};
+
+
+/**
+ * @param {!goog.events.Event} e
+ * @private
+ */
+funwithactivity.app.Shell.prototype.handleTabAction_ = function(e) {
+  const tab = /** @type {!goog.ui.Tab} */ (e.target);
+  const path = /** @type {string} */ (tab.getModel());
+  if (path) this.router_.go(path);
 };
 
 
@@ -166,38 +208,24 @@ funwithactivity.app.Shell.prototype.mountScreen_ = function(route) {
 
 
 /**
- * Screen construction is a switch on the route token. Tasks 5 and 6 have
- * landed (default/'recs' mounts funwithactivity.recs.RecsComponent;
- * 'profile' mounts funwithactivity.profile.ProfileComponent). Task 7 has
- * not, so 'sources'/'add-source' still mount a
- * funwithactivity.app.PlaceholderScreen_ instead of their real screen
- * components — goog.require'ing e.g. funwithactivity.sources.
- * SourcesComponent before it exists would fail PRUNE dependency
- * resolution and break the build for everyone until it lands. Replace
- * the remaining cases with the real components as that task lands; the
- * intended final shape (per the Task 4 brief) is:
- *
- *   case 'sources':
- *     return new funwithactivity.sources.SourcesComponent(this.router_);
- *   case 'add-source':
- *     return new funwithactivity.sources.AddSourceComponent(this.router_);
- *   case 'profile':
- *     return new funwithactivity.profile.ProfileComponent(this.state_);
- *   default:
- *     return new funwithactivity.recs.RecsComponent(this.state_);
- *
+ * Screen construction is a switch on the route token, plus a prefix check
+ * for source detail routes (`sources/<name>` — see Router.normalize,
+ * which is what produces that token shape from `/sources/<name>`).
  * @param {string} route
  * @return {!goog.ui.Component}
  * @private
  */
 funwithactivity.app.Shell.prototype.createScreen_ = function(route) {
+  if (route.indexOf('sources/') === 0) {
+    const name = route.substring('sources/'.length);
+    return new funwithactivity.sources.SourceDetailComponent(name);
+  }
   switch (route) {
     case 'sources':
-      return new funwithactivity.app.PlaceholderScreen_('Sources',
-          'Task 7 mounts funwithactivity.sources.SourcesComponent here.');
+      return new funwithactivity.sources.SourcesComponent(
+          this.state_, this.router_);
     case 'add-source':
-      return new funwithactivity.app.PlaceholderScreen_('Add Source',
-          'Task 7 mounts funwithactivity.sources.AddSourceComponent here.');
+      return new funwithactivity.sources.AddSourceComponent(this.router_);
     case 'profile':
       return new funwithactivity.profile.ProfileComponent(this.state_);
     default:
@@ -207,17 +235,27 @@ funwithactivity.app.Shell.prototype.createScreen_ = function(route) {
 
 
 /**
+ * Selects the tab that corresponds to `route`, including the two route
+ * shapes that have no tab of their own: 'add-source' (reached from the
+ * Sources screen's `+` button) and any `sources/<name>` detail route
+ * (reached by drilling into a row) both keep the Sources tab highlighted,
+ * since both are conceptually "still in Sources".
+ *
+ * goog.ui.Control#setSelected (which TabBar#setSelectedTab calls
+ * internally) already no-ops when the target is already selected, so
+ * calling this on every route change — even ones that didn't touch tab
+ * selection — is safe and never dispatches a redundant SELECT.
  * @param {string} route
  * @private
  */
 funwithactivity.app.Shell.prototype.markActiveTab_ = function(route) {
-  const activeId = funwithactivity.app.Shell.TAB_ID_BY_ROUTE_[route] ||
-      'tab-recs';
-  const tabs = goog.dom.getElementsByClass('fwa-tab');
-  for (let i = 0; i < tabs.length; i++) {
-    goog.dom.classlist.enable(
-        tabs[i], 'fwa-tab-active', tabs[i].id == activeId);
+  if (!this.tabBar_) return;
+  let activeRoute = route;
+  if (route === 'add-source' || route.indexOf('sources/') === 0) {
+    activeRoute = 'sources';
   }
+  const tab = this.tabsByRoute_[activeRoute] || this.tabsByRoute_['recs'];
+  if (tab) this.tabBar_.setSelectedTab(tab);
 };
 
 
@@ -227,53 +265,19 @@ funwithactivity.app.Shell.prototype.disposeInternal = function() {
     goog.events.unlistenByKey(this.routeChangedKey_);
     this.routeChangedKey_ = null;
   }
-  if (this.tabClickKey_) {
-    goog.events.unlistenByKey(this.tabClickKey_);
-    this.tabClickKey_ = null;
+  if (this.tabActionKey_) {
+    goog.events.unlistenByKey(this.tabActionKey_);
+    this.tabActionKey_ = null;
   }
+  if (this.tabBar_) {
+    // Disposes every goog.ui.Tab added via addChild() in buildTabBar_ too.
+    this.tabBar_.dispose();
+    this.tabBar_ = null;
+  }
+  this.tabsByRoute_ = {};
   if (this.currentScreen_) {
     this.currentScreen_.dispose();
     this.currentScreen_ = null;
   }
   funwithactivity.app.Shell.base(this, 'disposeInternal');
-};
-
-
-/**
- * Temporary stand-in for the real screen components Tasks 5-7 have not
- * built yet (see the doc on createScreen_ above). Renders a labeled block
- * into the mount element so each route is visibly, distinguishably
- * reachable during Task 4's own browser verification — a permanently blank
- * `#screen` would make it impossible to tell "routing works, screen is
- * unbuilt" apart from "routing is broken".
- *
- * Delete this class, and every createScreen_ case that constructs it, once
- * the real components exist.
- * @param {string} title
- * @param {string} note
- * @constructor
- * @extends {goog.ui.Component}
- * @private
- */
-funwithactivity.app.PlaceholderScreen_ = function(title, note) {
-  funwithactivity.app.PlaceholderScreen_.base(this, 'constructor');
-
-  /** @private @const {string} */
-  this.title_ = title;
-
-  /** @private @const {string} */
-  this.note_ = note;
-};
-goog.inherits(funwithactivity.app.PlaceholderScreen_, goog.ui.Component);
-
-
-/** @override */
-funwithactivity.app.PlaceholderScreen_.prototype.createDom = function() {
-  const heading = goog.dom.createDom(
-      goog.dom.TagName.H2, null, this.title_);
-  const note = goog.dom.createDom(
-      goog.dom.TagName.P, {'class': 'fwa-placeholder-note'}, this.note_);
-  this.setElementInternal(goog.dom.createDom(
-      goog.dom.TagName.DIV, {'class': 'fwa-screen-placeholder'},
-      heading, note));
 };

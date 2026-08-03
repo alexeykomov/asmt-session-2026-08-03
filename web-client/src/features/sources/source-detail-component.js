@@ -1,0 +1,134 @@
+goog.provide('funwithactivity.sources.SourceDetailComponent');
+
+goog.require('funwithactivity.app.LastStatuses');
+goog.require('funwithactivity.components.sourceDetailScreen');
+goog.require('funwithactivity.dto.ProviderStatus');
+goog.require('funwithactivity.features.recommendations.classify');
+goog.require('funwithactivity.render');
+goog.require('goog.dom');
+goog.require('goog.dom.TagName');
+goog.require('goog.ui.Component');
+
+
+/**
+ * Read-only detail screen for one source (`/sources/<name>`), styled with
+ * the same settings-group inset markup and CSS as
+ * funwithactivity.profile.ProfileComponent — see
+ * ui-soy/components/source-detail-screen.soy, which reuses the profile
+ * screen's `.settings-*` classes directly rather than inventing a second
+ * style.
+ *
+ * Reads its data from funwithactivity.app.LastStatuses rather than
+ * fetching: this screen exists to explain a status the presenter is
+ * already looking at (typically drilled into from the Sources list), not
+ * to trigger a fresh vendor call of its own. If the cache has never been
+ * populated this session (e.g. a deep link straight to /sources/<name>
+ * with no prior fetch), it says so plainly rather than showing an empty
+ * or misleading status.
+ *
+ * Every source in this proof of concept is read-only — see
+ * funwithactivity.sources.AddSourceComponent for why nothing can actually
+ * be added at runtime — so this component never wires up any control;
+ * the template renders plain label/value rows plus an explanatory
+ * footer.
+ * @param {string} name
+ * @constructor
+ * @extends {goog.ui.Component}
+ */
+funwithactivity.sources.SourceDetailComponent = function(name) {
+  funwithactivity.sources.SourceDetailComponent.base(this, 'constructor');
+
+  /** @private @const {string} */
+  this.name_ = name;
+};
+goog.inherits(
+    funwithactivity.sources.SourceDetailComponent, goog.ui.Component);
+
+
+/** @override */
+funwithactivity.sources.SourceDetailComponent.prototype.createDom =
+    function() {
+  const status = funwithactivity.app.LastStatuses.find(this.name_);
+  const viewModel = funwithactivity.sources.SourceDetailComponent
+      .buildViewModel_(this.name_, status);
+
+  const el = goog.dom.createDom(
+      goog.dom.TagName.DIV, {'class': 'fwa-screen-source-detail'});
+  this.setElementInternal(el);
+  funwithactivity.render.element(
+      el, funwithactivity.components.sourceDetailScreen.screen,
+      {source: viewModel});
+};
+
+
+/**
+ * Both built-in providers speak the same shared Lambda+FastAPI REST
+ * envelope (app-server/internal/providers/envelope.go) — there is no wire
+ * field that would tell the client this, so it is a fact about this
+ * deployment, stated here rather than derived from data that doesn't
+ * exist on the wire.
+ * @const {string}
+ * @private
+ */
+funwithactivity.sources.SourceDetailComponent.TYPE_ = 'REST';
+
+
+/**
+ * The real vendor URL (app-server's PROVIDER1_URL/PROVIDER2_URL) is never
+ * sent to the client on any existing endpoint — the wire contract is
+ * fixed for Phase 1 and this task adds no new one — so this screen cannot
+ * show it even though "Base URL" is asked for in CONFIGURATION. Showing a
+ * literal endpoint here would either be a lie (this client doesn't know
+ * it) or a leak (of an infrastructure detail this repo's own sensitivity
+ * audit already flagged as remotely sensitive for a similar case). Saying
+ * so plainly is both accurate and the same read-only story the footer
+ * below tells.
+ * @const {string}
+ * @private
+ */
+funwithactivity.sources.SourceDetailComponent.BASE_URL_NOTE_ =
+    'Configured at deployment time — not exposed to the client.';
+
+
+/**
+ * @param {string} name
+ * @param {?funwithactivity.dto.ProviderStatus} status
+ * @return {{name: string, type: string, baseUrl: string,
+ *           statusClass: string, statusLabel: string,
+ *           latencyDisplay: string, errorText: string}}
+ * @private
+ */
+funwithactivity.sources.SourceDetailComponent.buildViewModel_ = function(
+    name, status) {
+  const Detail = funwithactivity.sources.SourceDetailComponent;
+  if (!status) {
+    return {
+      name: name,
+      type: Detail.TYPE_,
+      baseUrl: Detail.BASE_URL_NOTE_,
+      statusClass: 'unknown',
+      statusLabel: 'no data',
+      latencyDisplay: '—',
+      errorText: 'No status reported yet this session — visit ' +
+          'Recommendations or Sources to fetch one.',
+    };
+  }
+
+  const classification =
+      funwithactivity.features.recommendations.classify(status);
+  return {
+    name: status.name,
+    type: Detail.TYPE_,
+    baseUrl: Detail.BASE_URL_NOTE_,
+    statusClass: classification,
+    statusLabel: classification,
+    // Latency renders '—' when zero, not '0 ms' — matches the Sources
+    // list's own rule (stub providers return in microseconds, which
+    // truncates to zero).
+    latencyDisplay: status.latencyMs ? (status.latencyMs + ' ms') : '—',
+    // Unlike the list, the detail screen's STATUS section shows the FULL,
+    // unredacted error text — this is where an operator needs it. See
+    // funwithactivity.features.recommendations.shortReason's doc.
+    errorText: status.error || '—',
+  };
+};

@@ -15,4 +15,15 @@ describe('Router.normalize', () => {
   it('tolerates a trailing slash', () => assert.equal(normalize('/profile/'), 'profile'));
   it('falls back to recs for an unknown path', () => assert.equal(normalize('/nope'), 'recs'));
   it('falls back to recs for the empty string', () => assert.equal(normalize(''), 'recs'));
+
+  it('maps /sources/service1 to sources/service1', () =>
+      assert.equal(normalize('/sources/service1'), 'sources/service1'));
+  it('maps /sources/service2-stub to sources/service2-stub', () =>
+      assert.equal(normalize('/sources/service2-stub'), 'sources/service2-stub'));
+  it('tolerates a trailing slash on a source detail path', () =>
+      assert.equal(normalize('/sources/service1/'), 'sources/service1'));
+  it('still maps /sources/add to add-source, not a source named "add"', () =>
+      assert.equal(normalize('/sources/add'), 'add-source'));
+  it('falls back to recs for a source detail path with an extra segment', () =>
+      assert.equal(normalize('/sources/service1/extra'), 'recs'));
 });

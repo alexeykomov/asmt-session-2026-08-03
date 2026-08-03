@@ -7,6 +7,7 @@
  */
 
 goog.provide('funwithactivity.features.recommendations.classify');
+goog.provide('funwithactivity.features.recommendations.shortReason');
 
 goog.require('funwithactivity.dto.ProviderStatus');
 
@@ -27,4 +28,39 @@ funwithactivity.features.recommendations.classify = function(status) {
   if (status.ok) return 'ok';
   if (status.skipped) return 'skipped';
   return 'degraded';
+};
+
+
+/**
+ * A short, presenter-safe reason for a non-ok provider status — for the
+ * Sources LIST, which must never print `status.error` verbatim: a real
+ * provider failure's `error` field is the raw text
+ * `%s: [%d] %s (%s)`-formatted server-side (app-server/internal/domain/
+ * errors.go), and for a genuine timeout that raw text embeds the full
+ * vendor URL (e.g. `service1: [0] Post "https://…lambda-url…": context
+ * deadline exceeded (transient)`) — exactly what got projected during a
+ * prior presentation and must not happen again. The full text still
+ * belongs on the Source detail screen's STATUS section, where an operator
+ * needs it; see funwithactivity.sources.SourceDetailComponent.
+ *
+ * Calls classify() rather than re-deriving skipped-vs-degraded — that
+ * branch has exactly one implementation in this project, by design.
+ * @param {!funwithactivity.dto.ProviderStatus} status
+ * @return {string} '' for ok (nothing to explain); otherwise a short
+ *     phrase such as 'timed out', 'unavailable', or
+ *     'skipped — no birth date'.
+ */
+funwithactivity.features.recommendations.shortReason = function(status) {
+  const classification =
+      funwithactivity.features.recommendations.classify(status);
+  if (classification === 'ok') return '';
+  if (classification === 'skipped') return 'skipped — no birth date';
+  // 'degraded': never surface status.error itself here — see the fileoverview
+  // note above. `faults.ModeTimeout` (app-server/internal/providers/
+  // fault.go) returns ctx.Err() verbatim ("context deadline exceeded"), and
+  // a genuinely slow real vendor call fails the same way once the
+  // aggregator's per-provider context.WithTimeout fires, so this phrase
+  // check is deliberately on the *message text*, not a status code the wire
+  // doesn't carry.
+  return /deadline exceeded/i.test(status.error) ? 'timed out' : 'unavailable';
 };
