@@ -26,4 +26,21 @@ describe('Router.normalize', () => {
       assert.equal(normalize('/sources/add'), 'add-source'));
   it('falls back to recs for a source detail path with an extra segment', () =>
       assert.equal(normalize('/sources/service1/extra'), 'recs'));
+
+  // Recommendation detail. Unlike a provider name, a title is vendor prose,
+  // so these cases are about punctuation and encoding surviving the trip.
+  it('maps /recs/<title> to recs/<title>', () =>
+      assert.equal(normalize('/recs/Exercise%20often'), 'recs/Exercise often'));
+  it('decodes punctuation in a title', () =>
+      assert.equal(normalize('/recs/Don\'t%20eat%20carbs!'),
+          'recs/Don\'t eat carbs!'));
+  it('decodes a comma in a title without splitting it', () =>
+      assert.equal(normalize('/recs/Walk%2C%20then%20rest'),
+          'recs/Walk, then rest'));
+  it('tolerates a trailing slash on a rec detail path', () =>
+      assert.equal(normalize('/recs/Exercise%20often/'), 'recs/Exercise often'));
+  it('still maps bare /recs to the list, not a detail screen', () =>
+      assert.equal(normalize('/recs'), 'recs'));
+  it('falls back to recs for a rec detail path with an extra segment', () =>
+      assert.equal(normalize('/recs/a/b'), 'recs'));
 });

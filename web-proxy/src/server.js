@@ -90,6 +90,17 @@ function buildApp({ getRecommendations }) {
     res.sendFile(path.join(__dirname, '..', '..', 'web-client', 'public', 'index.html'));
   });
 
+  // Recommendation detail lives at /recs/<title>, same deep-link reasoning
+  // as source detail above. The pattern is deliberately looser than the
+  // source one: a provider name is a registry key, but a title is vendor
+  // prose — "Don't eat carbs!" — so it arrives percent-encoded and can
+  // contain spaces, punctuation and non-ASCII. `[^/]+` still refuses a
+  // second path segment, so this stays an explicit route rather than the
+  // catch-all the comment above argues against.
+  app.get(/^\/recs\/[^/]+$/, (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'web-client', 'public', 'index.html'));
+  });
+
   // express.json() throws a SyntaxError on an unparseable body. Without this
   // handler that falls through to Express's default error handler, which —
   // absent NODE_ENV=production — includes the stack trace in the response

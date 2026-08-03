@@ -1,0 +1,76 @@
+{namespace funwithactivity.components.recDetailScreen}
+
+/**
+ * Recommendation detail screen (`/recs/<title>`): the shared screen header
+ * plus RECOMMENDATION, PROVENANCE and RANKING, each rendered through
+ * funwithactivity.components.screenSection.section — the same shared
+ * group/header template every other detail screen uses, so this screen
+ * inherits the settings-inset look rather than inventing a third one.
+ *
+ * Every row is read-only and carries no disclosure chevron: nothing on
+ * this screen navigates anywhere, matching source-detail-screen.soy's
+ * rule that a chevron means "this row goes somewhere".
+ *
+ * PROVENANCE is the point of the screen. The list row can only show the
+ * joined `source` string ("service1, service2"); here each contributing
+ * provider gets its own row carrying the status and latency it reported
+ * on the fetch that produced this recommendation, which is what makes the
+ * merge legible rather than implied.
+ *
+ * RANKING deliberately shows the final score only. The raw and normalised
+ * scores stay server-side — api/proto/recommendations.proto reserves those
+ * field numbers precisely so the ranker's internals never become wire
+ * contract — so this template states that rather than leaving a reader to
+ * wonder why the arithmetic is not shown.
+ */
+{template .screen}
+  {@param rec: ?}
+  <section class="rec-detail-section">
+    {call funwithactivity.components.screenHeader.header}
+      {param title: $rec.title /}
+    {/call}
+
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Recommendation' /}
+      {param content kind="html"}
+        <div class="settings-row settings-row-stacked">
+          <span class="settings-label">Details</span>
+          <span class="settings-value rec-detail-details">{$rec.detailsDisplay}</span>
+        </div>
+      {/param}
+    {/call}
+
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Provenance' /}
+      {param content kind="html"}
+        {foreach $p in $rec.providers}
+          <div class="settings-row">
+            <span class="settings-label">{$p.name}</span>
+            <span class="status-pill status-pill-{$p.statusClass}">{$p.statusLabel}</span>
+            <span class="settings-value settings-value-muted">{$p.latencyDisplay}</span>
+          </div>
+        {ifempty}
+          <div class="settings-row">
+            <span class="settings-value settings-value-muted">{$rec.provenanceUnknown}</span>
+          </div>
+        {/foreach}
+        <p class="rec-detail-note">{$rec.provenanceNote}</p>
+      {/param}
+    {/call}
+
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Ranking' /}
+      {param content kind="html"}
+        <div class="settings-row">
+          <span class="settings-label">Final score</span>
+          <span class="settings-value">{$rec.scoreDisplay}</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Rank</span>
+          <span class="settings-value">{$rec.rankDisplay}</span>
+        </div>
+        <p class="rec-detail-note">{$rec.rankingNote}</p>
+      {/param}
+    {/call}
+  </section>
+{/template}

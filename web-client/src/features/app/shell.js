@@ -4,6 +4,7 @@ goog.require('funwithactivity.app.AppState');
 goog.require('funwithactivity.app.Router');
 goog.require('funwithactivity.pages.shell');
 goog.require('funwithactivity.profile.ProfileComponent');
+goog.require('funwithactivity.recs.RecDetailComponent');
 goog.require('funwithactivity.recs.RecsComponent');
 goog.require('funwithactivity.render');
 goog.require('funwithactivity.sources.AddSourceComponent');
@@ -220,6 +221,10 @@ funwithactivity.app.Shell.prototype.createScreen_ = function(route) {
     const name = route.substring('sources/'.length);
     return new funwithactivity.sources.SourceDetailComponent(name);
   }
+  if (route.indexOf('recs/') === 0) {
+    const title = route.substring('recs/'.length);
+    return new funwithactivity.recs.RecDetailComponent(title);
+  }
   switch (route) {
     case 'sources':
       return new funwithactivity.sources.SourcesComponent(
@@ -229,7 +234,7 @@ funwithactivity.app.Shell.prototype.createScreen_ = function(route) {
     case 'profile':
       return new funwithactivity.profile.ProfileComponent(this.state_);
     default:
-      return new funwithactivity.recs.RecsComponent(this.state_);
+      return new funwithactivity.recs.RecsComponent(this.state_, this.router_);
   }
 };
 
@@ -253,6 +258,8 @@ funwithactivity.app.Shell.prototype.markActiveTab_ = function(route) {
   let activeRoute = route;
   if (route === 'add-source' || route.indexOf('sources/') === 0) {
     activeRoute = 'sources';
+  } else if (route.indexOf('recs/') === 0) {
+    activeRoute = 'recs';
   }
   const tab = this.tabsByRoute_[activeRoute] || this.tabsByRoute_['recs'];
   if (tab) this.tabBar_.setSelectedTab(tab);

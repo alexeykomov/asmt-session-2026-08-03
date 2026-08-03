@@ -3,6 +3,7 @@ goog.provide('funwithactivity.recs.bannerMessages');
 goog.provide('funwithactivity.recs.shouldFetch');
 
 goog.require('funwithactivity.app.AppState');
+goog.require('funwithactivity.app.LastRecommendations');
 goog.require('funwithactivity.app.LastStatuses');
 goog.require('funwithactivity.components.recommendationsTable');
 goog.require('funwithactivity.components.recsScreen');
@@ -13,6 +14,7 @@ goog.require('funwithactivity.features.recommendations.api');
 goog.require('funwithactivity.features.recommendations.classify');
 goog.require('funwithactivity.render');
 goog.require('goog.dom');
+goog.require('goog.dom.classlist');
 goog.require('goog.dom.TagName');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
@@ -48,11 +50,17 @@ funwithactivity.recs.shouldFetch = function(hasFetched, isDirty) {
  * @constructor
  * @extends {goog.ui.Component}
  */
-funwithactivity.recs.RecsComponent = function(state) {
+funwithactivity.recs.RecsComponent = function(state, router) {
   funwithactivity.recs.RecsComponent.base(this, 'constructor');
 
   /** @private @const {!funwithactivity.app.AppState} */
   this.state_ = state;
+
+  /** @private @const {!funwithactivity.app.Router} */
+  this.router_ = router;
+
+  /** @private {?goog.events.Key} */
+  this.rowClickKey_ = null;
 
   /**
    * The goog.ui.TableSorter currently decorating the results table, or
@@ -126,12 +134,45 @@ funwithactivity.recs.RecsComponent.prototype.enterDocument = function() {
         goog.events.EventType.CLICK, this.handleRefreshClick_, false, this);
   }
 
+  // Row clicks are intercepted and routed in-app rather than left to the
+  // browser. Letting the anchor navigate normally would work — web-proxy
+  // serves index.html for /recs/<title> — but it is a full page load, and
+  // funwithactivity.app.LastRecommendations is in-memory, so the detail
+  // screen would come up having forgotten the very response it exists to
+  // explain. Delegated from the mount rather than bound per row because
+  // renderTable_ replaces the whole table on every fetch.
+  const mount = goog.dom.getElement('recs-table-mount');
+  if (mount) {
+    this.rowClickKey_ = goog.events.listen(mount,
+        goog.events.EventType.CLICK, this.handleRowClick_, false, this);
+  }
+
   // Also (re)builds the table/sorter for whatever is currently in the DOM
   // (the empty-state table from recs-screen.soy) so a header click never
   // fires against an undecorated table even before the first fetch lands.
   this.attachTableSorter_();
 
   this.maybeFetch_(false);
+};
+
+
+/**
+ * Mirrors funwithactivity.sources.SourcesComponent.prototype.handleRowClick_:
+ * the row's title cell is a plain anchor, not a goog.ui control, so the
+ * click is caught by delegation and handed to the router.
+ * @param {!goog.events.BrowserEvent} e
+ * @private
+ */
+funwithactivity.recs.RecsComponent.prototype.handleRowClick_ = function(e) {
+  const anchor = goog.dom.getAncestor(/** @type {?Node} */ (e.target),
+      function(node) {
+        return node.nodeType == 1 &&
+            goog.dom.classlist.contains(/** @type {!Element} */ (node),
+                'recs-title-link');
+      }, true);
+  if (!anchor) return;
+  e.preventDefault();
+  this.router_.go(anchor.getAttribute('href'));
 };
 
 
@@ -243,6 +284,9 @@ funwithactivity.recs.RecsComponent.prototype.renderSuccess_ = function(
   // LastStatuses) so they can show "the most recent response's statuses[]"
   // without spending a second vendor call for data this fetch already has.
   funwithactivity.app.LastStatuses.set(response.statuses);
+  // Published for the detail screen (RecDetailComponent), which explains a
+  // row rather than re-fetching it — see LastRecommendations' fileoverview.
+  funwithactivity.app.LastRecommendations.set(response.recommendations);
   this.renderTable_(response.recommendations);
   this.renderBanner_(response.statuses, response.recommendations.length > 0);
 };
@@ -342,6 +386,10 @@ funwithactivity.recs.RecsComponent.withFormattedScore_ = function(r) {
     details: r.details,
     source: r.source,
     scoreDisplay: Number(r.score).toFixed(2),
+    // Drill-down target. Encoded because a title is vendor prose, not an
+    // identifier: "Don't eat carbs!" carries an apostrophe, punctuation
+    // and spaces, and would otherwise not survive the round trip.
+    href: '/recs/' + encodeURIComponent(r.title),
   };
 };
 
@@ -466,6 +514,10 @@ funwithactivity.recs.RecsComponent.prototype.disposeInternal = function() {
   if (this.refreshKey_) {
     goog.events.unlistenByKey(this.refreshKey_);
     this.refreshKey_ = null;
+  }
+  if (this.rowClickKey_) {
+    goog.events.unlistenByKey(this.rowClickKey_);
+    this.rowClickKey_ = null;
   }
   if (this.tableSorter_) {
     this.tableSorter_.dispose();

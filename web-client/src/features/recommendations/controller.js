@@ -370,6 +370,7 @@ funwithactivity.features.recommendations.Controller.withFormattedScore_ =
     details: r.details,
     source: r.source,
     scoreDisplay: Number(r.score).toFixed(2),
+    href: '/recs/' + encodeURIComponent(r.title),
   };
 };
 

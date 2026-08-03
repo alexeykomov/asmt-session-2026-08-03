@@ -48,6 +48,22 @@ funwithactivity.app.Router.SOURCE_DETAIL_RE_ = /^\/sources\/([^/]+)$/;
 
 
 /**
+ * Matches `/recs/<title>` — the recommendation detail route. Same
+ * single-segment rule as SOURCE_DETAIL_RE_: `/recs/a/b` is not a detail
+ * route and falls through to the 'recs' default rather than truncating.
+ *
+ * The key is the recommendation's title, URL-encoded. Titles are safe as
+ * keys because the server deduplicates by exact title before ranking
+ * (app-server/internal/ranking/dedupe.go), so a title identifies exactly
+ * one row of a response — and unlike a list index, a title still refers to
+ * the same recommendation after goog.ui.TableSorter re-sorts the table.
+ * @const {!RegExp}
+ * @private
+ */
+funwithactivity.app.Router.REC_DETAIL_RE_ = /^\/recs\/([^/]+)$/;
+
+
+/**
  * Maps a URL path to a route token. Unknown paths fall back to 'recs'
  * rather than rendering nothing — a blank screen on a typo'd deep link is
  * worse than a sensible default.
@@ -72,6 +88,11 @@ funwithactivity.app.Router.normalize = function(path) {
       if (match) {
         const name = decodeURIComponent(match[1]);
         if (name) return 'sources/' + name;
+      }
+      const recMatch = funwithactivity.app.Router.REC_DETAIL_RE_.exec(clean);
+      if (recMatch) {
+        const title = decodeURIComponent(recMatch[1]);
+        if (title) return 'recs/' + title;
       }
       return 'recs';
     }

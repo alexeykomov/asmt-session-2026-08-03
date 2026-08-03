@@ -841,3 +841,65 @@ main {
   font-size: 0.9rem;
   line-height: 1.6;
 }
+
+/* --- Recommendation detail drill-down (/recs/<title>) --- */
+
+/*
+ * The Recommendation cell is a link into the detail screen. The chevron is
+ * generated content rather than markup: goog.ui.TableSorter's alphaSort
+ * compares cell textContent, and generated content is excluded from it, so
+ * the affordance cannot leak into the sort key. See the doc on
+ * ui-soy/components/recommendations-table.soy.
+ */
+.recs-title-link {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.recs-title-link::after {
+  content: '\203A';
+  color: var(--color-muted);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.recs-title-link:hover {
+  text-decoration: underline;
+}
+
+.recs-title-link:hover::after {
+  color: var(--color-text);
+}
+
+/*
+ * Details text is vendor prose that runs to a full sentence, so its row
+ * stacks label above value instead of holding both on one line like every
+ * other settings row.
+ */
+.settings-row-stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.rec-detail-details {
+  text-align: left;
+  white-space: normal;
+  line-height: 1.45;
+}
+
+/*
+ * Explanatory footnote under a section's rows — the provenance and ranking
+ * notes. Sits inside the inset group, so it takes the row padding rather
+ * than the container's.
+ */
+.rec-detail-note {
+  margin: 0.65rem 0 0;
+  padding: 0 1rem 0.15rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}

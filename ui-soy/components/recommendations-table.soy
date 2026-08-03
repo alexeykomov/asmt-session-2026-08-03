@@ -17,6 +17,14 @@
  * Source and Score is styling only — a visual affordance so a user can
  * tell those headers are clickable — Details has no such class since it
  * is explicitly configured unsortable (goog.ui.TableSorter.noSort).
+ *
+ * The Recommendation cell wraps its text in an anchor to `$r.href`
+ * (`/recs/<title>`), which is what makes each row drillable. The
+ * disclosure chevron is drawn by CSS (`.recs-title-link::after`) rather
+ * than emitted here on purpose: goog.ui.TableSorter's alphaSort compares
+ * cell text content, so a chevron in the markup would become part of the
+ * sort key. CSS generated content is invisible to textContent, so sorting
+ * still compares exactly the title.
  */
 {template .table}
   {@param recommendations: list<?>}
@@ -32,7 +40,7 @@
     <tbody>
       {foreach $r in $recommendations}
         <tr>
-          <td class="recs-title">{$r.title}</td>
+          <td class="recs-title"><a class="recs-title-link" href="{$r.href}">{$r.title}</a></td>
           <td class="recs-details">{$r.details ?: '—'}</td>
           <td class="recs-source">{$r.source}</td>
           <td class="recs-score">{$r.scoreDisplay}</td>
