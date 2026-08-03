@@ -127,20 +127,20 @@ flowchart TD
     Seam1["Seam 1: Recommendation provider<br/>Provider interface + registry"]
     Seam2["Seam 2: Device / sensor<br/>DeviceAdapter + capability registry"]
     Seam3["Seam 3: Partner / reseller<br/>Public integration API"]
-    Seam4["Seam 4: Client app<br/>Public API surface"]
-    Seam5["Seam 5: Internal service<br/>Proto contract"]
+    Seam4["Seam 4: Client app<br/>same proto — frozen by shipped binaries"]
+    Seam5["Seam 5: Internal service<br/>same proto — changeable in lockstep"]
 
     New1["+ new provider<br/>e.g. service3"]:::new
     New2["+ new device<br/>e.g. Garmin OAuth adapter"]:::new
     New3["+ new partner<br/>e.g. gym chain"]:::new
-    New4["+ new client<br/>e.g. tvOS"]:::new
+    New4["+ new client<br/>e.g. tvOS — zero core change"]:::new
     New5["+ new internal service<br/>e.g. billing"]:::new
 
     Seam1 -- "HTTP/JSON (vendor's choice)" --> Core
     Seam2 -- "HealthKit, Health Connect, BLE GATT, OAuth" --> Core
     Seam3 -- "REST + OpenAPI + webhooks" --> Core
-    Seam4 -- "gRPC (native); REST facade (browsers)" --> Core
-    Seam5 -- "gRPC (proto contract)" --> Core
+    Seam4 -- "gRPC + proto (native)<br/>REST facade (browsers)<br/>append-only, never breakable" --> Core
+    Seam5 -- "gRPC + proto<br/>breaking change = coordinated release" --> Core
 
     New1 -.-> Seam1
     New2 -.-> Seam2
@@ -154,6 +154,19 @@ flowchart TD
 The brief names only seams 1 (providers) and 2 (devices) explicitly. Seam 3
 (resellers/gyms) is directly implied by the "expanding aggressively" language.
 Seams 4 and 5 are the ones a generic vendor deck tends to miss entirely.
+
+**Seams 4 and 5 share a mechanism and differ on a constraint.** A tvOS client
+would generate from `recommendations.proto` exactly as iOS does — same service,
+same methods, no server change at all. That is the seam working, not a gap in
+it. What separates the two is not transport but **who can break whom**. Seam 4
+faces binaries we no longer control once they ship: an iOS build from six months
+ago is still calling us and cannot be recalled, so that contract is append-only
+forever — enforced here by `Fields` slot discipline and by holding the wire
+byte-identical across 1.1.0 and 1.2.0 so existing mobile binaries keep working.
+Seam 5 faces services we deploy ourselves, where a breaking proto change is a
+coordinated release rather than a field incident. Same file, two different
+freedoms. Browsers are the one place seam 4 also differs mechanically: they get
+the REST facade, because gRPC-web would buy nothing over it here.
 
 ---
 
