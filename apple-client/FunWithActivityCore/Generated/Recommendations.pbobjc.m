@@ -269,12 +269,14 @@ typedef struct Recommendation__storage_ {
 @dynamic error;
 @dynamic count;
 @dynamic latencyMs;
+@dynamic baseURL;
 
 typedef struct ProviderStatus__storage_ {
   uint32_t _has_storage_[1];
   int32_t count;
   NSString *name;
   NSString *error;
+  NSString *baseURL;
   int64_t latencyMs;
 } ProviderStatus__storage_;
 
@@ -338,6 +340,15 @@ typedef struct ProviderStatus__storage_ {
         .flags = GPBFieldClearHasIvarOnZero,
         .dataType = GPBDataTypeInt64,
       },
+      {
+        .name = "baseURL",
+        .dataTypeSpecific.clazz = Nil,
+        .number = ProviderStatus_FieldNumber_BaseURL,
+        .hasIndex = 8,
+        .offset = (uint32_t)offsetof(ProviderStatus__storage_, baseURL),
+        .flags = (GPBFieldFlags)(GPBFieldTextFormatNameCustom | GPBFieldClearHasIvarOnZero),
+        .dataType = GPBDataTypeString,
+      },
     };
     GPBDescriptor *localDescriptor =
         [GPBDescriptor allocDescriptorForClass:GPBObjCClass(ProviderStatus)
@@ -348,6 +359,11 @@ typedef struct ProviderStatus__storage_ {
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(ProviderStatus__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
+    #if !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
+      static const char *extraTextFormatInfo =
+        "\001\007\004\241!!\000";
+      [localDescriptor setupExtraTextInfo:extraTextFormatInfo];
+    #endif  // !GPBOBJC_SKIP_MESSAGE_TEXTFORMAT_EXTRAS
     #if defined(DEBUG) && DEBUG
       NSAssert(descriptor == nil, @"Startup recursed!");
     #endif  // DEBUG

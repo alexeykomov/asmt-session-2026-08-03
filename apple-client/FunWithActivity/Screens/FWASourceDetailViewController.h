@@ -13,17 +13,17 @@
 //     only ever reaches this screen for one of the two built-in providers,
 //     so it is always rendered read-only: plain, non-editable rows plus a
 //     footer explaining that built-in sources are configured at deployment
-//     time and cannot be edited in the app. Type and base URL are NOT on
-//     the wire — ProviderStatus carries only name/ok/skipped/error/count/
-//     latencyMs (see Recommendations.pbobjc.h), and adding a wire field is
-//     out of scope. `type` ("REST") is a genuine, known property of the
-//     built-in adapters. `baseURL` is deliberately NOT a real or
-//     invented-looking address — a mobile binary is an artifact a customer
-//     can extract (see docs/mobile/fault-injection-decision.md for the same
-//     reasoning applied to fault injection), so it renders the honest fact
-//     instead: "Not exposed to clients" (see FWASourceConfig). Neither
-//     value is parsed out of `error`, which only happens to carry a URL on
-//     some failures and would leave this section blank for a healthy
+//     time and cannot be edited in the app. `type` ("REST") is a genuine,
+//     known property of the built-in adapters that is NOT on the wire and
+//     stays static text. `baseURL` IS on the wire as of
+//     ProviderStatus.baseURL (field 7, base_url in recommendations.proto —
+//     see Recommendations.pbobjc.h) — the provider's real configured
+//     endpoint, populated server-side from PROVIDER1_URL/PROVIDER2_URL. A
+//     server predating this field, or a provider with nothing configured,
+//     yields an empty string; that renders as the honest "Not exposed to
+//     clients" placeholder (see FWASourceConfig), never a fabricated
+//     value. It is not parsed out of `error`, which only happens to carry
+//     a URL on some failures and would leave this row blank for a healthy
 //     provider.
 //   STATUS — status word, latency, and `error` verbatim — the FULL text,
 //     including any vendor URL it embeds. This is the one place in the app

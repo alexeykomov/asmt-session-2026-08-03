@@ -134,6 +134,7 @@ typedef GPB_ENUM(ProviderStatus_FieldNumber) {
   ProviderStatus_FieldNumber_Error = 4,
   ProviderStatus_FieldNumber_Count = 5,
   ProviderStatus_FieldNumber_LatencyMs = 6,
+  ProviderStatus_FieldNumber_BaseURL = 7,
 };
 
 GPB_FINAL @interface ProviderStatus : GPBMessage
@@ -150,6 +151,15 @@ GPB_FINAL @interface ProviderStatus : GPBMessage
 @property(nonatomic, readwrite) int32_t count;
 
 @property(nonatomic, readwrite) int64_t latencyMs;
+
+/**
+ * The provider's configured endpoint, for display only (e.g. Source
+ * detail's "Base URL" row). Additive: field 7, added after fields 1-6
+ * shipped. Old clients that do not know this field continue to work
+ * unchanged — that is the whole point of appending rather than
+ * reshaping this message the day before a presentation.
+ **/
+@property(nonatomic, readwrite, copy, null_resettable) NSString *baseURL;
 
 @end
 

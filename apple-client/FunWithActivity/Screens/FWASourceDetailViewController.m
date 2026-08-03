@@ -34,23 +34,16 @@ static NSString *const kWrappingCellID = @"SourceDetailWrappingCell";
 
 #pragma mark - FWASourceConfig
 
-// Client-side, deployment-time-known configuration for a source. NOT on the
-// wire — ProviderStatus carries only name/ok/skipped/error/count/latencyMs
-// (Recommendations.pbobjc.h) — there is no baseURL field, and adding one is
-// out of scope (the wire contract is frozen for this release).
+// Client-side, deployment-time-known configuration for a source. `baseURL`
+// is NOT here: it used to be a client-side fabrication (or a fixed "not
+// exposed" string) precisely because ProviderStatus carried no such field.
+// As of recommendations.proto field 7 (base_url), the real endpoint IS on
+// the wire — see FWABaseURLDisplayValue below — so this type now only
+// holds the one property genuinely unknown to the wire.
 //
 // `type` is a genuine, known property of a built-in adapter (both vendors
 // are Lambda-fronted REST endpoints — see app-server's
 // providers/envelope.go) and is safe to state plainly.
-//
-// `baseURL` is deliberately NOT a fabricated address. A mobile binary is an
-// artifact a customer can extract, inspect, or side-load (see
-// docs/mobile/fault-injection-decision.md for the same reasoning applied to
-// fault injection) — shipping a real per-vendor endpoint inside one is a
-// liability with no benefit, and inventing a fake-looking one to fill the
-// row is worse: it reads as real configuration to anyone who doesn't know
-// better. The honest value is that provider endpoints are deployment
-// configuration the client was never told, and the footer says so.
 //
 // `editable` exists so a future user-added source (once
 // FWAAddSourceViewController's "not supported yet" stub becomes real) has
@@ -58,41 +51,49 @@ static NSString *const kWrappingCellID = @"SourceDetailWrappingCell";
 // editing UI exists.
 @interface FWASourceConfig : NSObject
 @property (nonatomic, copy, readonly) NSString *type;
-@property (nonatomic, copy, readonly) NSString *baseURL;
 @property (nonatomic, assign, readonly, getter=isEditable) BOOL editable;
-+ (instancetype)configWithType:(NSString *)type baseURL:(NSString *)baseURL editable:(BOOL)editable;
++ (instancetype)configWithType:(NSString *)type editable:(BOOL)editable;
 @end
 
 @implementation FWASourceConfig
 
-+ (instancetype)configWithType:(NSString *)type baseURL:(NSString *)baseURL editable:(BOOL)editable {
++ (instancetype)configWithType:(NSString *)type editable:(BOOL)editable {
     FWASourceConfig *config = [self new];
     config->_type = [type copy];
-    config->_baseURL = [baseURL copy];
     config->_editable = editable;
     return config;
 }
 
-// Both built-in providers, identically: real REST adapters, endpoint not
-// exposed to the client. Not name-keyed — unlike a fabricated per-vendor
-// URL, this fact does not vary between service1 and service2.
+// Both built-in providers, identically: real REST adapters. Not name-keyed
+// — this fact does not vary between service1 and service2.
 + (instancetype)builtInSourceConfig {
-    return [self configWithType:@"REST" baseURL:@"Not exposed to clients" editable:NO];
+    return [self configWithType:@"REST" editable:NO];
 }
 
 @end
 
+// The fallback text for an empty ProviderStatus.baseURL. A new field: a
+// server predating it, or a provider with nothing configured, yields "".
+// This is the one place that string is chosen — never fabricate a URL to
+// fill the row, which is exactly the invented data this feature replaced.
+static NSString *const kBaseURLNotExposedText = @"Not exposed to clients";
+
+static NSString *FWABaseURLDisplayValue(NSString *_Nullable baseURL) {
+    return baseURL.length > 0 ? baseURL : kBaseURLNotExposedText;
+}
+
 #pragma mark - FWACopyableWrappingCell
 
-// `error` genuinely can run long — a real vendor error can embed a full URL
-// (see FWASourcesViewController's header doc) — so Last error uses
-// UITableViewCellStyleSubtitle (label on top, full-width wrapping value
-// below, like Settings' Wi-Fi/IP address rows) rather than
+// `error` and the real `baseURL` both genuinely can run long — a real
+// vendor error can embed a full URL (see FWASourcesViewController's header
+// doc), and a real base URL is a full Lambda function URL — so Last error
+// and Base URL use UITableViewCellStyleSubtitle (label on top, full-width
+// wrapping value below, like Settings' Wi-Fi/IP address rows) rather than
 // UITableViewCellStyleValue1: Value1's side-by-side layout does not size
 // correctly with a multi-line detailTextLabel (its baked-in constraints
 // assume one line for both labels), so a wrapped value either clips or
-// overlaps the row below it. Name/Type/Base URL/Status/Latency stay plain
-// Value1 cells; they are short, single-line, and already correct.
+// overlaps the row below it. Name/Type/Status/Latency stay plain Value1
+// cells; they are short, single-line, and already correct.
 //
 // Long-press → Copy on the value, for an operator who wants it in the
 // clipboard rather than retyped.
@@ -230,10 +231,10 @@ static NSString *const kWrappingCellID = @"SourceDetailWrappingCell";
         // 1. The explicit "do not silently ignore taps" requirement: these
         //    rows are plain (no accessory, no selection) rather than
         //    looking like disabled controls, and this says why in words.
-        // 2. Explains the Base URL row's value: provider endpoints are
-        //    deployment configuration, deliberately never shipped to a
-        //    client binary — see FWASourceConfig's header doc.
-        return @"Built-in sources are configured at deployment time and cannot be edited in the app. Provider endpoints are deployment configuration and are not exposed to the client.";
+        // 2. Explains the Base URL row's value when it IS empty: some
+        //    servers/providers still have nothing to report there — see
+        //    FWABaseURLDisplayValue.
+        return @"Built-in sources are configured at deployment time and cannot be edited in the app. If Base URL shows \"Not exposed to clients\", this server or provider has nothing configured for it.";
     }
     if (section == FWASourceDetailSectionStatus) {
         return @"Status and latency come from the most recent Recommendations fetch and are not saved.";
@@ -241,22 +242,29 @@ static NSString *const kWrappingCellID = @"SourceDetailWrappingCell";
     return nil;
 }
 
-// Only Last error is a wrapping row now: Base URL's value ("Not exposed to
-// clients" — see FWASourceConfig's header doc) is short and fixed, same
-// shape as Name/Type, so it stays a plain right-aligned Value1 row.
-// `error`, on the other hand, genuinely can be long — a real vendor error
-// can embed a full URL (see FWASourcesViewController's header doc) — so it
-// keeps the self-sizing wrapping cell.
+// Base URL and Last error are both wrapping rows: Base URL now carries the
+// real ProviderStatus.baseURL (a full Lambda function URL, not the old
+// fixed "Not exposed to clients" stand-in), and `error` genuinely can be
+// long — a real vendor error can embed a full URL (see
+// FWASourcesViewController's header doc). Name/Type/Status/Latency stay
+// plain right-aligned Value1 rows; they are short, single-line, and
+// already correct.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    BOOL isWrappingRow = indexPath.section == FWASourceDetailSectionStatus
+    BOOL isBaseURLRow = indexPath.section == FWASourceDetailSectionConfiguration
+        && indexPath.row == FWASourceDetailConfigurationRowBaseURL;
+    BOOL isLastErrorRow = indexPath.section == FWASourceDetailSectionStatus
         && indexPath.row == FWASourceDetailStatusRowLastError;
 
-    if (isWrappingRow) {
+    if (isBaseURLRow || isLastErrorRow) {
         FWACopyableWrappingCell *cell = [tableView dequeueReusableCellWithIdentifier:kWrappingCellID];
         if (!cell) {
             cell = [[FWACopyableWrappingCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:kWrappingCellID];
         }
-        [self configureLastErrorCell:cell];
+        if (isBaseURLRow) {
+            [self configureBaseURLCell:cell];
+        } else {
+            [self configureLastErrorCell:cell];
+        }
         return cell;
     }
 
@@ -279,17 +287,13 @@ static NSString *const kWrappingCellID = @"SourceDetailWrappingCell";
 - (void)configureConfigurationValueCell:(UITableViewCell *)cell atRow:(NSInteger)row {
     switch (row) {
         case FWASourceDetailConfigurationRowName:
+        default:
             cell.textLabel.text = @"Name";
             cell.detailTextLabel.text = self.providerName;
             break;
         case FWASourceDetailConfigurationRowType:
             cell.textLabel.text = @"Type";
             cell.detailTextLabel.text = self.config.type;
-            break;
-        case FWASourceDetailConfigurationRowBaseURL:
-        default:
-            cell.textLabel.text = @"Base URL";
-            cell.detailTextLabel.text = self.config.baseURL;
             break;
     }
 }
@@ -307,6 +311,21 @@ static NSString *const kWrappingCellID = @"SourceDetailWrappingCell";
             cell.detailTextLabel.text = FWALatencyText(self.status.latencyMs);
             break;
     }
+}
+
+// Monospace: a URL/hostname is an identifier, not prose — easier to scan
+// and to eyeball-diff against another environment's value than proportional
+// text would be (matches Android's activity_source_detail.xml treatment of
+// the same field). Never fabricate a value: an empty baseURL (server
+// predating field 7, or a provider with nothing configured) renders the
+// honest "Not exposed to clients" placeholder via FWABaseURLDisplayValue,
+// and that placeholder is not offered for copy.
+- (void)configureBaseURLCell:(FWACopyableWrappingCell *)cell {
+    cell.textLabel.text = @"Base URL";
+    NSString *baseURL = self.status.baseURL;
+    cell.detailTextLabel.text = FWABaseURLDisplayValue(baseURL);
+    cell.detailTextLabel.font = [UIFont monospacedSystemFontOfSize:UIFont.smallSystemFontSize weight:UIFontWeightRegular];
+    [cell setCopyableValue:baseURL.length > 0 ? baseURL : nil];
 }
 
 - (void)configureLastErrorCell:(FWACopyableWrappingCell *)cell {
