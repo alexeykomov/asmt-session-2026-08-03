@@ -4,6 +4,8 @@
 //
 
 #import "FWARecommendationsViewController.h"
+
+#import "FWARecommendationDetailViewController.h"
 #import "FWAGRPCClient.h"
 #import "FWAAppState.h"
 #import "FWAProviderStatusPresentation.h"
@@ -374,10 +376,41 @@ typedef NS_ENUM(NSInteger, FWARecsSection) {
     cell.detailsLabel.text = hasDetails ? recommendation.details : nil;
     cell.detailsLabel.hidden = !hasDetails;
 
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.accessoryType = UITableViewCellAccessoryNone;
+    // Recommendation rows drill into a detail screen, so they get the
+    // disclosure chevron and a real selection style. Banner rows above them
+    // deliberately keep neither — a chevron means "this row goes
+    // somewhere", the same rule the Sources list follows.
+    cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 
     return cell;
+}
+
+#pragma mark - UITableViewDelegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+    // Banner rows explain the fetch; they are not recommendations and have
+    // nothing to drill into.
+    if (indexPath.section != FWARecsSectionRecommendations) {
+        return;
+    }
+    if ((NSUInteger)indexPath.row >= self.recommendations.count) {
+        return; // the "No recommendations" placeholder row
+    }
+
+    Recommendation *recommendation = self.recommendations[indexPath.row];
+    // Statuses come from the same response as the recommendation, so the
+    // detail screen explains one coherent fetch rather than mixing a stale
+    // recommendation with fresh statuses.
+    FWARecommendationDetailViewController *detailVC =
+        [[FWARecommendationDetailViewController alloc]
+            initWithRecommendation:recommendation
+                          statuses:self.appState.lastStatuses ?: @[]
+                              rank:indexPath.row + 1
+                             total:(NSInteger)self.recommendations.count];
+    [self.navigationController pushViewController:detailVC animated:YES];
 }
 
 @end
