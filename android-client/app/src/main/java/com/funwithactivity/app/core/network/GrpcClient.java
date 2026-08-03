@@ -9,6 +9,8 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Thin wrapper around the single gRPC channel used for the whole app.
  * All stub calls are blocking — callers must invoke them from a background
@@ -18,6 +20,18 @@ public class GrpcClient {
 
     private static final Metadata.Key<String> AUTHORIZATION_KEY =
         Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER);
+
+    /**
+     * Client-side deadline for the whole unary call. The server's own
+     * per-provider budget is 2s and providers are fanned out in parallel, so
+     * a healthy response is well inside this; 10s just needs to cover a cold
+     * TLS handshake against a cold-start vendor without ever letting the UI
+     * spin indefinitely. On expiry the blocking stub throws
+     * StatusRuntimeException(DEADLINE_EXCEEDED), which callers already
+     * handle through their normal RPC-failure path — no special-casing
+     * needed here.
+     */
+    private static final long DEADLINE_SECONDS = 10;
 
     private final ManagedChannel channel;
     private final String authToken;
@@ -52,7 +66,8 @@ public class GrpcClient {
     /** Blocking — call from a background thread. */
     public GetRecommendationsResponse getRecommendations(GetRecommendationsRequest request) {
         RecommendationsServiceGrpc.RecommendationsServiceBlockingStub stub =
-            RecommendationsServiceGrpc.newBlockingStub(channel);
+            RecommendationsServiceGrpc.newBlockingStub(channel)
+                .withDeadlineAfter(DEADLINE_SECONDS, TimeUnit.SECONDS);
         if (authToken != null && !authToken.isEmpty()) {
             Metadata headers = new Metadata();
             headers.put(AUTHORIZATION_KEY, "Bearer " + authToken);

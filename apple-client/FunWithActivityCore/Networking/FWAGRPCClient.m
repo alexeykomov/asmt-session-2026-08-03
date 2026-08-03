@@ -62,6 +62,18 @@ static os_log_t FWANetworkLog(void) {
 
 #pragma mark - FWAGRPCClient
 
+// Client-side deadline for the whole unary call, in seconds. The server's
+// own per-provider budget is 2s and providers are fanned out in parallel, so
+// a healthy response is well inside this; 10s just needs to cover a cold TLS
+// handshake against a cold-start vendor without ever letting the UI spin
+// indefinitely. GRPCMutableCallOptions.timeout defaults to 0 (no timeout) —
+// without this, a hung vendor left the loading spinner running forever. On
+// expiry the call closes with kGRPCErrorDomain/GRPCErrorCodeDeadlineExceeded,
+// which flows through the same -didCloseWithTrailingMetadata:error: path —
+// and so the same UI failure/retry path — as any other RPC error; no
+// special-casing needed here. Matches Android's GrpcClient.DEADLINE_SECONDS.
+static const NSTimeInterval kFWAGRPCCallTimeoutSeconds = 10.0;
+
 @interface FWAGRPCClient ()
 @property (nonatomic, strong) RecommendationsService *service;
 @end
@@ -86,6 +98,7 @@ static os_log_t FWANetworkLog(void) {
     options.transport = [FWAServerConfig useTLS]
         ? GRPCDefaultTransportImplList.core_secure
         : GRPCDefaultTransportImplList.core_insecure;
+    options.timeout = kFWAGRPCCallTimeoutSeconds;
     // Matches the app-server's authInterceptor, which requires this exact
     // header when INTERNAL_GRPC_TOKEN is configured. Token moves together
     // with host/transport — see FWAServerConfig.h.
