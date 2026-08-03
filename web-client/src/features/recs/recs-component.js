@@ -1,4 +1,5 @@
 goog.provide('funwithactivity.recs.RecsComponent');
+goog.provide('funwithactivity.recs.bannerMessages');
 goog.provide('funwithactivity.recs.shouldFetch');
 
 goog.require('funwithactivity.app.AppState');
@@ -243,7 +244,7 @@ funwithactivity.recs.RecsComponent.prototype.renderSuccess_ = function(
   // without spending a second vendor call for data this fetch already has.
   funwithactivity.app.LastStatuses.set(response.statuses);
   this.renderTable_(response.recommendations);
-  this.renderBanner_(response.statuses);
+  this.renderBanner_(response.statuses, response.recommendations.length);
 };
 
 
@@ -355,13 +356,57 @@ funwithactivity.recs.RecsComponent.withFormattedScore_ = function(r) {
  * rendering deliberate data-minimisation as a provider outage — that
  * exact ordering mistake has caused four defects in this project.
  * @param {!Array<!funwithactivity.dto.ProviderStatus>} statuses
+ * @param {number} recCount How many recommendations rendered. Zero changes
+ *     the message: "showing partial results" is a lie when none are shown.
  * @private
  */
 funwithactivity.recs.RecsComponent.prototype.renderBanner_ = function(
-    statuses) {
+    statuses, recCount) {
   const banner = goog.dom.getElement('degradation-banner');
   if (!banner) return;
   goog.dom.removeChildren(banner);
+
+  // "showing partial results" is only true when some results survived.
+  // With none, that line promises something the screen is not showing and
+  // reads as a broken app — which is exactly the state a flaky provider
+  // produces, so it is the message most likely to be on screen at the
+  // worst moment.
+  const empty = recCount === 0;
+
+  let degraded = 0;
+  let skipped = 0;
+  for (let i = 0; i < statuses.length; i++) {
+    const classification =
+        funwithactivity.features.recommendations.classify(statuses[i]);
+    if (classification == 'skipped') skipped++;
+    else if (classification == 'degraded') degraded++;
+  }
+
+  if (empty && (degraded || skipped)) {
+    // Skipped is a deliberate data-minimisation outcome, not an outage, so
+    // an all-skipped empty result stays informational. Rendering it as a
+    // failure inverts the meaning of the behaviour the product exists to
+    // demonstrate.
+    const failureOnly = degraded && !skipped;
+    const skipOnly = skipped && !degraded;
+    let text;
+    let cls;
+    if (skipOnly) {
+      text = 'No recommendations — no provider had the data it needs.';
+      cls = 'recs-banner-skipped';
+    } else if (failureOnly) {
+      text = 'No recommendations available — all providers are unavailable.';
+      cls = 'recs-banner-degraded';
+    } else {
+      text = 'No recommendations — one provider was skipped and the other ' +
+          'is unavailable.';
+      cls = 'recs-banner-degraded';
+    }
+    goog.dom.appendChild(banner, goog.dom.createDom(
+        goog.dom.TagName.P, {'class': cls}, text));
+    return;
+  }
+
   for (let i = 0; i < statuses.length; i++) {
     const status = statuses[i];
     const classification =
