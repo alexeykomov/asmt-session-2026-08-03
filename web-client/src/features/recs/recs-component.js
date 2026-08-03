@@ -244,7 +244,7 @@ funwithactivity.recs.RecsComponent.prototype.renderSuccess_ = function(
   // without spending a second vendor call for data this fetch already has.
   funwithactivity.app.LastStatuses.set(response.statuses);
   this.renderTable_(response.recommendations);
-  this.renderBanner_(response.statuses, response.recommendations.length);
+  this.renderBanner_(response.statuses, response.recommendations.length > 0);
 };
 
 
@@ -347,80 +347,103 @@ funwithactivity.recs.RecsComponent.withFormattedScore_ = function(r) {
 
 
 /**
- * Renders the degradation banner from provider statuses, one row per
- * non-ok status, classifying each through
- * funwithactivity.features.recommendations.classify() — the single place
- * that decides skipped vs. degraded. `error` itself is never consulted
- * here directly: a skipped provider also carries explanatory text in
- * `error`, so branching on it before classify() has done so would risk
- * rendering deliberate data-minimisation as a provider outage — that
- * exact ordering mistake has caused four defects in this project.
+ * Pure, DOM-free banner content decision — extracted (like
+ * funwithactivity.recs.shouldFetch above) so it is unit-testable without a
+ * browser. Classifies every status through funwithactivity.features.
+ * recommendations.classify() — the single place that decides skipped vs.
+ * degraded — rather than re-deriving that branch here; `error` itself is
+ * never consulted directly for the same reason classify() exists at all: a
+ * skipped provider also carries explanatory text in `error`, so branching
+ * on it before classify() has done so would risk rendering deliberate
+ * data-minimisation as a provider outage. That exact ordering mistake has
+ * caused four defects in this project.
+ *
+ * "<name> unavailable — showing partial results" is only true when some
+ * recommendation survived; with zero, it promises a table the screen is
+ * not showing and reads as a broken app — realistic on stage, since these
+ * vendors fail roughly one call in three and both can fail together. When
+ * `hasResults` is false, the aggregate cases below replace that per-
+ * provider claim rather than just deleting it, so the screen still says
+ * *something* about why the table is empty:
+ *  - every non-ok provider is 'degraded' (no 'skipped') → one failure
+ *    message, styled as a real outage (red/danger).
+ *  - every non-ok provider is 'skipped' (no 'degraded') → one
+ *    data-minimisation message, styled informational (blue) — never as a
+ *    failure; that inversion is exactly the four-defects mistake above.
+ *  - a genuine mix of both, zero results → state both plainly, one line
+ *    per provider in its own correct colour, and never claim partial
+ *    results; this is deliberately NOT collapsed into a single sentence,
+ *    since any one sentence mentioning both would have to put "skipped"
+ *    inside whatever single colour it picked.
  * @param {!Array<!funwithactivity.dto.ProviderStatus>} statuses
- * @param {number} recCount How many recommendations rendered. Zero changes
- *     the message: "showing partial results" is a lie when none are shown.
+ * @param {boolean} hasResults Whether this fetch produced at least one
+ *     recommendation.
+ * @return {!Array<{text: string, className: string}>}
+ */
+funwithactivity.recs.bannerMessages = function(statuses, hasResults) {
+  const classify = funwithactivity.features.recommendations.classify;
+  const classifications = statuses.map(classify);
+  const anySkipped = classifications.indexOf('skipped') !== -1;
+  const anyDegraded = classifications.indexOf('degraded') !== -1;
+
+  if (!hasResults && anyDegraded && !anySkipped) {
+    return [{
+      text: 'No recommendations available — all providers are unavailable',
+      className: 'recs-banner-degraded',
+    }];
+  }
+  if (!hasResults && anySkipped && !anyDegraded) {
+    return [{
+      text: 'No recommendations — no provider had the data it needs',
+      className: 'recs-banner-skipped',
+    }];
+  }
+
+  // Every other case: some results survived, nothing failed, or a genuine
+  // mix of skipped + degraded with zero results. One line per non-ok
+  // provider, in status order, exactly as before this change — except the
+  // degraded wording drops "— showing partial results" whenever there are
+  // zero results, since that phrase must never sit next to an empty table.
+  const messages = [];
+  for (let i = 0; i < statuses.length; i++) {
+    const status = statuses[i];
+    if (classifications[i] == 'skipped') {
+      messages.push({
+        text: status.name + ' skipped — ' + status.error,
+        className: 'recs-banner-skipped',
+      });
+    } else if (classifications[i] == 'degraded') {
+      messages.push({
+        text: hasResults ?
+            status.name + ' unavailable — showing partial results' :
+            status.name + ' unavailable',
+        className: 'recs-banner-degraded',
+      });
+    }
+  }
+  return messages;
+};
+
+
+/**
+ * Renders funwithactivity.recs.bannerMessages's output into the
+ * degradation banner. All decision-making lives in that pure function;
+ * this is DOM plumbing only.
+ * @param {!Array<!funwithactivity.dto.ProviderStatus>} statuses
+ * @param {boolean} hasResults Whether this fetch produced at least one
+ *     recommendation — see bannerMessages.
  * @private
  */
 funwithactivity.recs.RecsComponent.prototype.renderBanner_ = function(
-    statuses, recCount) {
+    statuses, hasResults) {
   const banner = goog.dom.getElement('degradation-banner');
   if (!banner) return;
   goog.dom.removeChildren(banner);
-
-  // "showing partial results" is only true when some results survived.
-  // With none, that line promises something the screen is not showing and
-  // reads as a broken app — which is exactly the state a flaky provider
-  // produces, so it is the message most likely to be on screen at the
-  // worst moment.
-  const empty = recCount === 0;
-
-  let degraded = 0;
-  let skipped = 0;
-  for (let i = 0; i < statuses.length; i++) {
-    const classification =
-        funwithactivity.features.recommendations.classify(statuses[i]);
-    if (classification == 'skipped') skipped++;
-    else if (classification == 'degraded') degraded++;
-  }
-
-  if (empty && (degraded || skipped)) {
-    // Skipped is a deliberate data-minimisation outcome, not an outage, so
-    // an all-skipped empty result stays informational. Rendering it as a
-    // failure inverts the meaning of the behaviour the product exists to
-    // demonstrate.
-    const failureOnly = degraded && !skipped;
-    const skipOnly = skipped && !degraded;
-    let text;
-    let cls;
-    if (skipOnly) {
-      text = 'No recommendations — no provider had the data it needs.';
-      cls = 'recs-banner-skipped';
-    } else if (failureOnly) {
-      text = 'No recommendations available — all providers are unavailable.';
-      cls = 'recs-banner-degraded';
-    } else {
-      text = 'No recommendations — one provider was skipped and the other ' +
-          'is unavailable.';
-      cls = 'recs-banner-degraded';
-    }
-    goog.dom.appendChild(banner, goog.dom.createDom(
-        goog.dom.TagName.P, {'class': cls}, text));
-    return;
-  }
-
-  for (let i = 0; i < statuses.length; i++) {
-    const status = statuses[i];
-    const classification =
-        funwithactivity.features.recommendations.classify(status);
-    if (classification == 'skipped') {
-      goog.dom.appendChild(banner, goog.dom.createDom(
-          goog.dom.TagName.P, {'class': 'recs-banner-skipped'},
-          status.name + ' skipped — ' + status.error));
-    } else if (classification == 'degraded') {
-      goog.dom.appendChild(banner, goog.dom.createDom(
-          goog.dom.TagName.P, {'class': 'recs-banner-degraded'},
-          status.name + ' unavailable — showing partial results'));
-    }
-  }
+  funwithactivity.recs.bannerMessages(statuses, hasResults).forEach(
+      function(message) {
+        goog.dom.appendChild(banner, goog.dom.createDom(
+            goog.dom.TagName.P, {'class': message.className}, message.text));
+      });
 };
 
 
