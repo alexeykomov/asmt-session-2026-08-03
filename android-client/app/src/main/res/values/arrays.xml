@@ -7,4 +7,21 @@
         <item>android.permission.health.READ_HEIGHT</item>
         <item>android.permission.health.READ_WEIGHT</item>
     </string-array>
+
+    <!-- Fault modes accepted by GetRecommendationsRequest.faults (see
+         recommendations.proto) — must stay in sync with the server's
+         understood values. -->
+    <string-array name="fault_modes">
+        <item>error</item>
+        <item>timeout</item>
+        <item>malformed</item>
+    </string-array>
+
+    <!-- Add-source stub form (Sources tab) — provider transport kinds per
+         the 1.2.0 design spec §5.3. Cosmetic only in Phase 1: the form
+         validates and explains, it never creates a callable source. -->
+    <string-array name="source_types">
+        <item>REST</item>
+        <item>gRPC</item>
+    </string-array>
 </resources>

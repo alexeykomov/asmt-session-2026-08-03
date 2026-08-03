@@ -6,4 +6,15 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/colorPageBg</item>
     </style>
+
+    <!-- MainActivity supplies its own Toolbar (see activity_main.xml) so it
+         can sit above the BottomNavigationView in a plain LinearLayout;
+         the window decor's own ActionBar must be off, or
+         setSupportActionBar() throws IllegalStateException. -->
+    <style name="Theme.FunWithActivity.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/colorPageBg</item>
+    </style>
 </resources>

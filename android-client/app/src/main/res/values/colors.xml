@@ -8,8 +8,11 @@
 
     <!-- Provider status banners: ok=silent/subtle, skipped=informational, error=degraded -->
     <color name="colorStatusOk">#2E7D5B</color>
+    <color name="colorStatusOkBg">#E6F4EC</color>
     <color name="colorStatusSkippedBg">#E8F0FE</color>
     <color name="colorStatusSkippedText">#1A3D8F</color>
     <color name="colorStatusErrorBg">#FDECEA</color>
     <color name="colorStatusErrorText">#B3261E</color>
+
+    <color name="colorDivider">#E0E0E0</color>
 </resources>

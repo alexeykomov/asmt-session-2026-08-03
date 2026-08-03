@@ -2,24 +2,24 @@
 <resources>
     <string name="app_name">FunWithActivity</string>
 
-    <!-- Measurement entry -->
-    <string name="measurement_title">Your measurements</string>
+    <!-- Bottom navigation tabs -->
+    <string name="tab_recommendations">Recommendations</string>
+    <string name="tab_sources">Sources</string>
+    <string name="tab_profile">Profile</string>
+
+    <!-- Measurements (Profile > MEASUREMENTS, also used by Health Connect prefill) -->
     <string name="label_height_cm">Height (cm)</string>
     <string name="label_weight_kg">Weight (kg)</string>
     <string name="label_birth_date">Date of birth (optional)</string>
     <string name="birth_date_hint">Not supplied</string>
     <string name="clear_birth_date">Clear</string>
-    <string name="get_recommendations">Get recommendations</string>
-    <string name="error_height_required">Enter a valid height</string>
-    <string name="error_weight_required">Enter a valid weight</string>
     <string name="health_connect_prefill">Prefill from Health Connect</string>
     <string name="health_connect_unavailable">Health Connect is not available on this device — enter your measurements manually.</string>
     <string name="health_connect_permission_denied">Health Connect access was declined — enter your measurements manually.</string>
     <string name="health_connect_no_data">No height/weight recorded in Health Connect yet — enter your measurements manually.</string>
     <string name="health_connect_prefilled">Prefilled from Health Connect.</string>
 
-    <!-- Results -->
-    <string name="results_title">Recommendations</string>
+    <!-- Recommendations tab -->
     <string name="loading">Loading recommendations…</string>
     <string name="empty_results">No recommendations returned.</string>
     <string name="request_failed">Request failed: %1$s</string>
@@ -27,4 +27,34 @@
     <string name="status_skipped_format">%1$s skipped — %2$s</string>
     <string name="status_error_format">%1$s unavailable — showing partial results (%2$s)</string>
     <string name="status_ok_format">%1$s: %2$d recommendation(s) in %3$d ms</string>
+    <string name="action_refresh">Refresh</string>
+
+    <!-- Sources tab -->
+    <string name="sources_empty">No source data yet — visit Recommendations first.</string>
+    <string name="source_status_ok">ok</string>
+    <string name="source_status_skipped">skipped</string>
+    <string name="source_status_degraded">degraded</string>
+    <string name="source_latency_format">Latency: %1$s</string>
+    <string name="source_latency_dash">—</string>
+    <string name="source_latency_ms_format">%1$d ms</string>
+    <string name="action_add_source">Add source</string>
+
+    <!-- Add-source stub form (Sources tab, + action) -->
+    <string name="add_source_title">Add source</string>
+    <string name="add_source_label_name">Name</string>
+    <string name="add_source_label_url">Base URL</string>
+    <string name="add_source_label_token">Auth token (optional)</string>
+    <string name="add_source_label_type">Type</string>
+    <string name="add_source_action">Add</string>
+    <string name="add_source_error_name">Enter a source name</string>
+    <string name="add_source_error_url">Enter a valid URL</string>
+    <string name="add_source_explain_title">Not supported yet</string>
+    <string name="add_source_explain_message">"%1$s" was validated but not added. A real source needs an adapter — Go code that knows its request shape, item schema and error envelope — not just a stored URL. That is a code change and a redeploy, so nothing was saved, and the auth token you entered was discarded rather than stored.</string>
+
+    <!-- Profile tab -->
+    <string name="profile_section_measurements">MEASUREMENTS</string>
+    <string name="profile_section_developer">DEVELOPER</string>
+    <string name="profile_fault_hint">Simulate a provider fault</string>
+    <string name="profile_service1_name">service1</string>
+    <string name="profile_service2_name">service2</string>
 </resources>

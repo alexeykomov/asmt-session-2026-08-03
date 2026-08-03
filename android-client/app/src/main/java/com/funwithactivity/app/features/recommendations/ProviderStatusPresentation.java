@@ -7,10 +7,13 @@ import funwithactivity.recommendations.v1.Recommendations.ProviderStatus;
 
 /**
  * Turns a {@link ProviderStatus} into a UI-ready severity classification.
- * Pulled out of {@link ResultsActivity} (which needs an Android
- * {@code Context}/resources to turn a severity into banner text) so the one
- * rule that matters is defined exactly once, in a plain-Java class that a
- * JVM unit test can exercise without Robolectric or instrumentation:
+ * Pulled out of the screen that renders it (originally ResultsActivity; now
+ * {@link com.funwithactivity.app.features.recommendations.RecommendationsFragment}
+ * and {@link com.funwithactivity.app.features.sources.SourceAdapter}, which
+ * both need an Android {@code Context}/resources to turn a severity into
+ * banner/label text) so the one rule that matters is defined exactly once,
+ * in a plain-Java class that a JVM unit test can exercise without
+ * Robolectric or instrumentation:
  *
  * <p>ALWAYS branch on {@code skipped} BEFORE {@code error}/{@code ok}. A
  * skipped status also carries text in {@code error} (it reuses the field for

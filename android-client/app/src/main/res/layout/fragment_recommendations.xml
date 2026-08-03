@@ -5,14 +5,14 @@
     android:orientation="vertical">
 
     <ProgressBar
-        android:id="@+id/results_progress"
+        android:id="@+id/recs_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="32dp" />
 
     <TextView
-        android:id="@+id/results_error"
+        android:id="@+id/recs_error"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="24dp"
@@ -20,16 +20,16 @@
         android:visibility="gone" />
 
     <!-- Status/banner area: one row per ProviderStatus, rendered per the
-         ok / skipped / error branching in ResultsActivity. Populated
-         dynamically since the number of providers is server-driven. -->
+         ok / skipped / error branching resolved by ProviderStatusPresentation.
+         Populated dynamically since the number of providers is server-driven. -->
     <LinearLayout
-        android:id="@+id/status_banner_container"
+        android:id="@+id/recs_status_banner_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
     <TextView
-        android:id="@+id/results_empty"
+        android:id="@+id/recs_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="24dp"
@@ -38,7 +38,7 @@
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/results_recycler_view"
+        android:id="@+id/recs_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

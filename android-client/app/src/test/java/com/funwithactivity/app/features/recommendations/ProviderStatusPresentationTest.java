@@ -16,8 +16,8 @@ import funwithactivity.recommendations.v1.Recommendations.ProviderStatus;
  * exercised explicitly rather than trusted to code review alone.
  *
  * Plain JUnit (JVM {@code test/} source set) — no instrumentation needed,
- * because the presentation logic was deliberately extracted out of {@link
- * ResultsActivity} into a class with no Android framework dependency.
+ * because the presentation logic was deliberately extracted out of the
+ * screen that renders it into a class with no Android framework dependency.
  */
 public class ProviderStatusPresentationTest {
 

@@ -36,8 +36,11 @@
         android:theme="@style/Theme.FunWithActivity"
         android:networkSecurityConfig="@xml/network_security_config">
 
-        <activity android:name=".features.measurement.MeasurementActivity"
+        <!-- LAUNCHER: three-tab shell (Recommendations / Sources / Profile)
+             behind a BottomNavigationView — see MainActivity. -->
+        <activity android:name=".features.app.MainActivity"
             android:exported="true"
+            android:theme="@style/Theme.FunWithActivity.NoActionBar"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,18 +48,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".features.recommendations.ResultsActivity"
-            android:exported="false"
-            android:parentActivityName=".features.measurement.MeasurementActivity" />
-
         <!-- Health Connect permission-rationale entry point. Health Connect's
-             permissions screen links back here; since this demo has no
-             separate privacy-policy page, it simply routes to the
-             measurement screen. -->
+             permissions screen links back here; routes to the tabbed shell,
+             which surfaces the same manual-entry fallback via Profile. -->
         <activity-alias
             android:name=".PermissionsRationaleActivity"
             android:exported="true"
-            android:targetActivity=".features.measurement.MeasurementActivity">
+            android:targetActivity=".features.app.MainActivity">
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
             </intent-filter>
