@@ -264,3 +264,70 @@ main {
 .recs-source { font-family: var(--font-mono); color: var(--color-accent); }
 .recs-score { font-family: var(--font-mono); }
 .recs-empty { color: var(--color-muted); text-align: center; }
+
+/* Three-tab navigation shell (funwithactivity.app.Shell / Router) */
+
+.fwa-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0 2rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.fwa-tab {
+  display: inline-block;
+  padding: 0.85rem 1rem 0.75rem;
+  color: var(--color-muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  /* Reserve space for the active underline on every tab, not just the
+     active one, so gaining/losing fwa-tab-active never shifts layout. */
+  border-bottom: 3px solid transparent;
+}
+
+.fwa-tab:hover {
+  color: var(--color-text);
+}
+
+/*
+ * Active state must be legible without relying on color alone (some
+ * viewers are color-blind, and a screenshot may be printed in grayscale):
+ * bold weight + a solid underline carry the signal even if --color-accent
+ * were indistinguishable from --color-muted.
+ */
+.fwa-tab-active {
+  color: var(--color-accent);
+  font-weight: 700;
+  border-bottom-color: var(--color-accent);
+}
+
+/*
+ * .fwa-screen (#screen) intentionally carries no padding/max-width of its
+ * own: it nests inside base.soy's #main-content, which the generic `main`
+ * rule above already pads and constrains. Repeating those here would
+ * double the indent.
+ */
+
+/* Task 4 placeholder for the not-yet-built Recs/Sources/Profile screens
+   (see funwithactivity.app.PlaceholderScreen_ in shell.js). Delete once
+   every screen mounted through createScreen_ is real. */
+.fwa-screen-placeholder {
+  padding: 2rem;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-alt);
+  color: var(--color-muted);
+}
+
+.fwa-screen-placeholder h2 {
+  margin: 0 0 0.5rem;
+  color: var(--color-text);
+}
+
+.fwa-placeholder-note {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}

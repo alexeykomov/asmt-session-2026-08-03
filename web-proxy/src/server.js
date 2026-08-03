@@ -51,6 +51,23 @@ function buildApp({ getRecommendations }) {
 
   app.use(apiRouter({ getRecommendations }));
 
+  // web-client is a client-side-routed SPA (funwithactivity.app.Router,
+  // Task 4): the browser can be pointed straight at /profile — a fresh
+  // load, a bookmark, or an F5 reload — and there is no server-side
+  // handler for that path other than this one. Without it, Express's
+  // default 404 fires here and the tab "works" only until the user
+  // reloads it.
+  //
+  // Match this explicit list of known SPA routes rather than a wildcard:
+  // a blanket catch-all would swallow genuine 404s (e.g. a typo'd asset
+  // path) and turn them into a confusing 200 HTML response instead of a
+  // debuggable 404. Keep this list in sync with
+  // funwithactivity.app.Router.normalize's routes.
+  const SPA_ROUTES = new Set(['/', '/recs', '/sources', '/sources/add', '/profile']);
+  app.get(Array.from(SPA_ROUTES), (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'web-client', 'public', 'index.html'));
+  });
+
   // express.json() throws a SyntaxError on an unparseable body. Without this
   // handler that falls through to Express's default error handler, which —
   // absent NODE_ENV=production — includes the stack trace in the response

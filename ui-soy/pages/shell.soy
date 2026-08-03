@@ -1,0 +1,23 @@
+{namespace funwithactivity.pages.shell}
+
+/**
+ * Application shell: a three-tab header and a single mount element the
+ * active screen component renders into. Screens are mounted by
+ * funwithactivity.app.Shell, not by this template.
+ */
+{template .page}
+  {call funwithactivity.layout.base.render}
+    {param content kind="html"}
+      {call .body /}
+    {/param}
+  {/call}
+{/template}
+
+{template .body}
+  <nav class="fwa-tabs" id="fwa-tabs">
+    <a class="fwa-tab" id="tab-recs" href="/recs">Recommendations</a>
+    <a class="fwa-tab" id="tab-sources" href="/sources">Sources</a>
+    <a class="fwa-tab" id="tab-profile" href="/profile">Profile</a>
+  </nav>
+  <main id="screen" class="fwa-screen"></main>
+{/template}
