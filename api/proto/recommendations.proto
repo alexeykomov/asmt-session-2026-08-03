@@ -13,6 +13,11 @@ service RecommendationsService {
   // this rpc as part of that work — replace/remove this declaration only
   // if the SSE design is deliberately superseded by gRPC streaming instead.
   rpc StreamVitals(StreamVitalsRequest) returns (stream VitalsSample);
+  // Health charts for the Charts tab. Additive: a new method alongside
+  // existing ones, so a 1.1.x binary that never calls it is unaffected.
+  // Deliberately not part of the recommendation fan-out — it calls no
+  // vendor and reports no provider status.
+  rpc GetHealthCharts(GetHealthChartsRequest) returns (HealthChartsResponse);
 }
 
 // Canonical measurement input. Unit conversion happens in each provider
@@ -74,4 +79,52 @@ message VitalsSample {
   int64 t_unix_ms = 1;
   double value = 2;
   string unit = 3;
+}
+
+// ---------------------------------------------------------------------------
+// Health charts (Charts tab)
+//
+// Carries data only. No colour, no palette index, no styling: each client maps
+// Series.key to its own named colour asset, exactly as provider status colours
+// already work (StatusOK in Assets.xcassets, colorStatusOk in colors.xml,
+// --color-status-ok in main.css). That also means iOS and Android get dark
+// mode for free, which a hex string on the wire could never provide.
+// ---------------------------------------------------------------------------
+
+message GetHealthChartsRequest {
+  Measurements measurements = 1;
+}
+
+message HealthChartsResponse {
+  repeated Chart charts = 1;
+}
+
+enum ChartType {
+  CHART_TYPE_UNSPECIFIED = 0;
+  CHART_TYPE_BAR = 1;
+  CHART_TYPE_PIE = 2;
+  CHART_TYPE_GROUPED_BAR = 3;
+}
+
+message Chart {
+  // Stable identifier: "steps" | "sleep" | "active_minutes".
+  string id = 1;
+  string title = 2;
+  ChartType type = 3;
+  // X-axis labels for bar charts; slice labels for pies.
+  repeated string categories = 4;
+  repeated Series series = 5;
+}
+
+message Series {
+  // Stable mapping handle: "deep" | "light" | "rem" | "awake" | "steps" |
+  // "light_activity" | "moderate" | "vigorous". Clients map THIS to a colour
+  // asset, never `label` — a copy edit to display text must not silently
+  // recolour a chart.
+  string key = 1;
+  // Display text. Safe to change without affecting rendering.
+  string label = 2;
+  // One value per entry in Chart.categories for bar charts; a single value
+  // per series for pies.
+  repeated double values = 3;
 }
