@@ -20,6 +20,8 @@ The product is a three-tab app on all three clients:
 
 ## Architecture, in a few lines
 
+### What is in this repo — the PoC
+
 ```
 Browser ──HTTP/JSON──► web-proxy ──gRPC──► app-server ──HTTP/JSON──► provider adapters
 iOS/Android ──gRPC + bearer token──► nginx edge ──gRPC (h2c)──► app-server
@@ -50,6 +52,59 @@ are recorded as ADRs in `docs/decisions/`:
 
 - [`0001-replace-not-accumulate.md`](docs/decisions/0001-replace-not-accumulate.md) — each response replaces the rendered result set; clients never accumulate results across requests.
 - [`0002-property-names-never-cross-the-wire.md`](docs/decisions/0002-property-names-never-cross-the-wire.md) — why the wire format is packed positional arrays, not named JSON fields, and where plain objects are still fine.
+
+### Where this goes in production
+
+The topology above calls both vendors **on the request path**. That works for a
+demo and cannot work in production, and the reason is arithmetic rather than
+taste: the customer's stated peak is **2000 RPS**, two providers deep, over
+APIs they have told us they cannot renegotiate, from vendors we have measured
+failing about one call in three. That is 4,000 outbound third-party calls per
+second. So the vendor call moves off the request path entirely.
+
+```
+Wearables ─┐                                    ┌─► ClickHouse #1  (PHI plane)
+           ├─► durable buffer ──► ingest ───────┤
+Vendor   ──┘   (Kafka/Kinesis/                  └─► refresh worker (Go, scheduled)
+health APIs     Pub-Sub)                              │  Requires() gate
+via inbound                                           ▼
+connectors                                        provider adapters
+                                                  (cache + circuit breaker)
+                                                      │
+                                                      ▼
+Browser ──► web-proxy ─┐                          Postgres  (state: profile,
+                       ├─► app-server ──────────► entitlements, stored recs)
+iOS/Android ──► edge ──┘   entitlement check          │
+                            (in-process)              └─► ClickHouse #2 (analytics
+                                                            plane, pseudonymous)
+```
+
+What survives unchanged: the edge, `web-proxy`, the gRPC contract, the three
+provider outcomes (`ok` / `skipped` / `degraded`), and the `Requires()`
+data-minimisation gate. **Only the gate's trigger moves** — from an inline call
+to a background refresh.
+
+What is new: persistence, a durable ingest buffer, and a read path that serves
+entirely from our own store and never calls a vendor inline. **Persistence is
+not a feature to add later; it is the production read path.**
+
+Two things on that diagram are easy to misread:
+
+- **There are two vendor seams, pointing in opposite directions.** *Inbound
+  connectors* pull user data in from third-party health APIs and normalise it
+  into the same schema a device sample uses. *Outbound provider adapters* call
+  recommendation services. One is a PHI data source, the other a compute
+  dependency — conflating them would misstate both.
+- **Two ClickHouse deployments, split by access breadth rather than volume.**
+  CH #1 holds health telemetry and needs almost no human access; CH #2 holds
+  pseudonymous product events and needs a wide, growing audience — analysts,
+  PMs, BI. Access that broad next to data that sensitive is where grants drift,
+  so the boundary is a separate account, not a separate permission.
+
+Fully drawn, with the compliance controls mapped to the obligations they
+discharge, in
+**[`docs/architecture-diagrams.md`](docs/architecture-diagrams.md)** — diagram 4
+and section 4a.
 
 ### Erasure: why crypto-shredding rather than `DELETE`
 
