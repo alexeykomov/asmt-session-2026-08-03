@@ -313,6 +313,56 @@ narrow: the recommendation pipeline sees current values, never raw samples.
 
 ---
 
+## 4a. Where HIPAA and GDPR actually live in this picture
+
+A fair criticism of the diagram above is that nothing on it says "compliance."
+Some of it is there and unlabelled, some belongs on the diagram and is not yet
+drawn, and some can never be drawn at all. Being explicit about which is which
+is more useful than a "secure & compliant" badge.
+
+**Already in the diagram, just not labelled as compliance:**
+
+| Control | Where it is | What it discharges |
+|---|---|---|
+| Data-minimisation gate | `Provider.Requires()` in the refresh worker | GDPR Art. 5(1)(c) — a provider that does not need DOB never receives it; one that does is skipped rather than fed a placeholder |
+| Plane separation | ClickHouse #1 vs #2 | Art. 32 / HIPAA §164.312(a) — the wide-audience store physically cannot contain health values, so broad grants cannot drift onto PHI |
+| Server-side pseudonymisation | `web-proxy` and `app-server` on the way to CH #2 | Art. 4(5) — the `analytics_id` is assigned where the user id is known and stripped; a client cannot be trusted to do this |
+| No client touches a store | every write goes through a tier we operate | §164.312(b) — auth, validation and audit have exactly two chokepoints |
+| Vendors never called on the read path | `Entitlement → Postgres → API` | no PHI leaves the boundary as a side effect of someone opening the app |
+
+**Drawable, and deliberately not on the diagram yet** — each adds a box, and the
+diagram is already at the density limit for one page. They belong in the build:
+
+- **Per-region cells.** Own Postgres, own ClickHouse, own residency boundary,
+  users pinned home. This is one decision that satisfies three requirements at
+  once — Art. 44 residency, the brief's stated pilot-then-global rollout, and
+  blast-radius containment for a company that has already settled a data suit.
+- **KMS and per-user key store.** Erasure under Art. 17 is by crypto-shredding:
+  destroy the user's key and the ciphertext in immutable columnar storage is
+  dead. Deleting rows from ClickHouse at scale is not a mechanism you want to
+  depend on for a regulatory deadline.
+- **Consent and PHI-access audit log.** Append-only, in Postgres, and
+  deliberately **not** erasable — §164.312(b) audit controls and a six-year
+  legal-basis retention that directly conflicts with Art. 17. We name the
+  conflict rather than hide it; where erasure yields to retention is a question
+  for the customer, not an assumption for us.
+
+**Not drawable at all, and not optional:** a BAA with the cloud provider and
+with each vendor that touches PHI; a DPIA, which Art. 35 requires because this
+is profiling at scale; breach-notification runbooks under §164.400 and
+Art. 33/34; retention schedules; and periodic access review. An architecture
+diagram can show where the controls attach — it cannot show that anyone signed
+anything.
+
+**The question underneath all of this is still open.** Whether the customer is a
+HIPAA covered entity or business associate, or whether this is consumer wellness
+under FTC HBNR plus GDPR Art. 9, changes retention obligations and BAA
+requirements directly. It is the second question on our list for them, and the
+architecture above is deliberately built so that the answer changes
+configuration and contracts rather than topology.
+
+---
+
 ## 5. What changes from PoC to production
 
 This is the honest centrepiece, not a list of shortcomings. At 2000 RPS peak, two
