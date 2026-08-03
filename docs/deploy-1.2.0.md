@@ -18,9 +18,13 @@ This is survivable rather than alarming, and only because the wire contract
 was kept byte-identical: `base_url` went on as field 7 of `ProviderStatus`
 rather than reshaping the message, so a 1.1.x binary ignores the field it
 does not know and keeps working against the 1.2.0 server. That is the
-append-only slot discipline doing the job it exists for. But it is a
-property we should verify rather than assume if a mobile fallback is ever
-actually needed.
+append-only slot discipline doing the job it exists for.
+
+**This is an accepted decision, not an outstanding risk.** One droplet
+routing gRPC for both versions is deliberate: a second droplet would buy a
+mobile fallback nobody needs, since the wire contract makes 1.1.x binaries
+work against the 1.2.0 server anyway. Recorded here so the sharing is a
+documented choice rather than something discovered during a demo.
 
 | | value |
 |---|---|
