@@ -182,6 +182,17 @@ static NSString *const kSourceSubmitCellID = @"SourceSubmitCell";
     self.tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
     [self.view addSubview:self.tableView];
 
+    // Interactive keyboardDismissMode only dismisses on a drag; a short form
+    // like this one may not need to scroll at all, so a plain tap outside
+    // the active field needs to resign it too. cancelsTouchesInView = NO is
+    // load-bearing: without it this recognizer would swallow the touch
+    // before UITableView's own selection handling sees it, breaking the
+    // TYPE rows and the Add Source row.
+    UITapGestureRecognizer *dismissKeyboardTap =
+        [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
+    dismissKeyboardTap.cancelsTouchesInView = NO;
+    [self.tableView addGestureRecognizer:dismissKeyboardTap];
+
     [NSLayoutConstraint activateConstraints:@[
         [self.tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
         [self.tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
@@ -268,6 +279,10 @@ static NSString *const kSourceSubmitCellID = @"SourceSubmitCell";
         header.frame = CGRectMake(0, 0, width, fitSize.height);
         self.tableView.tableHeaderView = header;
     }
+}
+
+- (void)dismissKeyboard {
+    [self.view endEditing:YES];
 }
 
 #pragma mark - UITableViewDataSource

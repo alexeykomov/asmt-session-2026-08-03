@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.funwithactivity.app.FunWithActivityApplication;
 import com.funwithactivity.app.R;
 import com.funwithactivity.app.core.state.AppState;
+import com.funwithactivity.app.core.ui.KeyboardDismissUtil;
 import com.funwithactivity.app.features.app.TabVisibilityAware;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -162,6 +163,14 @@ public class SourcesFragment extends Fragment implements TabVisibilityAware {
         });
 
         dialog.show();
+
+        // A dialog is its own Window, separate from the host Activity's —
+        // KeyboardDismissUtil looks up the focused view in *this* window so
+        // it finds the dialog's own EditTexts, not whatever was focused
+        // behind it. Wired to the inflated content view only, so the
+        // type Spinner and the dialog's own OK/Cancel buttons (added by
+        // AlertDialog.Builder, outside this view tree) are untouched.
+        KeyboardDismissUtil.dismissOnOutsideTouch(view, dialog.getWindow());
     }
 
     private void showAddSourceExplanation(String name) {

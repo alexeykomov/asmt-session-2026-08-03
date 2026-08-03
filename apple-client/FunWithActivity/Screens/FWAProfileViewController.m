@@ -175,6 +175,21 @@ static NSString *const kFaultCellID = @"FaultCell";
         [self.tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
         [self.tableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
     ]];
+
+    // Height/Weight use UIKeyboardTypeDecimalPad, which has no Return key at
+    // all, so a tap outside is the ONLY way to dismiss short of the picker
+    // row's own interaction. Same cancelsTouchesInView = NO reasoning as
+    // FWAAddSourceViewController: the birth-date row selection, the Clear
+    // button's accessoryView, the DEVELOPER switches and segmented controls
+    // all still need their touches.
+    UITapGestureRecognizer *dismissKeyboardTap =
+        [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
+    dismissKeyboardTap.cancelsTouchesInView = NO;
+    [self.tableView addGestureRecognizer:dismissKeyboardTap];
+}
+
+- (void)dismissKeyboard {
+    [self.view endEditing:YES];
 }
 
 #pragma mark - UITableViewDataSource

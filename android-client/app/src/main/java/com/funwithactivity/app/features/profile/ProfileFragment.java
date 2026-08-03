@@ -20,6 +20,7 @@ import com.funwithactivity.app.FunWithActivityApplication;
 import com.funwithactivity.app.R;
 import com.funwithactivity.app.core.health.HealthConnectHelper;
 import com.funwithactivity.app.core.state.AppState;
+import com.funwithactivity.app.core.ui.KeyboardDismissUtil;
 import com.funwithactivity.app.features.app.TabVisibilityAware;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
@@ -141,6 +142,13 @@ public class ProfileFragment extends Fragment implements TabVisibilityAware {
             () -> service1ProviderName, service1Switch));
         service2ModeSpinner.setOnItemSelectedListener(modeSelectedListener(
             () -> service2ProviderName, service2Switch));
+
+        // windowSoftInputMode="adjustResize" on the host activity already
+        // keeps the IME from covering the focused field; this handles the
+        // other half — touching outside height/weight must clear focus and
+        // hide the IME too, without breaking the birth-date row, Clear,
+        // Prefill, the fault switches, or the mode spinners underneath.
+        KeyboardDismissUtil.dismissOnOutsideTouch(view, requireActivity().getWindow());
 
         applyStateToViews();
     }
