@@ -97,7 +97,7 @@ Chrome extension (`claude-in-chrome`):
   are registered as `service1-stub`/`service2-stub`, so the checkbox's
   fault never reaches the stub it's checked against. (Confirmed via curl:
   `{"faults":{"service1-stub":"timeout"}}` degrades `service1-stub`
-  correctly at the API level — `docs/task-ui-parity-report.md` verification
+  correctly at the API level — `docs/engineering-log/task-ui-parity-report.md` verification
   log below.) To still exercise the real CSS/Soy rendering pipeline in the
   browser rather than only at the curl/API level, I monkey-patched
   `window.fetch` in the page (via `javascript_tool`) to return the exact
@@ -137,7 +137,7 @@ Test Suite 'FWAProviderStatusPresentationTests' passed at 2026-08-03 11:08:07.13
 
 Installed on the already-booted `iPhone 15 (15F6D5E7-46C4-4229-8624-8D707A839E9B)`
 simulator and driven via the existing DEBUG-only `-FWA_AUTOSUBMIT_DEMO`
-launch-argument hook (see `docs/task-mobile-verification-report.md`) —
+launch-argument hook (see `docs/engineering-log/task-mobile-verification-report.md`) —
 real gRPC round trip, real `FWAResultsViewController` rendering, nothing
 mocked:
 

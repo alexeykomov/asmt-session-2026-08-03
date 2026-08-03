@@ -222,8 +222,8 @@ flowchart TD
 
     WebProxy["web-proxy — REST facade for browsers<br/>(Node.js · or any BFF runtime)"]
     Edge["Edge load balancer<br/>TLS · native gRPC<br/>(nginx · Envoy · managed LB)"]
-    Browser(["Browser"])
-    Native(["iOS / Android"])
+    Browser(["Browser<br/>Closure Library + Compiler, ADVANCED"])
+    Native(["iOS — Obj-C / UIKit<br/>Android — Java / AppCompat"])
 
     Devices -- "continuous telemetry" --> Stream
     Partners --> Connectors

@@ -304,7 +304,7 @@ two (`okStatusClassifiesAsOk`, `genuineFailureClassifiesAsDegraded`)
 continued to pass, confirming they don't accidentally depend on branch
 order and wouldn't mask a reintroduced defect. This matches the iOS
 `FWAProviderStatusPresentationTests` branch-reversal result exactly
-(see `docs/task-tls-repoint-report.md`).
+(see `docs/engineering-log/task-tls-repoint-report.md`).
 
 Reverted the reversal, reran, all 3 pass again:
 
