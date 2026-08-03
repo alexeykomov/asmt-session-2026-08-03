@@ -242,9 +242,10 @@ flowchart TD
     Entitlement -- "tier-filtered read<br/>vendors never called" --> PG
     PG -- "recommendations plus status" --> API
 
-    Browser -. "product events" .-> CH2
-    Native -. "product events" .-> CH2
-    API -. "service events" .-> CH2
+    Browser -. "product events" .-> WebProxy
+    Native -. "product events" .-> API
+    WebProxy -. "pseudonymised<br/>analytics_id assigned here" .-> CH2
+    API -. "service events plus<br/>pseudonymised product events" .-> CH2
 
     classDef store fill:#e7f0fd,stroke:#2b6cb0,color:#1a1a1a;
     class PG,CH1 store;
@@ -292,6 +293,15 @@ Outbound provider adapters call recommendation services and are the seam already
 built in the PoC. Conflating them would be a mistake: one is a data source
 subject to the same PHI handling as a wearable, the other is a compute
 dependency we send the minimum to.
+
+**No client writes to a store.** Browser events reach CH #2 through
+`web-proxy`, native events through `app-server` — the same two doors the read
+path already uses. The reason is not tidiness: pseudonymisation has to happen
+somewhere we control. The `analytics_id` is assigned server-side, at the one
+point where the real user id is known and can be stripped; a client that
+assigned its own would make the analytics plane's whole guarantee
+unverifiable. Routing events through the existing tiers also means they inherit
+auth, validation and rate limiting rather than needing their own.
 
 **So ClickHouse #1 is not the gate's only input.** Measured fields arrive through
 the stream; declared fields do not — a date of birth is never on a wearable
