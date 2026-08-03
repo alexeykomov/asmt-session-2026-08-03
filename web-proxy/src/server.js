@@ -68,6 +68,21 @@ function buildApp({ getRecommendations }) {
     res.sendFile(path.join(__dirname, '..', '..', 'web-client', 'public', 'index.html'));
   });
 
+  // Source detail lives at /sources/<name>, where <name> is a provider name
+  // rather than a fixed path, so it cannot go in the static list above. It
+  // is still matched by an explicit pattern rather than a catch-all, for the
+  // same reason the list exists: a blanket handler would answer 200 with
+  // HTML for a mistyped asset path and turn a debuggable 404 into a
+  // confusing one.
+  //
+  // Without this, the tab bar and in-app navigation work fine while F5,
+  // a bookmark, or a shared link on a source detail page all 404 — a
+  // failure that only appears once someone reloads, which is exactly when
+  // a reviewer tries it.
+  app.get('/sources/:name([A-Za-z0-9_-]+)', (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'web-client', 'public', 'index.html'));
+  });
+
   // express.json() throws a SyntaxError on an unparseable body. Without this
   // handler that falls through to Express's default error handler, which —
   // absent NODE_ENV=production — includes the stack trace in the response
