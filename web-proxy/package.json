@@ -1,0 +1,28 @@
+{
+  "name": "funwithactivity-web-proxy",
+  "version": "1.0.0",
+  "description": "FunWithActivity web proxy — REST façade for the client-rendered web-client SPA. Calls app-server via gRPC.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.10",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.4.0",
+    "mocha": "^10.7.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

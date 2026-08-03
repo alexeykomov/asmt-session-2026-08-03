@@ -1,0 +1,21 @@
+{
+  "name": "funwithactivity-web-client",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-css.js && node scripts/compile-soy.js && node scripts/compile.js",
+    "lint": "eslint src/**/*.js",
+    "test": "mocha test/**/*_test.js"
+  },
+  "dependencies": {
+    "google-closure-library": "^20230802.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "closure-templates": "20160825.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-google": "^0.14.0",
+    "google-closure-compiler": "^20240317.0.0",
+    "mocha": "^10.8.2"
+  }
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Declared for the android.health_connect.PERMISSIONS manifest property
+         (required by Health Connect on API 34+). Keep in sync with the
+         permissions requested by HealthConnectHelper. -->
+    <string-array name="health_permissions">
+        <item>android.permission.health.READ_HEIGHT</item>
+        <item>android.permission.health.READ_WEIGHT</item>
+    </string-array>
+</resources>

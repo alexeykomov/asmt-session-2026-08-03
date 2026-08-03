@@ -1,0 +1,21 @@
+{namespace funwithactivity.layout.base}
+
+/**
+ * App frame: site header + the `#main-content` wrapper around page content.
+ *
+ * Client-side rendering only — there is no SSR in this project. The static
+ * HTML document (doctype, head, stylesheet link, mount element, bundle
+ * script tag) lives in web-client/public/index.html; this template renders
+ * *into* that document's mount element, so it emits only the header/main
+ * markup, not a full `<html>` document.
+ */
+{template .render}
+  {@param content: html}
+  <header class="site-header">
+    <h1>FunWithActivity</h1>
+    <p class="site-tagline">Health and activity recommendations · EPAM pre-sale skeleton</p>
+  </header>
+  <main id="main-content">
+    {$content}
+  </main>
+{/template}

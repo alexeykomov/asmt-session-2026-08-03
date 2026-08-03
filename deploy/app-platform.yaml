@@ -1,0 +1,121 @@
+# DigitalOcean App Platform spec for FunWithActivity.
+#
+# Two components in one App:
+#   - app-server: Go gRPC backend, private. An HTTP /health sidecar on a
+#     separate port exists because App Platform's probes speak HTTP, not gRPC,
+#     so the gRPC port alone is unprobeable.
+#   - web-proxy:  Node Express public surface — REST API plus the compiled
+#     Closure/Soy static bundle. Reaches app-server over the private network.
+#
+# Before deploying:
+#   1. Authorize the DigitalOcean GitHub App on the repository below.
+#   2. Set INTERNAL_GRPC_TOKEN as an encrypted secret on BOTH components,
+#      with the same value.
+#   3. App Platform has no .env support, so PROVIDER1_URL / PROVIDER2_URL
+#      below are non-secret placeholders — set the real Service 1 / Service 2
+#      endpoints (see .env.example / docs/integrations/service1.md and
+#      service2.md) as plain (non-SECRET) env vars in the DO dashboard for
+#      each component, overriding the placeholders below.
+#
+# Region: fra (Frankfurt) — EU residency, consistent with the GDPR position
+# in the design document. Fallback: ams (Amsterdam).
+
+name: funwithactivity
+region: fra
+
+services:
+  - name: app-server
+    dockerfile_path: app-server/Dockerfile
+    source_dir: /
+    github:
+      branch: main
+      repo: alexeykomov/asmt-session-2026-08-03
+      deploy_on_push: true
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    # Internal-only: no http_port, so no public route is created and nothing
+    # collides with web-proxy's `/`. Both gRPC (50051) and the HTTP health
+    # sidecar (50052) are reachable from sibling components over the App's
+    # private network.
+    internal_ports:
+      - 50051
+      - 50052
+    health_check:
+      http_path: /health
+      port: 50052
+      initial_delay_seconds: 5
+      period_seconds: 10
+      timeout_seconds: 3
+      failure_threshold: 3
+    envs:
+      - key: GRPC_PORT
+        value: "50051"
+        scope: RUN_TIME
+      - key: HEALTH_HTTP_PORT
+        value: "50052"
+        scope: RUN_TIME
+      # 2s per provider. The fault-toggle demo must degrade within a beat —
+      # the inherited 15s default produced fifteen seconds of dead air.
+      - key: PROVIDER_TIMEOUT_MS
+        value: "2000"
+        scope: RUN_TIME
+      # Placeholders only — App Platform has no .env support. Set the real
+      # vendor endpoints as plain env vars on this component in the DO
+      # dashboard (both sit behind the same Lambda + FastAPI deployment —
+      # see docs/integrations/service1.md and service2.md for the
+      # (corrected) wire contract, which differs from the customer's own
+      # written brief).
+      - key: PROVIDER1_URL
+        value: "https://example.invalid/services/service1"
+        scope: RUN_TIME
+      - key: PROVIDER2_URL
+        value: "https://example.invalid/services/service2"
+        scope: RUN_TIME
+      # USE_STUB_PROVIDERS is intentionally NOT set here: the real endpoints
+      # above are live, so the deployed demo uses real vendor data. The stub
+      # implementation (providers.NewService1Stub/NewService2Stub) stays in
+      # the codebase as a documented fallback — set USE_STUB_PROVIDERS=true
+      # here only if the vendors are down during the session; the stubs name
+      # themselves "service1-stub"/"service2-stub" and the UI renders that in
+      # its Source column, so fabricated data can never be mistaken on screen
+      # for the customer's real vendors. Nothing falls back to stubs
+      # silently — this must be an explicit, deliberate change.
+      #
+      # Per-provider trust weights for the ranker. Equal until calibrated
+      # against outcome data.
+      - key: RANKER_WEIGHTS
+        value: "service1=1.0,service2=1.0"
+        scope: RUN_TIME
+      - key: INTERNAL_GRPC_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+
+  - name: web-proxy
+    dockerfile_path: web-proxy/Dockerfile
+    source_dir: /
+    github:
+      branch: main
+      repo: alexeykomov/asmt-session-2026-08-03
+      deploy_on_push: true
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    http_port: 3000
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 5
+      period_seconds: 10
+    routes:
+      - path: /
+    envs:
+      - key: PORT
+        value: "3000"
+        scope: RUN_TIME
+      - key: NODE_ENV
+        value: "production"
+        scope: RUN_TIME
+      - key: APP_SERVER_URL
+        value: "${app-server.PRIVATE_DOMAIN}:50051"
+        scope: RUN_TIME
+      - key: INTERNAL_GRPC_TOKEN
+        scope: RUN_TIME
+        type: SECRET

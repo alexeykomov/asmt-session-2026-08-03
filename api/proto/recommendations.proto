@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package funwithactivity.recommendations.v1;
+
+option go_package = "github.com/funwithactivity/funwithactivity/api/gen/go/funwithactivity/api;recommendationsv1";
+
+service RecommendationsService {
+  rpc GetRecommendations(GetRecommendationsRequest) returns (GetRecommendationsResponse);
+  // Reserved, not yet implemented: no server implementation exists and no
+  // client calls this. It stays declared on purpose as the intended shape
+  // for streaming vitals; the SSE vitals work (server-sent events, not
+  // gRPC streaming) is where that feature actually lands. Do not implement
+  // this rpc as part of that work — replace/remove this declaration only
+  // if the SSE design is deliberately superseded by gRPC streaming instead.
+  rpc StreamVitals(StreamVitalsRequest) returns (stream VitalsSample);
+}
+
+// Canonical measurement input. Unit conversion happens in each provider
+// adapter, never here — this is always metric.
+message Measurements {
+  double height_cm = 1;
+  double weight_kg = 2;
+  // 0 means "not supplied". Service 2 requires it; Service 1 does not.
+  // A user who declines it still receives Service 1 results — GDPR
+  // Art. 5(1)(c) data minimisation expressed as a routing rule.
+  int64 birth_date_unix = 3;
+}
+
+message GetRecommendationsRequest {
+  Measurements measurements = 1;
+  // Demo-only fault injection: provider name -> "error" | "timeout" |
+  // "malformed". Per-request so the demo needs no restart.
+  map<string, string> faults = 2;
+}
+
+message Recommendation {
+  string title = 1;
+  string details = 2;
+  string source = 3;
+  // Final ranked score only. Raw and normalised scores stay server-side:
+  // exposing them would make the ranker's internals contract.
+  double score = 4;
+
+  reserved 5 to 15;
+  reserved "confidence", "priority", "intent_code";
+}
+
+message ProviderStatus {
+  string name = 1;
+  bool ok = 2;
+  // True when Requires() was not satisfied by the supplied measurements.
+  bool skipped = 3;
+  string error = 4;
+  int32 count = 5;
+  int64 latency_ms = 6;
+}
+
+message GetRecommendationsResponse {
+  repeated Recommendation recommendations = 1;
+  repeated ProviderStatus statuses = 2;
+}
+
+message StreamVitalsRequest {
+  string metric = 1; // "heart_rate" | "steps"
+}
+
+message VitalsSample {
+  int64 t_unix_ms = 1;
+  double value = 2;
+  string unit = 3;
+}

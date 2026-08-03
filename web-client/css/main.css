@@ -1,0 +1,266 @@
+:root {
+  --color-text: #1a1a1a;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-bg: #ffffff;
+  --color-bg-alt: #f9fafb;
+  --color-accent: #1e40af;
+  --color-danger: #b91c1c;
+  --color-danger-bg: #fef2f2;
+  /* Informational (skipped/data-minimisation) treatment — deliberately
+     blue/neutral, never red. Matches Android's colorStatusSkipped{Bg,Text}
+     (#E8F0FE / #1A3D8F) and iOS's systemBlue "info.circle" styling for the
+     same FWAProviderStatusSeverityInfo / Severity.INFO case, so all three
+     clients agree on what "this provider was skipped for privacy reasons"
+     looks like. */
+  --color-info: #1a3d8f;
+  --color-info-bg: #e8f0fe;
+  --font-stack: system-ui, -apple-system, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+  --font-mono: "SF Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-stack);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--color-border);
+  padding: 1.25rem 2rem;
+}
+
+.site-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.site-tagline {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+main {
+  padding: 1.5rem 2rem;
+  max-width: 1200px;
+}
+
+/* Measurement + fault-injection form */
+
+.recs-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 480px;
+  margin: 0 0 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-alt);
+}
+
+.recs-form fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem 1rem;
+}
+
+.recs-form legend {
+  padding: 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.recs-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.recs-field:last-child { margin-bottom: 0; }
+
+.recs-field label {
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.recs-field .recs-optional {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+.recs-field input,
+.recs-field select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.recs-fault-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.recs-fault-row select {
+  padding: 0.25rem 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.recs-submit {
+  justify-self: start;
+  padding: 0.55rem 1.25rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.recs-submit:hover { opacity: 0.9; }
+
+/*
+ * The banner container itself carries no color — it is only a layout slot.
+ * Each status gets its own box, styled by severity below, so a skipped
+ * (deliberate data-minimisation) provider and a genuinely failed provider
+ * never look the same, even when both are present at once (that exact
+ * combination is reachable: e.g. birth date omitted + a faulted service).
+ */
+#degradation-banner {
+  display: none;
+  margin: 0 0 1.25rem;
+}
+
+#degradation-banner:not(:empty) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#degradation-banner p {
+  margin: 0;
+  padding: 0.6rem 1rem 0.6rem 2.1rem;
+  /* Width/style only — deliberately no color here. This selector's ID
+     specificity (1,0,1) would otherwise always beat the state classes'
+     `border-color` (0,1,0) below, which is exactly the bug this rule once
+     had: every banner rendered with a transparent border regardless of
+     state. Leaving border-color unset at this specificity lets
+     .recs-banner-skipped/-degraded/-error's border-color win. */
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+#degradation-banner p::before {
+  position: absolute;
+  left: 0.9rem;
+  top: 0.6rem;
+  font-weight: 700;
+}
+
+/* skipped: ok=false, skipped=true — deliberate GDPR data minimisation, NOT
+   a failure. Informational blue, matching Android's colorStatusSkipped{Bg,
+   Text} and iOS's systemBlue "info.circle" treatment. */
+.recs-banner-skipped {
+  border-color: var(--color-info);
+  background: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.recs-banner-skipped::before { content: "\24D8"; /* circled small i */ }
+
+/* degraded (genuine outage) and the whole-request fetch failure both stay
+   in the pre-existing danger/red treatment — that is a real failure. */
+.recs-banner-degraded,
+.recs-banner-error {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.recs-banner-degraded::before,
+.recs-banner-error::before { content: "\26A0"; /* warning triangle */ }
+
+/* Recommendations table */
+
+.recs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.recs-table th,
+.recs-table td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.recs-table thead th {
+  background: var(--color-bg-alt);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+}
+
+.recs-table tbody tr:hover { background: var(--color-bg-alt); }
+
+/*
+ * Sortable-header affordance for goog.ui.TableSorter (wired up in
+ * Controller.attachTableSorter_). Only headers carrying `recs-th-sortable`
+ * (Recommendation, Source, Score) get the pointer + glyph — Details is
+ * left unstyled since it is configured goog.ui.TableSorter.noSort and
+ * clicking it does nothing.
+ *
+ * goog-tablesorter-sorted / goog-tablesorter-sorted-reverse are applied
+ * directly by TableSorter itself (via goog.getCssName, unrenamed here —
+ * this project does not use a CSS renaming map) to whichever header was
+ * last clicked, so the arrow glyph always reflects live sort state, not
+ * just hover.
+ */
+.recs-table thead th.recs-th-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.recs-table thead th.recs-th-sortable:hover {
+  color: var(--color-text);
+}
+
+.recs-table thead th.recs-th-sortable::after {
+  content: "\21C5"; /* ⇅ up-down arrows: unsorted, but sortable */
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.7rem;
+  opacity: 0.45;
+}
+
+.recs-table thead th.recs-th-sortable.goog-tablesorter-sorted::after {
+  content: "\2191"; /* ↑ ascending */
+  opacity: 1;
+}
+
+.recs-table thead th.recs-th-sortable.goog-tablesorter-sorted-reverse::after {
+  content: "\2193"; /* ↓ descending */
+  opacity: 1;
+}
+
+.recs-source { font-family: var(--font-mono); color: var(--color-accent); }
+.recs-score { font-family: var(--font-mono); }
+.recs-empty { color: var(--color-muted); text-align: center; }

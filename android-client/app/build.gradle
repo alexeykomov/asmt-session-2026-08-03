@@ -1,0 +1,158 @@
+plugins {
+    id 'com.android.application'
+    id 'com.google.protobuf'
+}
+
+// Load the repo-root .env (if present) into project properties, so
+// -PserverHost/-PserverTls/-PserverToken keep working exactly as before
+// when passed on the command line, but a fresh clone with a real .env
+// (copied from .env.example) also gets its defaults from there — without
+// requiring the command-line flags every time. Env keys map to Gradle
+// properties as: GRPC_HOST -> serverHost, INTERNAL_GRPC_TOKEN -> serverToken.
+// Project properties set via -P always win (Gradle only fills in a property
+// via ext when it isn't already present), so the existing override
+// behaviour is unchanged.
+def envFile = rootProject.file('../.env')
+if (envFile.exists()) {
+    def envProps = new Properties()
+    envFile.withInputStream { envProps.load(it) }
+    if (envProps.containsKey('GRPC_HOST') && !project.hasProperty('serverHost')) {
+        project.ext.serverHost = envProps.getProperty('GRPC_HOST')
+    }
+    if (envProps.containsKey('INTERNAL_GRPC_TOKEN') && !project.hasProperty('serverToken')) {
+        def token = envProps.getProperty('INTERNAL_GRPC_TOKEN')
+        if (token) {
+            project.ext.serverToken = token
+        }
+    }
+}
+
+android {
+    namespace 'com.funwithactivity.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.funwithactivity.app"
+        minSdk 24  // API 24+ (Android 7.0)
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Build-config constants for the gRPC server host:port, transport,
+        // AND auth token. These get repointed live during customer demos
+        // (e.g. -PserverHost=10.0.2.2:51100 -PserverTls=false
+        // -PserverToken=testtoken123 when the app-server is started locally
+        // on a non-default high port), so none of the three must be
+        // hardcoded anywhere else — and they MUST be changed TOGETHER: the
+        // TLS edge only speaks TLS and only accepts its own token, the local
+        // dev server only speaks plaintext and only accepts its own token,
+        // so host/transport/credential describe one endpoint, not three
+        // independent knobs. The default below is a safe, non-real
+        // placeholder — the repo-root .env's GRPC_HOST (loaded above) fills
+        // in the real deployed edge for anyone who has a .env; set
+        // serverToken at build time for a build that must authenticate
+        // against a real edge.
+        buildConfigField "String", "SERVER_HOST",
+            "\"${project.findProperty('serverHost') ?: 'localhost:50051'}\""
+        buildConfigField "boolean", "SERVER_TLS",
+            "${project.findProperty('serverTls') ?: 'true'}"
+        buildConfigField "String", "SERVER_TOKEN",
+            "\"${project.findProperty('serverToken') ?: ''}\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            // Demo override, changed together:
+            //   ./gradlew installDebug -PserverHost=10.0.2.2:51100 -PserverTls=false -PserverToken=testtoken123
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        viewBinding true
+        buildConfig true
+    }
+
+    // Point the protobuf plugin at the repo's existing api/proto directory
+    // rather than duplicating recommendations.proto here — a second copy
+    // would drift from the contract.
+    sourceSets {
+        main {
+            proto {
+                srcDir '../../api/proto'
+            }
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.25.5'
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.56.0'
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+            }
+            task.plugins {
+                grpc {
+                    option 'lite'
+                }
+            }
+        }
+    }
+}
+
+configurations.all {
+    // Espresso's `accessibility-test-framework` transitively brings in the
+    // long-deprecated `com.google.protobuf:protobuf-lite:3.0.1`, whose
+    // GeneratedMessageLite class lacks the 2-arg `registerDefaultInstance`
+    // overload that protoc 3.25.5 emits. The legacy class shadows the modern
+    // `protobuf-javalite` runtime in the test APK, crashing the app on
+    // first proto use. Exclude the legacy artifact everywhere.
+    exclude group: 'com.google.protobuf', module: 'protobuf-lite'
+}
+
+dependencies {
+    // AndroidX
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.recyclerview:recyclerview:1.3.1'
+    implementation 'com.google.android.material:material:1.9.0'
+
+    // Health Connect (M5 — read height/weight/date-of-birth to prefill the form)
+    implementation 'androidx.health.connect:connect-client:1.1.0-alpha07'
+
+    // gRPC
+    implementation 'io.grpc:grpc-okhttp:1.56.0'
+    implementation 'io.grpc:grpc-protobuf-lite:1.56.0'
+    implementation 'io.grpc:grpc-stub:1.56.0'
+    // Pin protobuf-javalite to match protoc 3.25.5 above. grpc-protobuf-lite:1.56.0
+    // brings in javalite 3.22.3 transitively, which lacks the 2-arg
+    // registerDefaultInstance(Class, GeneratedMessageLite) overload that protoc
+    // 3.25.5 emits — the app crashes on first proto message use without this pin.
+    implementation 'com.google.protobuf:protobuf-javalite:3.25.5'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

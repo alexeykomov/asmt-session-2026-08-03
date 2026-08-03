@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Release/base: no cleartext traffic anywhere. The debug source set overrides
+     this file (app/src/debug/res/xml/) to allow cleartext, since the demo
+     server (BuildConfig.SERVER_HOST) is plaintext gRPC. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

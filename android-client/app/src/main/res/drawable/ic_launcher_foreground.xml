@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Simple heart/pulse mark as a placeholder demo mark. -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,78 L30,55 C20,45 20,30 34,26 C43,23 51,29 54,36 C57,29 65,23 74,26 C88,30 88,45 78,55 Z" />
+</vector>

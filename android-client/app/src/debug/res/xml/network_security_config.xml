@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- DEBUG builds only: BuildConfig.SERVER_HOST is repointed live during customer
+     demos (e.g. -PserverHost=10.0.2.2:51100 or a different LAN IP entirely), so
+     rather than enumerate demo hosts we permit cleartext everywhere in debug.
+     Release uses the base config in app/src/main/res/xml/, which forbids
+     cleartext entirely. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

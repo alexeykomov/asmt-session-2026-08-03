@@ -1,0 +1,45 @@
+{namespace funwithactivity.components.recommendationsTable}
+
+/**
+ * Ranked recommendations with provenance. The source column is what makes
+ * multi-provider aggregation visible rather than implied.
+ *
+ * Score is rendered from `scoreDisplay`, not `score`: the server sends
+ * `score` as a raw float with variable precision, and the controller (see
+ * Controller.withFormattedScore_) adds `scoreDisplay` — the same value
+ * formatted to exactly 2 decimal places — before handing data to this
+ * template, matching iOS's "%.2f" and Android's "%1$.2f" score formatting.
+ *
+ * Sorting itself is not wired up here: the controller decorates this
+ * table with goog.ui.TableSorter after every render (see
+ * Controller.attachTableSorter_), which requires exactly this
+ * thead/tbody structure. The `recs-th-sortable` class on Recommendation,
+ * Source and Score is styling only — a visual affordance so a user can
+ * tell those headers are clickable — Details has no such class since it
+ * is explicitly configured unsortable (goog.ui.TableSorter.noSort).
+ */
+{template .table}
+  {@param recommendations: list<?>}
+  <table class="recs-table">
+    <thead>
+      <tr>
+        <th class="recs-th-sortable">Recommendation</th>
+        <th>Details</th>
+        <th class="recs-th-sortable">Source</th>
+        <th class="recs-th-sortable">Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {foreach $r in $recommendations}
+        <tr>
+          <td class="recs-title">{$r.title}</td>
+          <td class="recs-details">{$r.details ?: '—'}</td>
+          <td class="recs-source">{$r.source}</td>
+          <td class="recs-score">{$r.scoreDisplay}</td>
+        </tr>
+      {ifempty}
+        <tr><td colspan="4" class="recs-empty">No recommendations yet.</td></tr>
+      {/foreach}
+    </tbody>
+  </table>
+{/template}

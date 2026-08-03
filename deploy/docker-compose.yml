@@ -1,0 +1,59 @@
+services:
+  app-server:
+    build:
+      context: ..
+      dockerfile: app-server/Dockerfile
+    container_name: funwithactivity-app-server
+    # Loads PROVIDER1_URL / PROVIDER2_URL / INTERNAL_GRPC_TOKEN / etc. from
+    # the repo-root .env (see .env.example for the full key list and where
+    # to get real values). Copy .env.example to .env before running this.
+    env_file: ../.env
+    environment:
+      GRPC_PORT: "50051"
+      HEALTH_HTTP_PORT: "50052"
+      # 2s per provider: the fault-toggle demo must degrade visibly within a
+      # beat, not after fifteen seconds of dead air in front of an audience.
+      PROVIDER_TIMEOUT_MS: "2000"
+      # Real vendor endpoints come from .env via env_file above (both behind
+      # the same Lambda + FastAPI deployment — see docs/integrations/service1.md
+      # and service2.md for the corrected wire contract, which differs from
+      # the customer's own written brief).
+      # Set to "true" to fall back to canned data if the vendors are down
+      # during a session; never engages automatically.
+      USE_STUB_PROVIDERS: "${USE_STUB_PROVIDERS:-}"
+      # This stack deliberately runs with no INTERNAL_GRPC_TOKEN by default
+      # (leave it blank in .env). The explicit ALLOW_INSECURE_GRPC opt-out
+      # (see cmd/server/main.go's authInterceptor) makes that an intentional,
+      # loud choice for local dev/compose rather than silently benefiting
+      # from the server's old fail-open behaviour when a secret happens to
+      # be unset. Never set this for anything customer-facing — set
+      # INTERNAL_GRPC_TOKEN in .env instead.
+      ALLOW_INSECURE_GRPC: "true"
+    expose:
+      - "50051"
+      - "50052"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:50052/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  web-proxy:
+    build:
+      context: ..
+      dockerfile: web-proxy/Dockerfile
+    container_name: funwithactivity-web-proxy
+    env_file: ../.env
+    environment:
+      PORT: "3000"
+      NODE_ENV: "production"
+      APP_SERVER_URL: "app-server:50051"
+      # No INTERNAL_GRPC_TOKEN here either — app-server accepts unauthenticated
+      # calls in this stack via its own ALLOW_INSECURE_GRPC opt-out above.
+    ports:
+      - "${WEB_PROXY_PORT:-3000}:3000"
+    depends_on:
+      app-server:
+        condition: service_healthy
+    restart: unless-stopped
