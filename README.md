@@ -51,6 +51,52 @@ are recorded as ADRs in `docs/decisions/`:
 - [`0001-replace-not-accumulate.md`](docs/decisions/0001-replace-not-accumulate.md) — each response replaces the rendered result set; clients never accumulate results across requests.
 - [`0002-property-names-never-cross-the-wire.md`](docs/decisions/0002-property-names-never-cross-the-wire.md) — why the wire format is packed positional arrays, not named JSON fields, and where plain objects are still fine.
 
+### Erasure: why crypto-shredding rather than `DELETE`
+
+This one is worth stating in the README because it drives the storage design
+rather than following from it, and because it is the first thing an architect
+asks about once ClickHouse appears on a diagram.
+
+**ClickHouse is bad at deleting.** `MergeTree` parts are immutable, so
+`ALTER TABLE … DELETE` is a *mutation* that rewrites every part containing a
+matching row — and after a year, one user's samples are scattered across
+nearly all of them. Lightweight `DELETE FROM` is faster to issue but only
+writes a `_row_exists` mask; the bytes remain until background merges rewrite
+those parts. What ClickHouse *is* good at is `DROP PARTITION`, which is
+metadata-only and effectively instant. So time-based retention is cheap and
+per-user erasure is expensive — exactly backwards from what GDPR Art. 17 asks
+for.
+
+**Crypto-shredding** inverts that: encrypt under a per-user key, and erase by
+destroying the key. The ciphertext stays and becomes permanently unreadable.
+It is a general technique, not a ClickHouse one, and it wins on four counts:
+
+| | Row deletion | Key destruction |
+|---|---|---|
+| Cost | O(data) — rewrite parts, propagate to replicas | O(1) — one KMS call |
+| Backups, snapshots, replicas | Untouched — the user still exists in every retained backup and every S3 version | All become unreadable at once |
+| Immutable / WORM storage | Fights it — Object Lock and MergeTree parts are *deliberately* undeletable | Composes with it |
+| Evidence | You assert the deletion happened | An auditable, timestamped key-deletion event |
+
+The backups row is the real argument. Deleting a user from the live database
+is easy; deleting them from every retained backup is not something you can
+practically do. NIST SP 800-88 recognises cryptographic erase as a
+sanitisation method, so this is not a novel position.
+
+**The limit, stated rather than discovered:** this cannot be applied to the
+measurement *values* in ClickHouse. Per-user-encrypted columns are
+high-entropy, so columnar compression collapses — and the volume estimates
+depend on that compression — and population-insight queries aggregate *across*
+users, which is impossible under per-user keys. So the mechanism applies to
+the **identity linkage, not the samples**: telemetry lands under a per-user
+pseudonym, the pseudonym-to-identity mapping lives encrypted in Postgres, and
+erasure destroys that mapping while partition TTL ages the orphaned rows out.
+
+The open question that follows, and one for the customer's DPO rather than for
+us to assert: health time series are notoriously re-identifiable, so whether
+orphaned samples are *anonymous* under Art. 4(5) — or merely pseudonymous, and
+therefore still personal data — is a determination we flag rather than make.
+
 ## The two vendor integrations
 
 Both recommendation providers are external services this project does not

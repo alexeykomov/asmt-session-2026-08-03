@@ -337,10 +337,27 @@ diagram is already at the density limit for one page. They belong in the build:
   users pinned home. This is one decision that satisfies three requirements at
   once — Art. 44 residency, the brief's stated pilot-then-global rollout, and
   blast-radius containment for a company that has already settled a data suit.
-- **KMS and per-user key store.** Erasure under Art. 17 is by crypto-shredding:
-  destroy the user's key and the ciphertext in immutable columnar storage is
-  dead. Deleting rows from ClickHouse at scale is not a mechanism you want to
-  depend on for a regulatory deadline.
+- **KMS and per-user key store.** Erasure under Art. 17 is by crypto-shredding
+  rather than row deletion. ClickHouse is bad at deleting — `MergeTree` parts
+  are immutable, so a delete is a mutation that rewrites every part holding a
+  matching row, and one user's samples end up scattered across nearly all of
+  them. It is good at `DROP PARTITION`. So time-based retention is cheap and
+  per-user erasure is expensive, which is backwards from what Art. 17 asks.
+  Crypto-shredding also reaches what deletion cannot: every retained backup,
+  snapshot and replica becomes unreadable in one key-destruction event, which
+  is auditable rather than merely asserted.
+
+  **The shredding applies to the identity linkage, not to the samples**, and
+  the distinction matters. Per-user-encrypted columns are high-entropy, so
+  columnar compression collapses — and the volume estimates depend on that
+  compression — while population-insight queries aggregate *across* users,
+  which per-user keys make impossible. So telemetry lands under a per-user
+  pseudonym, the pseudonym-to-identity mapping is encrypted in Postgres, and
+  erasure destroys that mapping while partition TTL ages the orphaned rows
+  out. Whether those orphaned samples are then *anonymous* under Art. 4(5) or
+  merely pseudonymous — health time series are notoriously re-identifiable —
+  is a determination for the customer's DPO, and we flag it rather than
+  assume the favourable reading.
 - **Consent and PHI-access audit log.** Append-only, in Postgres, and
   deliberately **not** erasable — §164.312(b) audit controls and a six-year
   legal-basis retention that directly conflicts with Art. 17. We name the
