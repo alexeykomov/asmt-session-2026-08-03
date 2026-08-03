@@ -10,6 +10,8 @@
 #import "FWASourcesViewController.h"
 #import "FWAProfileViewController.h"
 #import "FWAAddSourceViewController.h"
+#import "FWASourceDetailViewController.h"
+#import "Recommendations.pbobjc.h"
 
 @implementation AppDelegate
 
@@ -96,6 +98,38 @@
         // before this reaches into it.
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [profileVC debug_expandBirthDatePicker];
+        });
+    }
+
+    // Headless verification for FWASourceDetailViewController — same
+    // reasoning as every other hook in this method (no XCUITest/UI-
+    // automation harness in this project): pushes the exact same screen,
+    // constructed the exact same way, that FWASourcesViewController's
+    // -tableView:didSelectRowAtIndexPath: pushes on a real tap. Requires
+    // FWA_DEMO_SELECT_TAB_AFTER_FETCH=1 in the same launch so Sources has
+    // already switched in and a real fetch has already populated
+    // appState.lastStatuses by the time this fires.
+    if ([defaults boolForKey:@"FWA_DEMO_PUSH_SOURCE_DETAIL"]) {
+        NSInteger detailIndex = [defaults integerForKey:@"FWA_DEMO_PUSH_SOURCE_DETAIL_INDEX"];
+        // 5.0s: long enough to land after FWA_DEMO_REFETCH_SEQUENCE's own
+        // ~3.6s of tab switches AND the real (network) second fetch it
+        // triggers, not just the first launch fetch — this is the hook used
+        // to verify the STATUS section against a genuinely degraded/skipped
+        // status, which only exists after that sequence completes.
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            // Force Sources to have loaded its view at least once first, so
+            // its navigationItem.title ("Sources", set in -viewDidLoad) is
+            // there for the pushed detail screen's back button — pushing
+            // onto a tab's nav stack does not itself trigger that tab's
+            // view to load if it has never been the selected tab.
+            tabBarController.selectedIndex = 1;
+            NSArray<ProviderStatus *> *statuses = appState.lastStatuses;
+            if (detailIndex >= 0 && detailIndex < (NSInteger)statuses.count) {
+                ProviderStatus *status = statuses[detailIndex];
+                FWASourceDetailViewController *detailVC =
+                    [[FWASourceDetailViewController alloc] initWithProviderName:status.name status:status];
+                [sourcesNav pushViewController:detailVC animated:NO];
+            }
         });
     }
 

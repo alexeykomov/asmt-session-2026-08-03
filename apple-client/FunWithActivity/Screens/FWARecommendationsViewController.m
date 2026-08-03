@@ -7,6 +7,7 @@
 #import "FWAGRPCClient.h"
 #import "FWAAppState.h"
 #import "FWAProviderStatusPresentation.h"
+#import "FWASourceStatusFormatting.h"
 #import "Recommendations.pbobjc.h"
 #if DEBUG
 #import <os/log.h>
@@ -284,12 +285,16 @@ typedef NS_ENUM(NSInteger, FWARecsSection) {
         cell.textLabel.textColor = [UIColor secondaryLabelColor];
         cell.backgroundColor = [UIColor secondarySystemBackgroundColor];
         cell.imageView.image = [UIImage systemImageNamed:@"info.circle"];
-        cell.imageView.tintColor = [UIColor systemBlueColor];
+        cell.imageView.tintColor = FWAStatusColor(banner);
     } else {
-        cell.textLabel.textColor = [UIColor systemOrangeColor];
+        // Same StatusDegraded asset colour Sources uses for this severity —
+        // single source of truth, so this and Sources cannot independently
+        // drift out of parity with web/Android the way orange-here/
+        // red-there already had.
+        cell.textLabel.textColor = FWAStatusColor(banner);
         cell.backgroundColor = [UIColor systemBackgroundColor];
         cell.imageView.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
-        cell.imageView.tintColor = [UIColor systemOrangeColor];
+        cell.imageView.tintColor = FWAStatusColor(banner);
     }
 
     return cell;

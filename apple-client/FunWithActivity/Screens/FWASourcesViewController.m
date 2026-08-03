@@ -5,6 +5,8 @@
 
 #import "FWASourcesViewController.h"
 #import "FWAAddSourceViewController.h"
+#import "FWASourceDetailViewController.h"
+#import "FWASourceStatusFormatting.h"
 #import "FWAAppState.h"
 #import "FWAProviderStatusPresentation.h"
 #import "Recommendations.pbobjc.h"
@@ -161,14 +163,13 @@ static NSString *const kPlaceholderCellID = @"PlaceholderCell";
     if (!cell) {
         cell = [[FWASourceCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kSourceCellID];
     }
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 
     ProviderStatus *status = statuses[indexPath.row];
     cell.nameLabel.text = status.name;
 
-    NSString *latencyText = status.latencyMs > 0
-        ? [NSString stringWithFormat:@"%lld ms", (long long)status.latencyMs]
-        : @"—";
+    NSString *latencyText = FWALatencyText(status.latencyMs);
 
     // The skipped-vs-degraded decision is NOT re-derived here. It is made
     // exactly once, by FWAProviderStatusPresentation (see its header doc:
@@ -183,22 +184,40 @@ static NSString *const kPlaceholderCellID = @"PlaceholderCell";
 
     if (presentations.count == 0) {
         cell.statusLabel.text = [NSString stringWithFormat:@"● ok · %@", latencyText];
-        cell.statusLabel.textColor = [UIColor systemGreenColor];
+        cell.statusLabel.textColor = FWAStatusColor(nil);
         cell.errorLabel.text = nil;
         cell.errorLabel.hidden = YES;
     } else {
         FWAProviderStatusPresentation *presentation = presentations.firstObject;
-        BOOL isSkipped = presentation.severity == FWAProviderStatusSeverityInfo;
-        NSString *statusWord = isSkipped ? @"skipped" : @"degraded";
-        cell.statusLabel.text = [NSString stringWithFormat:@"● %@ · %@", statusWord, latencyText];
-        cell.statusLabel.textColor = isSkipped ? [UIColor systemBlueColor] : [UIColor systemOrangeColor];
+        cell.statusLabel.text = [NSString stringWithFormat:@"● %@ · %@", FWAStatusWord(presentation), latencyText];
+        cell.statusLabel.textColor = FWAStatusColor(presentation);
 
-        BOOL hasError = status.error.length > 0;
-        cell.errorLabel.text = hasError ? status.error : nil;
-        cell.errorLabel.hidden = !hasError;
+        // Short, list-safe reason only — never the full `error`, which can
+        // embed an entire vendor URL (that URL got captured live and
+        // projected during a demo once already). The full text moves to
+        // FWASourceDetailViewController's STATUS section, where an
+        // operator genuinely needs it.
+        cell.errorLabel.text = FWAShortStatusReason(presentation, status);
+        cell.errorLabel.hidden = NO;
     }
 
     return cell;
+}
+
+#pragma mark - UITableViewDelegate (selection)
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+    NSArray<ProviderStatus *> *statuses = self.appState.lastStatuses;
+    if (statuses.count == 0) {
+        return; // the "waiting for the first fetch" placeholder row — not tappable
+    }
+
+    ProviderStatus *status = statuses[indexPath.row];
+    FWASourceDetailViewController *detailVC =
+        [[FWASourceDetailViewController alloc] initWithProviderName:status.name status:status];
+    [self.navigationController pushViewController:detailVC animated:YES];
 }
 
 @end

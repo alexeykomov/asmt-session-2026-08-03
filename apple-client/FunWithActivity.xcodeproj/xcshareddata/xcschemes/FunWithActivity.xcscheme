@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B33D2D977ABF51870604B06C"
+               BlueprintIdentifier = "FAE9C3BCBAF8088870ADE8FC"
                BuildableName = "FunWithActivity.app"
                BlueprintName = "FunWithActivity"
                ReferencedContainer = "container:FunWithActivity.xcodeproj">
@@ -28,7 +28,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E447002432ACE708D1E71958"
+               BlueprintIdentifier = "AE2C6B9EDCF4B59579B38B00"
                BuildableName = "FunWithActivityCoreTests.xctest"
                BlueprintName = "FunWithActivityCoreTests"
                ReferencedContainer = "container:FunWithActivity.xcodeproj">
@@ -44,7 +44,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B33D2D977ABF51870604B06C"
+            BlueprintIdentifier = "FAE9C3BCBAF8088870ADE8FC"
             BuildableName = "FunWithActivity.app"
             BlueprintName = "FunWithActivity"
             ReferencedContainer = "container:FunWithActivity.xcodeproj">
@@ -55,7 +55,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E447002432ACE708D1E71958"
+               BlueprintIdentifier = "AE2C6B9EDCF4B59579B38B00"
                BuildableName = "FunWithActivityCoreTests.xctest"
                BlueprintName = "FunWithActivityCoreTests"
                ReferencedContainer = "container:FunWithActivity.xcodeproj">
@@ -77,7 +77,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B33D2D977ABF51870604B06C"
+            BlueprintIdentifier = "FAE9C3BCBAF8088870ADE8FC"
             BuildableName = "FunWithActivity.app"
             BlueprintName = "FunWithActivity"
             ReferencedContainer = "container:FunWithActivity.xcodeproj">
@@ -94,7 +94,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B33D2D977ABF51870604B06C"
+            BlueprintIdentifier = "FAE9C3BCBAF8088870ADE8FC"
             BuildableName = "FunWithActivity.app"
             BlueprintName = "FunWithActivity"
             ReferencedContainer = "container:FunWithActivity.xcodeproj">

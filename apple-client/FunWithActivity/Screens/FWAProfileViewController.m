@@ -361,14 +361,18 @@ static NSString *const kFaultCellID = @"FaultCell";
 }
 
 // Only reached when the picker row is expanded from a "Not set" birth date
-// (the user tapped the row to set one from scratch) — a reasonable, clearly
-// non-future starting point for the wheel, same year FWAAppState seeds a
-// fresh launch's default with.
+// (the user tapped the row to set one from scratch) — this ONLY positions
+// the wheel somewhere plausible so picking a date on stage is one gesture
+// instead of thirty years of scrolling. It does not write anything: the
+// field still reads "Not set" until the user actually turns the wheel (see
+// -didChangeBirthDatePicker:, the only place appState.birthDate is
+// assigned from the picker) or taps Clear, which must still return it to
+// "Not set" exactly as before.
 - (NSDate *)fallbackBirthDateForEmptyPicker {
     NSDateComponents *components = [[NSDateComponents alloc] init];
-    components.year = 1990;
-    components.month = 1;
-    components.day = 1;
+    components.year = 1983;
+    components.month = 5;
+    components.day = 29;
     NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
     return [calendar dateFromComponents:components] ?: [NSDate date];
 }

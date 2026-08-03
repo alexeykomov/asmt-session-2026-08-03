@@ -75,16 +75,27 @@ core_dir = File.join(PROJECT_DIR, 'FunWithActivityCore')
 add_files_to_target(project, core_target, core_group, core_dir)
 
 # FWAServerConfig.h/.m (in FunWithActivityCore) is driven by
-# GCC_PREPROCESSOR_DEFINITIONS — base every build configuration of this
-# target on Generated.xcconfig when it's present, so `FWA_GRPC_HOST` etc.
-# come from the repo-root .env automatically. Doing this here (rather than
-# leaving it as a manual Xcode step every regeneration) means the manual
-# step only has to happen once, ever: run generate-xcconfig.sh before the
-# first `ruby generate_project.rb`, or re-run generate_project.rb after.
-xcconfig_ref = nil
+# GCC_PREPROCESSOR_DEFINITIONS. Generated.xcconfig, when present, holds
+# FWA_ENV_GRPC_HOST/FWA_ENV_GRPC_TOKEN from the repo-root .env — parse those
+# two values out and inject them straight into each build configuration's
+# GCC_PREPROCESSOR_DEFINITIONS build setting, rather than setting
+# Generated.xcconfig as the target's base_configuration_reference. A target
+# has exactly one base-configuration slot, and `pod install` (run after this
+# script — see Config/generate-xcconfig.sh's header doc) needs that slot for
+# Pods-FunWithActivityCore's own xcconfig (search paths, etc.); claiming it
+# here first means CocoaPods silently declines to wire Pods in at all
+# ("did not set the base configuration... project already has a custom
+# config set"), and every Pod header import fails to resolve. Reading the
+# two values out of the file sidesteps the conflict entirely.
+generated_defines = nil
 if File.exist?(GENERATED_XCCONFIG_PATH)
-  config_group = project.main_group.new_group('Config')
-  xcconfig_ref = config_group.new_reference(GENERATED_XCCONFIG_PATH)
+  xcconfig_contents = File.read(GENERATED_XCCONFIG_PATH)
+  env_host = xcconfig_contents[/^FWA_ENV_GRPC_HOST\s*=\s*(.+)$/, 1]&.strip
+  env_token = xcconfig_contents[/^FWA_ENV_GRPC_TOKEN\s*=\s*(.+)$/, 1]&.strip
+  if env_host && !env_host.empty?
+    generated_defines = ["FWA_GRPC_HOST=\\\"#{env_host}\\\""]
+    generated_defines << "FWA_GRPC_TOKEN=\\\"#{env_token}\\\"" if env_token && !env_token.empty?
+  end
 end
 
 core_target.build_configurations.each do |config|
@@ -92,7 +103,10 @@ core_target.build_configurations.each do |config|
   config.build_settings['PRODUCT_NAME'] = '$(TARGET_NAME)'
   config.build_settings['HEADER_SEARCH_PATHS'] = ['$(inherited)', "#{core_dir}/**"]
   config.build_settings['OTHER_LDFLAGS'] = ['$(inherited)', '-ObjC']
-  config.base_configuration_reference = xcconfig_ref if xcconfig_ref
+  if generated_defines
+    existing_defines = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+    config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = existing_defines + generated_defines
+  end
 end
 
 # Generated proto sources use manual retain/release (protobuf-objc
@@ -111,11 +125,30 @@ iphone_dir = File.join(PROJECT_DIR, 'FunWithActivity')
 
 add_files_to_target(project, iphone_target, iphone_group, iphone_dir)
 
+# Assets.xcassets — single source of truth for named colours (StatusOK /
+# StatusSkipped / StatusDegraded and any future additions). An asset
+# catalog is added as one folder reference to the Resources build phase;
+# actool reads its contents at build time, so nothing inside it needs its
+# own PBXFileReference the way add_files_to_target's .h/.m/.c walk works.
+assets_path = File.join(iphone_dir, 'Resources', 'Assets.xcassets')
+if Dir.exist?(assets_path)
+  resources_group = iphone_group.new_group('Resources')
+  assets_ref = resources_group.new_reference(assets_path)
+  iphone_target.add_resources([assets_ref])
+end
+
 iphone_target.build_configurations.each do |config|
   common_build_settings(config)
   config.build_settings['PRODUCT_NAME'] = 'FunWithActivity'
   config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.funwithactivity.ios'
   config.build_settings['INFOPLIST_FILE'] = '$(SRCROOT)/FunWithActivity/Supporting/Info.plist'
+  # No AppIcon/AccentColor set in Assets.xcassets (it exists only for the
+  # named status colours) — Xcode's default ASSETCATALOG_COMPILER_*_NAME
+  # build settings otherwise point actool at an "AppIcon"/"AccentColor" set
+  # that doesn't exist, which is a hard actool error for AppIcon (unlike
+  # the accent colour, which only warns).
+  config.build_settings['ASSETCATALOG_COMPILER_APPICON_NAME'] = ''
+  config.build_settings['ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME'] = ''
   config.build_settings['HEADER_SEARCH_PATHS'] = [
     '$(inherited)',
     "#{core_dir}/**",
