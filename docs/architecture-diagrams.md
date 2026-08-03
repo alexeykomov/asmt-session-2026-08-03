@@ -54,8 +54,9 @@ flowchart LR
     class iOS,Android,NginxEdge mobile;
 ```
 
-In production (AWS), an ALB with a gRPC target group replaces the nginx edge —
-the workaround is specific to this one PaaS, not to the architecture.
+In production, any load balancer with native gRPC support replaces the nginx edge
+— every major cloud offers one. The workaround is specific to this one PaaS, not
+to the architecture, and not to any cloud choice.
 
 ---
 
@@ -165,9 +166,18 @@ streaming ingest layer rather than being typed into a form — heart rate at up 
 runs as a background refresh, decoupled from the read path, calling provider
 adapters behind a cache and a circuit breaker. The read path serves 2000 RPS peak
 entirely from our own store and never calls a vendor inline. State — profile,
-entitlements, stored recommendations — lives in Postgres; events — telemetry,
-analytics — live in ClickHouse, because state is small, mutable and transactional
-while telemetry is enormous, immutable and analytical. Provider adapters are the
+entitlements, stored recommendations — lives in Postgres, because it is small,
+mutable and transactional. Events live in ClickHouse, because telemetry is
+enormous, immutable and analytical.
+
+**There are two ClickHouse deployments, and the reason is access, not volume.**
+CH #1 holds health telemetry and population insights and sits in the PHI plane;
+CH #2 holds pseudonymous product events — screens, funnels, tier conversion — and
+sits in the analytics plane. CH #2 needs a wide audience: analysts, PMs, growth,
+BI, dozens of people and services over time. CH #1 needs almost none. Access that
+broad next to data that sensitive is where grants drift, and this customer has
+already settled a suit over user data. Separating the planes is what makes
+"analysts can self-serve" and "health data is tightly held" both true at once. Provider adapters are the
 permanent seam, not a placeholder for a future standard API, because the customer
 has confirmed no control over third-party interfaces. Entitlement / subscription
 sits on the read path itself, because paid tiers make provider selection depend on
@@ -179,46 +189,103 @@ one.
 ```mermaid
 flowchart TD
     Devices(["Wearables & sensors<br/>HR up to 1 Hz dwarfs everything else"])
-    Stream["Stream ingest layer"]
-    CH[("ClickHouse<br/>events: telemetry, analytics")]
-    Refresh["Background refresh worker<br/>async, decoupled from reads"]
-    Gate{"Data-minimisation gate<br/>Provider.Requires() vs. fields present"}
-    Adapters["Provider adapters<br/>cache + circuit breaker"]
+    Partners(["Third-party health APIs<br/>OAuth-linked accounts, webhooks"])
+    Connectors["Inbound connectors — one adapter per source<br/>(Go · normalise into our schema)"]
+    Stream["Durable ordered buffer<br/>(Kafka · Kinesis · Pub/Sub)"]
+    CH1[("ClickHouse #1 — PHI plane<br/>health telemetry, population insights<br/>large · almost no human access")]
+    CH2[("ClickHouse #2 — Analytics plane<br/>pseudonymous product events<br/>small · wide audience")]
     PG[("Postgres<br/>state: profile, entitlements,<br/>stored recommendations")]
-    Entitlement{"Entitlement / subscription check"}
-    API["Read API"]
-    Client(["Client apps"])
+
+    subgraph Worker["Refresh worker — Go, async"]
+        Gate["Data-minimisation gate<br/>Provider.Requires() vs. fields present"]
+        Adapters["Outbound provider adapters<br/>cache + circuit breaker"]
+    end
+
+    subgraph AppServer["app-server — Go, gRPC"]
+        API["Read API"]
+        Entitlement["Entitlement / subscription check<br/>in-process, reads Postgres"]
+    end
+
+    WebProxy["web-proxy — REST facade for browsers<br/>(Node.js · or any BFF runtime)"]
+    Edge["Edge load balancer<br/>TLS · native gRPC<br/>(nginx · Envoy · managed LB)"]
+    Browser(["Browser"])
+    Native(["iOS / Android"])
 
     Devices -- "continuous telemetry" --> Stream
-    Stream --> CH
-    CH -- "latest height/weight/DOB<br/>projection" --> Refresh
-    PG -- "entitlement + profile" --> Refresh
-    Refresh --> Gate
-    Gate -- "eligible providers" --> Adapters
+    Partners --> Connectors
+    Connectors -- "same schema as device samples" --> Stream
+    Stream -- "PHI" --> CH1
+    CH1 -- "measured fields<br/>height, weight, latest vitals" --> Gate
+    PG -- "declared fields (DOB)<br/>plus entitlement" --> Gate
+    Gate -- "eligible providers only" --> Adapters
     Adapters -- "recommendations<br/>written on refresh cycle" --> PG
 
-    Client -- "GetRecommendations" --> API
+    Browser -- "HTTP/JSON" --> Edge
+    Native -- "gRPC/TLS" --> Edge
+    Edge --> WebProxy
+    Edge -- "gRPC" --> API
+    WebProxy -- "gRPC" --> API
     API --> Entitlement
     Entitlement -- "tier-filtered read<br/>vendors never called" --> PG
     PG -- "recommendations plus status" --> API
-    API --> Client
+
+    Browser -. "product events" .-> CH2
+    Native -. "product events" .-> CH2
+    API -. "service events" .-> CH2
 
     classDef store fill:#e7f0fd,stroke:#2b6cb0,color:#1a1a1a;
-    class PG,CH store;
+    class PG,CH1 store;
 
-    classDef async stroke:#8a5cf6,stroke-width:2px;
-    class Refresh,Gate,Adapters async;
+    classDef analytics fill:#f3f0ff,stroke:#8a5cf6,stroke-dasharray: 4 3,color:#1a1a1a;
+    class CH2 analytics;
 
-    classDef read stroke:#0b6e4f,stroke-width:2px;
-    class API,Entitlement,Client read;
+    classDef async fill:#f6f4ff,stroke:#8a5cf6,stroke-width:2px,color:#1a1a1a;
+    class Gate,Adapters,Connectors async;
+
+    classDef read fill:#eefaf4,stroke:#0b6e4f,stroke-width:2px,color:#1a1a1a;
+    class API,Entitlement,Browser,Native,Edge,WebProxy read;
+
+    classDef groupAsync fill:#fbfaff,stroke:#8a5cf6,stroke-width:1px,color:#4c1d95;
+    class Worker groupAsync;
+
+    classDef groupRead fill:#f7fdfa,stroke:#0b6e4f,stroke-width:1px,color:#0b6e4f;
+    class AppServer groupRead;
 ```
 
 Blue fill = the two stores, split by the nature of the data they hold, not by a
 size threshold. Purple outline = the asynchronous, provider-facing side — nothing
 here runs on a request. Green outline = the read path — nothing here calls a
-vendor. The projection from ClickHouse into the refresh worker is the one narrow
-point where the telemetry domain feeds the recommendation domain; the rest of the
-recommendation pipeline never sees a raw sample.
+vendor.
+
+The refresh worker runs as scheduled containers, or as timer-triggered
+functions — the choice is a deployment detail, not an architectural one.
+
+**Two boxes are drawn inside a process, not beside it.** The
+data-minimisation gate is `Provider.Requires()` — a function call in the refresh
+worker, the same one running in the PoC today. The entitlement check is a
+Postgres read on the way through `app-server`. Neither is a service, and drawing
+either as its own box would put a network hop, a deployment and a failure mode on
+the diagram that do not exist in the design. They are shown because they are the
+two decisions that make this architecture defensible, not because they are
+tiers — so they sit inside the process that owns them. If entitlement ever moves
+out, it will be because billing gets its own team and cadence, not because the
+read path needs it remote.
+
+**There are two vendor seams, and they point in opposite directions.** Inbound
+connectors pull user data *in* from third-party health APIs — an OAuth-linked
+account, a webhook, a nightly backfill — and normalise it into the same schema a
+device sample uses, so everything downstream of the buffer is source-agnostic.
+Outbound provider adapters call recommendation services and are the seam already
+built in the PoC. Conflating them would be a mistake: one is a data source
+subject to the same PHI handling as a wearable, the other is a compute
+dependency we send the minimum to.
+
+**So ClickHouse #1 is not the gate's only input.** Measured fields arrive through
+the stream; declared fields do not — a date of birth is never on a wearable
+feed, so it comes from the Postgres profile the user filled in, alongside their
+entitlement. The gate compares whatever is present, from either source, against
+what each provider requires. That is also why the projection out of CH #1 is
+narrow: the recommendation pipeline sees current values, never raw samples.
 
 ---
 
