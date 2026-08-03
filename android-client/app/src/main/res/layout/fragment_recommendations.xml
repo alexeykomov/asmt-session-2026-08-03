@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="24dp"
-        android:textColor="@color/colorStatusErrorText"
+        android:textColor="@color/colorStatusDegradedText"
         android:visibility="gone" />
 
     <!-- Status/banner area: one row per ProviderStatus, rendered per the
@@ -37,12 +37,25 @@
         android:text="@string/empty_results"
         android:visibility="gone" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recs_recycler_view"
+    <!-- Standard Android reload gesture, matching iOS's UIRefreshControl
+         (FWARecommendationsViewController.m) — parity across clients. This
+         is the ONLY manual refresh affordance on this screen: no toolbar
+         action, no FAB (the FAB is reserved for Sources' "+"). Calls
+         loadRecommendations(), the same force-refresh path the dirty-driven
+         auto-refetch uses. -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/recs_swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="8dp" />
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recs_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="8dp" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

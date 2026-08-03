@@ -26,8 +26,15 @@
     <string name="score_format">Score: %1$.2f</string>
     <string name="status_skipped_format">%1$s skipped — %2$s</string>
     <string name="status_error_format">%1$s unavailable — showing partial results (%2$s)</string>
-    <string name="status_ok_format">%1$s: %2$d recommendation(s) in %3$d ms</string>
-    <string name="action_refresh">Refresh</string>
+    <string name="status_ok_format">%1$s: %2$s in %3$d ms</string>
+
+    <!-- Pluralised recommendation count for the OK status banner
+         (status_ok_format's %2$s) — avoids the "recommendation(s)"
+         placeholder-ism. -->
+    <plurals name="recommendation_count">
+        <item quantity="one">%d recommendation</item>
+        <item quantity="other">%d recommendations</item>
+    </plurals>
 
     <!-- Sources tab -->
     <string name="sources_empty">No source data yet — visit Recommendations first.</string>
@@ -38,6 +45,30 @@
     <string name="source_latency_dash">—</string>
     <string name="source_latency_ms_format">%1$d ms</string>
     <string name="action_add_source">Add source</string>
+
+    <!-- Sources list: short reasons only (design spec addendum — the full
+         provider error embeds the vendor's Lambda URL and must never be
+         projected in the list; the full text still appears on the source
+         detail screen's STATUS section). -->
+    <string name="source_reason_skipped_no_birth_date">skipped — no birth date</string>
+    <string name="source_reason_timed_out">timed out</string>
+    <string name="source_reason_unavailable">unavailable</string>
+
+    <!-- Source detail screen: same grouped-card style as Profile. The two
+         built-in sources are read-only; a footer explains why. -->
+    <string name="source_detail_section_configuration">CONFIGURATION</string>
+    <string name="source_detail_section_status">STATUS</string>
+    <string name="source_detail_label_name">Name</string>
+    <string name="source_detail_label_type">Type</string>
+    <string name="source_detail_label_base_url">Base URL</string>
+    <string name="source_detail_label_status">Status</string>
+    <string name="source_detail_label_latency">Latency</string>
+    <string name="source_detail_label_last_error">Last error</string>
+    <string name="source_detail_value_none">None</string>
+    <string name="source_detail_base_url_value">Configured at deployment time</string>
+    <string name="source_detail_type_builtin">REST</string>
+    <string name="source_detail_builtin_footer">Built-in sources are configured at deployment time. There is nothing here to edit.</string>
+    <string name="source_detail_copied_format">%1$s copied</string>
 
     <!-- Add-source stub form (Sources tab, + action) -->
     <string name="add_source_title">Add source</string>

@@ -4,6 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
     app:cardElevation="2dp">
 
     <LinearLayout
@@ -50,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="@color/colorStatusErrorText"
+            android:textColor="@color/colorTextMuted"
             android:textAppearance="?attr/textAppearanceCaption"
             android:visibility="gone" />
 

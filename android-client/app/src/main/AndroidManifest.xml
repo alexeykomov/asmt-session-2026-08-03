@@ -48,6 +48,14 @@
             </intent-filter>
         </activity>
 
+        <!-- Source detail screen (Sources tab row tap) — same grouped-card
+             style as Profile, pushed as its own Activity so system/gesture
+             back just finishes it. -->
+        <activity android:name=".features.sources.SourceDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FunWithActivity.NoActionBar"
+            android:parentActivityName=".features.app.MainActivity" />
+
         <!-- Health Connect permission-rationale entry point. Health Connect's
              permissions screen links back here; routes to the tabbed shell,
              which surfaces the same manual-entry fallback via Profile. -->

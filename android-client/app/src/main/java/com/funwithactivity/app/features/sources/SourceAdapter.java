@@ -14,12 +14,14 @@ import com.funwithactivity.app.features.recommendations.ProviderStatusPresentati
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import funwithactivity.recommendations.v1.Recommendations.ProviderStatus;
 
 /**
  * Renders the Sources tab list: one row per provider from the most recent
- * {@code GetRecommendationsResponse.statuses}.
+ * {@code GetRecommendationsResponse.statuses}. Rows are tappable and open
+ * {@link SourceDetailActivity} via the supplied {@link OnItemClickListener}.
  *
  * The ok/skipped/degraded classification is resolved exclusively by {@link
  * ProviderStatusPresentation#forStatus} — the same class ResultsActivity /
@@ -29,10 +31,28 @@ import funwithactivity.recommendations.v1.Recommendations.ProviderStatus;
  * branch is exactly what has caused four defects on this project (see
  * ProviderStatusPresentation's Javadoc) — do not "simplify" this class by
  * inlining the check.
+ *
+ * <p>The list row shows a SHORT reason only (e.g. "timed out", "skipped —
+ * no birth date") — never the raw provider error, which embeds the full
+ * vendor URL and must not be projected during a demo/presentation. {@link
+ * #shortReason} is pure formatting on top of the already-resolved severity,
+ * same rationale as the latency dash below; it does not re-decide anything.
+ * The full raw error text still reaches the user, just on {@link
+ * SourceDetailActivity}'s STATUS section, not here.
  */
 public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder> {
 
+    /** Notified when a row is tapped, with the row's raw (un-presented) status. */
+    public interface OnItemClickListener {
+        void onItemClick(ProviderStatus status);
+    }
+
     private final List<ProviderStatus> items = new ArrayList<>();
+    private final OnItemClickListener listener;
+
+    public SourceAdapter(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setItems(List<ProviderStatus> newItems) {
         items.clear();
@@ -55,6 +75,9 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         Context context = holder.itemView.getContext();
 
         holder.name.setText(presentation.getProviderName());
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(status);
+        });
 
         switch (presentation.getSeverity()) {
             case INFO:
@@ -64,8 +87,8 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                 break;
             case DEGRADED:
                 holder.statusLabel.setText(R.string.source_status_degraded);
-                holder.statusLabel.setBackgroundColor(context.getColor(R.color.colorStatusErrorBg));
-                holder.statusLabel.setTextColor(context.getColor(R.color.colorStatusErrorText));
+                holder.statusLabel.setBackgroundColor(context.getColor(R.color.colorStatusDegradedBg));
+                holder.statusLabel.setTextColor(context.getColor(R.color.colorStatusDegradedText));
                 break;
             case OK:
             default:
@@ -84,14 +107,54 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
             : context.getString(R.string.source_latency_ms_format, presentation.getLatencyMs());
         holder.latency.setText(context.getString(R.string.source_latency_format, latencyValue));
 
-        String error = presentation.getError();
-        if (presentation.getSeverity() == ProviderStatusPresentation.Severity.DEGRADED
-            && error != null && !error.isEmpty()) {
+        String reason = shortReason(context, presentation);
+        if (reason != null) {
             holder.error.setVisibility(View.VISIBLE);
-            holder.error.setText(error);
+            holder.error.setText(reason);
+            // Colour the reason text to match its severity — INFO (skipped)
+            // must read as informational/blue, never as the DEGRADED red,
+            // or a deliberate data-minimisation outcome reads as an outage.
+            // The "OnSurface" variants (not the badge-paired
+            // colorStatusSkippedText/colorStatusDegradedText) are used here
+            // deliberately: this text sits bare on the card, which stays a
+            // light surface in dark mode too, so it must not pick up the
+            // night-tuned lighter tone meant for the colored badge — see
+            // colors.xml's comment on those two resources.
+            int reasonColorRes = presentation.getSeverity() == ProviderStatusPresentation.Severity.INFO
+                ? R.color.colorStatusSkippedTextOnSurface
+                : R.color.colorStatusDegradedTextOnSurface;
+            holder.error.setTextColor(context.getColor(reasonColorRes));
         } else {
             holder.error.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Short, presentation-only reason text for the list row. Never the raw
+     * {@code error} string — that would print the vendor URL in a screen
+     * that gets projected. Returns {@code null} for OK (no reason to show).
+     */
+    private static String shortReason(Context context, ProviderStatusPresentation presentation) {
+        switch (presentation.getSeverity()) {
+            case INFO:
+                // The only skip reason this app produces is a missing birth
+                // date (see aggregator.go's Requires() routing) — fixed text,
+                // not derived from the raw error.
+                return context.getString(R.string.source_reason_skipped_no_birth_date);
+            case DEGRADED:
+                return context.getString(looksLikeTimeout(presentation.getError())
+                    ? R.string.source_reason_timed_out
+                    : R.string.source_reason_unavailable);
+            case OK:
+            default:
+                return null;
+        }
+    }
+
+    private static boolean looksLikeTimeout(String rawError) {
+        if (rawError == null || rawError.isEmpty()) return false;
+        String lower = rawError.toLowerCase(Locale.US);
+        return lower.contains("deadline exceeded") || lower.contains("timeout");
     }
 
     @Override

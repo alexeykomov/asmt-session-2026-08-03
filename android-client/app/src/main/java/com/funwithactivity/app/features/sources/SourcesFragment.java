@@ -5,9 +5,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -25,6 +22,7 @@ import com.funwithactivity.app.FunWithActivityApplication;
 import com.funwithactivity.app.R;
 import com.funwithactivity.app.core.state.AppState;
 import com.funwithactivity.app.features.app.TabVisibilityAware;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -55,7 +53,6 @@ public class SourcesFragment extends Fragment implements TabVisibilityAware {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         FunWithActivityApplication app = (FunWithActivityApplication) requireActivity().getApplication();
         appState = app.getAppState();
     }
@@ -72,27 +69,19 @@ public class SourcesFragment extends Fragment implements TabVisibilityAware {
         super.onViewCreated(view, savedInstanceState);
         emptyView = view.findViewById(R.id.sources_empty);
         recyclerView = view.findViewById(R.id.sources_recycler_view);
+        FloatingActionButton fab = view.findViewById(R.id.sources_fab);
 
-        adapter = new SourceAdapter();
+        adapter = new SourceAdapter(this::openSourceDetail);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
+
+        fab.setOnClickListener(v -> showAddSourceDialog());
 
         refresh();
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_sources, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_add_source) {
-            showAddSourceDialog();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    private void openSourceDetail(ProviderStatus status) {
+        startActivity(SourceDetailActivity.createIntent(requireContext(), status));
     }
 
     @Override

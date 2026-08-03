@@ -58,11 +58,11 @@
                         android:inputType="numberDecimal" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <View
+                <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:background="@color/colorDivider" />
+                    app:dividerColor="@color/colorDivider" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -90,19 +90,19 @@
                         android:clickable="true"
                         android:focusable="true" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/profile_clear_birth_date"
-                        style="?attr/borderlessButtonStyle"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/clear_birth_date" />
                 </LinearLayout>
 
-                <View
+                <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:background="@color/colorDivider" />
+                    app:dividerColor="@color/colorDivider" />
 
                 <TextView
                     android:id="@+id/profile_health_connect_status"
@@ -112,9 +112,9 @@
                     android:textColor="@color/colorTextMuted"
                     android:visibility="gone" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/profile_health_connect_button"
-                    style="?attr/borderlessButtonStyle"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -188,11 +188,11 @@
                     android:layout_marginTop="4dp"
                     android:entries="@array/fault_modes" />
 
-                <View
+                <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginVertical="16dp"
-                    android:background="@color/colorDivider" />
+                    app:dividerColor="@color/colorDivider" />
 
                 <!-- service2 -->
                 <LinearLayout

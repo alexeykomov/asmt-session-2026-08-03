@@ -1,6 +1,5 @@
 package com.funwithactivity.app.features.profile;
 
-import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -22,12 +21,14 @@ import com.funwithactivity.app.R;
 import com.funwithactivity.app.core.health.HealthConnectHelper;
 import com.funwithactivity.app.core.state.AppState;
 import com.funwithactivity.app.features.app.TabVisibilityAware;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import funwithactivity.recommendations.v1.Recommendations.ProviderStatus;
@@ -56,6 +57,16 @@ public class ProfileFragment extends Fragment implements TabVisibilityAware {
 
     private static final String DEFAULT_PROVIDER_1 = "service1";
     private static final String DEFAULT_PROVIDER_2 = "service2";
+
+    /**
+     * Where the birth-date picker opens when nothing is set yet — purely a
+     * starting position so choosing a date on stage is one gesture instead
+     * of scrolling back thirty-odd years. The field itself stays unset until
+     * the user actually picks something (see {@link #showDatePicker}).
+     */
+    private static final int DEFAULT_PICKER_YEAR = 1983;
+    private static final int DEFAULT_PICKER_MONTH = Calendar.MAY;
+    private static final int DEFAULT_PICKER_DAY = 29;
 
     private TextInputEditText heightInput;
     private TextInputEditText weightInput;
@@ -236,20 +247,53 @@ public class ProfileFragment extends Fragment implements TabVisibilityAware {
     }
 
     private void showDatePicker() {
-        Calendar calendar = Calendar.getInstance();
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(R.string.label_birth_date)
+            .setSelection(pickerStartSelectionUtcMillis())
+            .build();
+        picker.addOnPositiveButtonClickListener(this::onDatePicked);
+        picker.show(getParentFragmentManager(), "birth_date_picker");
+    }
+
+    /**
+     * Where the picker opens, as UTC millis (MaterialDatePicker always
+     * operates in UTC — see Google's docs on
+     * {@code MaterialDatePicker#todayInUtcMilliseconds}). If a birth date is
+     * already set, this points at that same calendar day (re-expressed in
+     * UTC so the correct day highlights regardless of device timezone);
+     * otherwise it points at 29 May 1983 (see {@link #DEFAULT_PICKER_YEAR}).
+     * Either way this only positions the dialog — it never itself sets
+     * {@link AppState}'s birth date.
+     */
+    private long pickerStartSelectionUtcMillis() {
+        Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        utc.clear();
         long current = appState.getBirthDateUnix();
         if (current > 0) {
-            calendar.setTimeInMillis(TimeUnit.SECONDS.toMillis(current));
+            Calendar local = Calendar.getInstance();
+            local.setTimeInMillis(TimeUnit.SECONDS.toMillis(current));
+            utc.set(local.get(Calendar.YEAR), local.get(Calendar.MONTH), local.get(Calendar.DAY_OF_MONTH));
         } else {
-            calendar.add(Calendar.YEAR, -30);
+            utc.set(DEFAULT_PICKER_YEAR, DEFAULT_PICKER_MONTH, DEFAULT_PICKER_DAY);
         }
-        new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
-            Calendar picked = Calendar.getInstance();
-            picked.clear();
-            picked.set(year, month, dayOfMonth);
-            setBirthDate(TimeUnit.MILLISECONDS.toSeconds(picked.getTimeInMillis()));
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-            .show();
+        return utc.getTimeInMillis();
+    }
+
+    /**
+     * MaterialDatePicker hands back a UTC-midnight selection; re-expressed
+     * against a default-timezone Calendar (same as the old
+     * android.app.DatePickerDialog callback did) so the stored value keeps
+     * meaning "local midnight of the chosen day", matching {@link
+     * #renderBirthDate}'s formatting.
+     */
+    private void onDatePicked(Long utcSelectionMillis) {
+        if (utcSelectionMillis == null) return;
+        Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        utc.setTimeInMillis(utcSelectionMillis);
+        Calendar local = Calendar.getInstance();
+        local.clear();
+        local.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH));
+        setBirthDate(TimeUnit.MILLISECONDS.toSeconds(local.getTimeInMillis()));
     }
 
     /** Sets birth date to 0 to clear it — the data-minimisation demo beat (1.2.0 spec §7). */

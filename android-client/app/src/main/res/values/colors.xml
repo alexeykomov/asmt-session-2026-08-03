@@ -4,15 +4,35 @@
     <color name="colorPrimaryDark">#1B5E42</color>
     <color name="colorAccent">#F2A541</color>
     <color name="colorPageBg">#F7F7F7</color>
+    <color name="colorSurface">#FFFFFF</color>
     <color name="colorTextMuted">#666666</color>
 
-    <!-- Provider status banners: ok=silent/subtle, skipped=informational, error=degraded -->
+    <!-- Provider status colours: a cross-platform contract, not a styling
+         choice. ok=silent/subtle, skipped=blue/informational (a deliberate
+         data-minimisation outcome, never an error), degraded=red (Android
+         and web agree on red for a genuine outage; iOS uses orange for the
+         same state — do not repurpose these names/values without checking
+         both other clients). skipped and degraded MUST NOT share a colour:
+         that inversion has caused four defects on this project (see
+         ProviderStatusPresentation). -->
     <color name="colorStatusOk">#2E7D5B</color>
     <color name="colorStatusOkBg">#E6F4EC</color>
     <color name="colorStatusSkippedBg">#E8F0FE</color>
     <color name="colorStatusSkippedText">#1A3D8F</color>
-    <color name="colorStatusErrorBg">#FDECEA</color>
-    <color name="colorStatusErrorText">#B3261E</color>
+    <color name="colorStatusDegradedBg">#FDECEA</color>
+    <color name="colorStatusDegradedText">#B3261E</color>
+
+    <!-- Deliberately NOT overridden in values-night: cards stay a light/
+         white surface in both modes (see values-night/colors.xml's
+         comment), so bare status text sitting directly on a card — as
+         opposed to colorStatusSkippedText/colorStatusDegradedText above,
+         which pair with their matching *Bg as a self-contained badge and
+         DO need a night-tuned (lighter) value — must stay the same
+         dark-on-light tone in both modes, or it reads as washed-out on a
+         card that never actually goes dark. Used by SourceAdapter's list
+         "reason" line only. -->
+    <color name="colorStatusSkippedTextOnSurface">#1A3D8F</color>
+    <color name="colorStatusDegradedTextOnSurface">#B3261E</color>
 
     <color name="colorDivider">#E0E0E0</color>
 </resources>

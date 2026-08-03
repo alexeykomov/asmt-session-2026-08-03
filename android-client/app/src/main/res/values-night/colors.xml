@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Dark-mode overrides for the semantic colours in values/colors.xml —
+      same names, dark-appropriate values. This is a partial dark mode by
+      design: the app's base theme stays Theme.MaterialComponents.Light
+      (see themes.xml's comment — migrating to Theme.Material3/DayNight is
+      explicitly out of scope for this pass, too risky this close to the
+      presentation). Resource-qualifier resolution (values-night) is
+      independent of that "Light" base theme, so every view that references
+      one of these @color/... names directly (page background, card
+      surfaces, dividers, muted text, the three status colours) follows the
+      system's dark setting correctly. Stock Material widget chrome that
+      pulls from theme attributes instead (Spinner dropdowns, SwitchCompat
+      tracks, TextInputLayout boxes, AlertDialog surfaces) stays visually
+      light regardless, because Theme.MaterialComponents.Light hardcodes
+      those attributes — that is the accepted trade-off of not migrating
+      the theme.
+
+      Same cross-platform contract as the light values: degraded is red,
+      skipped is blue, and the two must never share a colour — only the
+      exact shades change here for legibility against a dark surface.
+    -->
+    <color name="colorPrimary">#2E7D5B</color>
+    <color name="colorPrimaryDark">#0F2E20</color>
+    <color name="colorAccent">#F2A541</color>
+    <color name="colorPageBg">#121212</color>
+    <color name="colorSurface">#1E1E1E</color>
+    <color name="colorTextMuted">#A6A6A6</color>
+
+    <color name="colorStatusOk">#7FD9A8</color>
+    <color name="colorStatusOkBg">#1C3A2B</color>
+    <color name="colorStatusSkippedBg">#1B2C4D</color>
+    <color name="colorStatusSkippedText">#9DBBFF</color>
+    <color name="colorStatusDegradedBg">#452221</color>
+    <color name="colorStatusDegradedText">#FFB4AB</color>
+
+    <color name="colorDivider">#3A3A3A</color>
+</resources>

@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -16,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.funwithactivity.app.FunWithActivityApplication;
 import com.funwithactivity.app.R;
@@ -45,7 +43,9 @@ import funwithactivity.recommendations.v1.Recommendations.Recommendation;
  *   <li>Refetch when the tab becomes visible again ONLY if {@link
  *       AppState#isDirty()} — i.e. Profile changed measurements or fault
  *       settings since the last fetch — then clear the flag.</li>
- *   <li>A manual refresh action in the app bar always fetches, dirty or
+ *   <li>Pull-to-refresh (the only manual refresh affordance on this screen —
+ *       no toolbar action, no FAB; a FAB here would be a second one, and
+ *       Material reserves that for Sources' "+") always fetches, dirty or
  *       not.</li>
  * </ul>
  * Both directions matter: refetching unconditionally on every tab switch
@@ -64,6 +64,7 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
     private TextView errorView;
     private TextView emptyView;
     private ViewGroup statusBannerContainer;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private RecommendationAdapter adapter;
 
@@ -73,7 +74,6 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         FunWithActivityApplication app = (FunWithActivityApplication) requireActivity().getApplication();
         appState = app.getAppState();
         grpcClient = app.getGrpcClient();
@@ -94,26 +94,17 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
         errorView = view.findViewById(R.id.recs_error);
         emptyView = view.findViewById(R.id.recs_empty);
         statusBannerContainer = view.findViewById(R.id.recs_status_banner_container);
+        swipeRefreshLayout = view.findViewById(R.id.recs_swipe_refresh);
         recyclerView = view.findViewById(R.id.recs_recycler_view);
 
         adapter = new RecommendationAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
-    }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_recommendations, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            loadRecommendations();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        // The only manual force-refresh path on this screen — same
+        // dirty-check-bypassing loadRecommendations() the auto-refetch uses,
+        // just triggered by the swipe gesture instead of a dirty AppState.
+        swipeRefreshLayout.setOnRefreshListener(() -> loadRecommendations(/* showProgressBar= */ false));
     }
 
     /** Called by MainActivity right after this tab is shown (see TabVisibilityAware). */
@@ -121,13 +112,26 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
     public void onTabShown() {
         if (getView() == null) return; // view not created yet; onViewCreated path isn't ready
         if (!appState.hasFetchedOnce() || appState.isDirty()) {
-            loadRecommendations();
+            loadRecommendations(/* showProgressBar= */ true);
         }
     }
 
-    private void loadRecommendations() {
+    /**
+     * The single fetch path — no dirty check here, callers decide whether to
+     * call it. Both triggers (dirty-driven auto-refetch on tab shown,
+     * pull-to-refresh) end up here.
+     *
+     * @param showProgressBar whether to show the centred spinner. Pull-to-
+     *     refresh already shows its own top-anchored spinner via {@link
+     *     SwipeRefreshLayout#setRefreshing}, so showing the centred one too
+     *     would double up; the auto-refetch has no other indicator, so it
+     *     asks for it.
+     */
+    private void loadRecommendations(boolean showProgressBar) {
         if (getView() == null) return;
-        progressBar.setVisibility(View.VISIBLE);
+        if (showProgressBar) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         errorView.setVisibility(View.GONE);
         emptyView.setVisibility(View.GONE);
 
@@ -162,6 +166,7 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
         if (getView() == null || !isAdded()) return;
 
         progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
         renderStatusBanners(response.getStatusesList());
 
         List<Recommendation> recommendations = response.getRecommendationsList();
@@ -184,6 +189,7 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
         if (getView() == null || !isAdded()) return;
 
         progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
         errorView.setVisibility(View.VISIBLE);
         errorView.setText(getString(R.string.request_failed, e.getMessage()));
     }
@@ -204,12 +210,14 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
                 case DEGRADED:
                     addBanner(inflater, getString(R.string.status_error_format,
                         presentation.getProviderName(), presentation.getError()),
-                        R.color.colorStatusErrorBg, R.color.colorStatusErrorText);
+                        R.color.colorStatusDegradedBg, R.color.colorStatusDegradedText);
                     break;
                 case OK:
                 default:
+                    String count = getResources().getQuantityString(
+                        R.plurals.recommendation_count, presentation.getCount(), presentation.getCount());
                     addBanner(inflater, getString(R.string.status_ok_format,
-                        presentation.getProviderName(), presentation.getCount(), presentation.getLatencyMs()),
+                        presentation.getProviderName(), count, presentation.getLatencyMs()),
                         android.R.color.transparent, R.color.colorStatusOk);
                     break;
             }
