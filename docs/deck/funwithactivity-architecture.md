@@ -30,6 +30,11 @@
 
 ## 3. High-level architecture, and the five extension seams
 
+**Diagrams for this slide and the next four architecture-heavy slides are in
+`docs/architecture-diagrams.md`** — system topology (and why mobile bypasses
+`web-proxy` entirely), the request flow for one recommendation call (the
+ok/skipped/degraded distinction), and the five extension seams below, drawn out.
+
 ```
 Clients: Web (Closure) · iOS (Obj-C/UIKit) · Android (Java)
               │ REST                    │ gRPC + bearer token
