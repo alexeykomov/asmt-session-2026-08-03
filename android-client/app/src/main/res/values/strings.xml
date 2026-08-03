@@ -71,6 +71,22 @@
 
     <!-- Source detail screen: same grouped-card style as Profile. The two
          built-in sources are read-only; a footer explains why. -->
+    <!-- Recommendation detail (RecommendationDetailActivity) -->
+    <string name="rec_detail_section_recommendation">RECOMMENDATION</string>
+    <string name="rec_detail_section_provenance">PROVENANCE</string>
+    <string name="rec_detail_section_ranking">RANKING</string>
+    <string name="rec_detail_label_score">Final score</string>
+    <string name="rec_detail_label_rank">Rank</string>
+    <string name="rec_detail_score_format">%1$.2f</string>
+    <string name="rec_detail_rank_format">%1$d of %2$d</string>
+    <string name="rec_detail_no_details">This provider supplied no detail text.</string>
+    <string name="rec_detail_provider_status_format">%1$s · %2$s</string>
+    <string name="rec_detail_provider_no_data">no data</string>
+    <string name="rec_detail_provenance_unknown">Unknown</string>
+    <string name="rec_detail_provenance_single">Returned by a single provider.</string>
+    <string name="rec_detail_provenance_merged_format">Returned independently by %1$d providers and merged into one entry. The highest-scoring instance won; any details only the other supplied were carried across.</string>
+    <string name="rec_detail_ranking_note">Final score only. Raw and normalised scores stay server-side by design — exposing them would make the ranker\'s internals part of the wire contract.</string>
+
     <string name="source_detail_section_configuration">CONFIGURATION</string>
     <string name="source_detail_section_status">STATUS</string>
     <string name="source_detail_label_name">Name</string>

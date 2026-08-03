@@ -18,7 +18,22 @@ import funwithactivity.recommendations.v1.Recommendations.Recommendation;
 /** Renders the flat list of recommendations returned by the server. */
 public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAdapter.ViewHolder> {
 
+    /**
+     * Set by RecommendationsFragment so a tapped row can open
+     * RecommendationDetailActivity. Mirrors SourceAdapter's listener rather
+     * than having the adapter start an Activity itself — the adapter renders,
+     * the fragment navigates.
+     */
+    public interface OnItemClickListener {
+        void onItemClick(Recommendation recommendation, int position);
+    }
+
     private final List<Recommendation> items = new ArrayList<>();
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setItems(List<Recommendation> newItems) {
         items.clear();
@@ -42,6 +57,14 @@ public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAd
         holder.source.setText(item.getSource());
         holder.score.setText(holder.itemView.getContext()
             .getString(R.string.score_format, item.getScore()));
+
+        // position is captured rather than read back inside the callback:
+        // getBindingAdapterPosition() can return NO_POSITION mid-update, and
+        // the rank shown on the detail screen must match the row tapped.
+        final int position1 = position;
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(item, position1);
+        });
     }
 
     @Override

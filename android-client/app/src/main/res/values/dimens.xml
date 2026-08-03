@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Vertical spacing above and below the divider between provenance rows in
+      RecommendationDetailActivity. Matches the 12dp layout_marginVertical the
+      static dividers in activity_source_detail.xml use, so rows built in code
+      line up with rows built in XML.
+    -->
+    <dimen name="rec_detail_row_spacing">12dp</dimen>
+</resources>

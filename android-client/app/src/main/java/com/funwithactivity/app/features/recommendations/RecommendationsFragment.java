@@ -98,6 +98,13 @@ public class RecommendationsFragment extends Fragment implements TabVisibilityAw
         recyclerView = view.findViewById(R.id.recs_recycler_view);
 
         adapter = new RecommendationAdapter();
+        // Statuses come from the same response as the recommendation, so the
+        // detail screen explains one coherent fetch rather than pairing a
+        // recommendation with statuses from a later one.
+        adapter.setOnItemClickListener((recommendation, position) ->
+            startActivity(RecommendationDetailActivity.createIntent(
+                requireContext(), recommendation, appState.getLastStatuses(),
+                position + 1, adapter.getItemCount())));
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
 

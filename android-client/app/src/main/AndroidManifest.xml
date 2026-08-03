@@ -55,6 +55,15 @@
             android:exported="false"
             android:theme="@style/Theme.FunWithActivity.NoActionBar"
             android:parentActivityName=".features.app.MainActivity" />
+        <!-- Recommendations → row detail. Same NoActionBar theme as source
+             detail: the layout supplies its own Toolbar, and without this the
+             window decor also supplies one, which throws on
+             setSupportActionBar. -->
+        <activity
+            android:name=".features.recommendations.RecommendationDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FunWithActivity.NoActionBar"
+            android:parentActivityName=".features.app.MainActivity" />
 
         <!-- Health Connect permission-rationale entry point. Health Connect's
              permissions screen links back here; routes to the tabbed shell,
