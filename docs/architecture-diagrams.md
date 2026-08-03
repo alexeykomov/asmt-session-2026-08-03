@@ -395,6 +395,30 @@ provider outcomes (OK / SKIPPED / DEGRADED) carry over unchanged — only what c
 them changes, from a synchronous fan-out on the request path to an asynchronous
 background refresh.
 
+That phrase is the hinge of the whole argument, so it is worth spelling out.
+**Synchronous fan-out on the request path** means that while a user's request is
+still open, `app-server` calls every eligible provider in parallel and blocks
+until they answer or time out. The user's latency *is* the slowest vendor's
+latency. Four consequences compound at peak: **amplification** — one read
+becomes two vendor calls, so vendor rate limits are hit by user traffic spikes
+with nothing to smooth them; **latency coupling** — our p99 is their p99, and
+theirs is over two seconds cold against a 60–120 ms warm call; **failure
+coupling** — a vendor failing about one call in three degrades roughly a third
+of requests every time, because with no store there is nothing to fall back on,
+making our availability the product of theirs; and **concurrency** — by Little's
+Law, 2000 RPS at roughly a second of service time is about 2,000 in-flight
+fan-outs holding some 4,000 outbound sockets, all of them waiting.
+
+**Asynchronous background refresh** breaks each of those. Recommendations are
+computed on a schedule and written to Postgres, so a read is a point lookup that
+never touches a vendor. The decisive change is that vendor call volume stops
+being a function of read volume and becomes a function of *active users ×
+refresh cadence*: roughly 70 calls per second for three million users refreshed
+daily, against 4,000 per second at peak — about a fifty-fold reduction, and
+still an order of magnitude even at four refreshes a day. A vendor outage stops
+being a user-visible failure and becomes stale-but-served data, with staleness
+as an explicit budget rather than an accident.
+
 ```mermaid
 flowchart LR
     subgraph PoC["PoC — as built"]

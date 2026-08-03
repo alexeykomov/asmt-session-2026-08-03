@@ -182,15 +182,28 @@ Note: The test for whether the separation is real: "health data lives in a separ
 
 ---
 
-## Security — provable erasure, and durability as the other half
+## Security — encryption, and erasure that is provable
 
 - TLS 1.2+ everywhere including service-to-service, mTLS between tiers. KMS CMK at rest, **per-user envelope keys** for health samples. No PHI in application logs — `request_id` through gRPC metadata for tracing without identifiers.
 - **Erasure: crypto-shredding, because ClickHouse is bad at deleting.** `MergeTree` parts are immutable, so a delete is a mutation that rewrites every part holding a matching row — and one user's samples end up scattered across nearly all of them. Dropping a whole partition is cheap; erasing one user is not. That is backwards from what Art. 17 asks. So erasure destroys a key instead: the ciphertext stays and becomes permanently unreadable, and the event is **provable** from an audit log rather than asserted. It also reaches what deletion cannot — every retained backup, snapshot and replica, in one operation.
 - **What is shredded is the identity linkage, not the samples.** Per-user-encrypted columns are high-entropy, so columnar compression collapses — and the volume estimates depend on it — while population-insight queries aggregate *across* users, which per-user keys make impossible. Telemetry lands under a per-user pseudonym; the pseudonym-to-identity mapping is encrypted in Postgres; erasure destroys the mapping and partition TTL ages the orphaned rows out. Whether those orphans are then *anonymous* under Art. 4(5) or merely pseudonymous is a question for your DPO — health time series are notoriously re-identifiable, and we are not going to assume the favourable reading.
-- **Durability, the other reading of the same lawsuit:** Aurora Multi-AZ synchronous standby (RPO≈0) + PITR; ClickHouse `ReplicatedMergeTree` across AZs; S3 versioning + Object Lock — which defends against accidental *and* malicious deletion, the actual mechanism of most incidents; **a quarterly restore drill with measured RTO/RPO and a written runbook.**
-- That last control costs the least and matters most: "we test restores on a schedule, here is the runbook" lands harder with someone who just wrote a settlement cheque than a third region on a diagram.
+Note: "Both concerns are valid" means two separate answers — confidentiality here, durability next. Designed, not built: say so plainly if asked, then pivot to why it is still right to lead with — it is the direct rebuttal to the lawsuit, and getting the mechanism right matters more at this stage than having it running.
 
-Note: Designed, not built — say so plainly if asked, then pivot to why it is still the right thing to lead with: it is the direct rebuttal to the lawsuit, and getting the mechanism right matters more at this stage than having it running. "Both concerns are valid" means two separate answers; this slide gives both rather than blurring them.
+---
+
+## Durability — the other reading of the same lawsuit
+
+You told us the suit reads as **both** a disclosure and a durability concern. Those have different remedies, so we give them separately rather than blurring them into "we take security seriously."
+
+- **Aurora Multi-AZ** synchronous standby (RPO≈0) with point-in-time recovery to any second.
+- **ClickHouse `ReplicatedMergeTree`** across availability zones.
+- **S3 versioning + Object Lock** — which defends against accidental *and* malicious deletion. That second case is the actual mechanism of most incidents, and it is the one plain backups do not cover.
+- Cross-region backup copies, held **within the same jurisdiction** so durability does not quietly undo residency.
+- **A quarterly restore drill, with measured RTO/RPO and a written runbook.**
+
+> That last control costs the least and matters most. "We test restores on a schedule, here is the runbook" lands harder with someone who has just written a settlement cheque than a third region on a diagram does.
+
+Note: If asked which of the two readings we optimised for — neither, deliberately. Hold-less-and-encrypt-harder and keep-more-copies pull in opposite directions, and which one dominates the budget is question 3 on the final slide. Until they answer it, we build the controls that serve both.
 
 ---
 

@@ -1,0 +1,176 @@
+/* FunWithActivity — Architecture deck
+   Styles layered on top of reveal.js's "white" theme. */
+
+:root {
+  --epam-blue: #00a1c9;
+  --ink: #2c3e50;
+  --muted: #6b7a86;
+  --rule: #dfe6ea;
+}
+
+/* ---------- Base layout ---------- */
+
+.reveal .slides section {
+  text-align: left;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  color: var(--ink);
+}
+
+.reveal p,
+.reveal li {
+  line-height: 1.35;
+}
+
+/* ---------- Title slides ---------- */
+
+.reveal .slides section.title-slide {
+  text-align: center;
+}
+
+.reveal .slides section.title-slide h1 {
+  color: var(--epam-blue);
+  font-size: 2.2em;
+}
+
+.reveal .slides section.title-slide h2 {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+/* ---------- Tables ---------- */
+
+.reveal table {
+  width: 100%;
+  font-size: 0.55em;
+  border-collapse: collapse;
+  margin: 0.6em 0;
+}
+
+.reveal table th,
+.reveal table td {
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 0.4em 0.6em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.reveal table th {
+  color: var(--ink);
+  border-bottom: 2px solid var(--epam-blue);
+  font-weight: 700;
+}
+
+.reveal table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---------- Blockquotes as callouts ---------- */
+
+.reveal blockquote {
+  width: auto;
+  margin: 0.6em 0;
+  padding: 0.5em 0.9em;
+  background: #f4fbfd;
+  border-left: 5px solid var(--epam-blue);
+  border-radius: 0 4px 4px 0;
+  box-shadow: none;
+  font-style: normal;
+  font-size: 0.85em;
+  color: var(--ink);
+}
+
+.reveal blockquote p {
+  margin: 0;
+}
+
+/* ---------- Diagram slides ---------- */
+
+.reveal .slides section.diagram-slide {
+  text-align: center;
+}
+
+.reveal .slides section.diagram-slide img {
+  max-height: 70vh;
+  width: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* The five-seams diagram is very wide and short; give it more headroom
+   without letting it dominate the slide. */
+.reveal img.seams {
+  display: block;
+  margin: 0.4em auto;
+  max-height: 45vh;
+  width: auto;
+}
+
+/* ---------- Body text density ---------- */
+
+.reveal .slides section {
+  font-size: 0.85em;
+}
+
+.reveal .slides section.title-slide {
+  font-size: 1em;
+}
+
+/* ---------- Long / dense slide fixes ---------- */
+/* Reveal does not auto-shrink content, so a handful of slides overflow the
+   1280x800 stage. slides.md carries no per-slide classes, so these are
+   targeted structurally with :has() on the distinctive shape of each
+   slide's content (table, blockquote+list combo, long list, etc). */
+
+.reveal .slides section:has(table) {
+  font-size: 0.7em;
+}
+
+.reveal .slides section:has(table) blockquote,
+.reveal .slides section:has(table) > ul,
+.reveal .slides section:has(table) > ol {
+  font-size: 0.95em;
+}
+
+/* Slides combining a blockquote callout with a numbered list ("brief" and
+   "Cloud - AWS" slides) run long — shrink the body copy, not the heading. */
+.reveal .slides section:has(> blockquote):has(> ol) > p,
+.reveal .slides section:has(> blockquote):has(> ol) > ol,
+.reveal .slides section:has(> blockquote):has(> ol) > blockquote {
+  font-size: 0.72em;
+}
+
+/* A numbered list with 7+ items ("Our questions for you") needs a tighter
+   line-height and smaller type to stay on one slide. */
+.reveal .slides section:has(ol li:nth-child(7)) > ol {
+  font-size: 0.7em;
+  line-height: 1.18;
+}
+
+/* Plain bullet-list slides with long entries and no table/blockquote/ol
+   ("Resilience...", "Security...", "GDPR...") — shrink the list body. */
+.reveal .slides section:has(> ul):not(:has(table)):not(:has(blockquote)):not(:has(ol)) > ul {
+  font-size: 0.78em;
+  line-height: 1.28;
+}
+
+/* Bullet list plus a pull-quote callout, with no table and no ordered list
+   ("Durability - the other reading..."). This shape matched no rule above:
+   the blockquote rule requires an <ol>, and the plain-bullet rule below it
+   explicitly excludes any slide carrying a blockquote. */
+.reveal .slides section:has(> blockquote):has(> ul):not(:has(table)):not(:has(ol)) > ul,
+.reveal .slides section:has(> blockquote):has(> ul):not(:has(table)):not(:has(ol)) > p,
+.reveal .slides section:has(> blockquote):has(> ul):not(:has(table)):not(:has(ol)) > blockquote {
+  font-size: 0.75em;
+  line-height: 1.28;
+}
+
+/* The five-seams diagram slide: image already capped by .seams; shrink the
+   explanatory paragraphs beneath it so the slide fits. */
+.reveal .slides section:has(> img.seams) > p {
+  font-size: 0.75em;
+}

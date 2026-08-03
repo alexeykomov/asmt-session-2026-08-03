@@ -1,0 +1,17 @@
+{
+  "name": "funwithactivity-deck",
+  "version": "1.2.0",
+  "private": true,
+  "description": "FunWithActivity pre-sale architecture session \u2014 reveal.js deck",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server .. -p 8422 -c-1 -o /presentation/",
+    "dev": "npm start",
+    "print": "echo 'Open http://localhost:8422/presentation/?print-pdf then File > Print > Save as PDF'"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "reveal.js": "^5.1.0"
+  }
+}
