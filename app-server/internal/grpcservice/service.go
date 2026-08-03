@@ -88,6 +88,7 @@ func toProtoStatuses(in []aggregator.ProviderStatus) []*recommendationsv1.Provid
 			Error:     s.Error,
 			Count:     int32(s.Count),
 			LatencyMs: s.LatencyMs,
+			BaseUrl:   s.BaseURL,
 		})
 	}
 	return out

@@ -32,6 +32,9 @@ func NewService1(name, url string) *Service1 {
 
 func (p *Service1) Name() string { return p.name }
 
+// BaseURL returns the configured endpoint this adapter calls.
+func (p *Service1) BaseURL() string { return p.url }
+
 // Service 1 needs no birth date. A user who declines to supply one still
 // receives these recommendations.
 func (p *Service1) Requires() domain.FieldSet {

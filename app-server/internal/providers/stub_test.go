@@ -14,6 +14,15 @@ func TestStub_NamesAreDistinctFromRealProviders(t *testing.T) {
 	require.Equal(t, "service2-stub", NewService2Stub().Name())
 }
 
+func TestStub_BaseURLReportsStubIdentityHonestly(t *testing.T) {
+	// Stubs must never claim a real vendor URL — that would show
+	// fabricated configuration on the Source detail screen.
+	require.Equal(t, "stub:service1-stub", NewService1Stub().BaseURL())
+	require.Equal(t, "stub:service2-stub", NewService2Stub().BaseURL())
+	require.NotContains(t, NewService1Stub().BaseURL(), "http")
+	require.NotContains(t, NewService2Stub().BaseURL(), "http")
+}
+
 func TestStub_RequiresMirrorsRealProviders(t *testing.T) {
 	withDOB := domain.Measurements{HeightCm: 184, WeightKg: 84, BirthDate: dobPtr()}
 	withoutDOB := domain.Measurements{HeightCm: 184, WeightKg: 84}

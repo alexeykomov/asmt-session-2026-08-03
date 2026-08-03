@@ -19,6 +19,11 @@ type Provider interface {
 	// calling them with placeholder data.
 	Requires() domain.FieldSet
 	Fetch(ctx context.Context, m domain.Measurements) ([]domain.Recommendation, error)
+	// BaseURL is the configured endpoint this provider calls, surfaced to
+	// clients for display only (e.g. Source detail's "Base URL" row).
+	// Stub providers must report their stub identity honestly rather than
+	// claiming a real vendor URL — see StubProvider.
+	BaseURL() string
 }
 
 // clampNormScore forces a normalised score into [0, 1] at the adapter

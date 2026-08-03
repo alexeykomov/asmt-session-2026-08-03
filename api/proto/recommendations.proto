@@ -53,6 +53,12 @@ message ProviderStatus {
   string error = 4;
   int32 count = 5;
   int64 latency_ms = 6;
+  // The provider's configured endpoint, for display only (e.g. Source
+  // detail's "Base URL" row). Additive: field 7, added after fields 1-6
+  // shipped. Old clients that do not know this field continue to work
+  // unchanged — that is the whole point of appending rather than
+  // reshaping this message the day before a presentation.
+  string base_url = 7;
 }
 
 message GetRecommendationsResponse {

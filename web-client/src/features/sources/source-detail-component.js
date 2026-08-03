@@ -74,20 +74,15 @@ funwithactivity.sources.SourceDetailComponent.TYPE_ = 'REST';
 
 
 /**
- * The real vendor URL (app-server's PROVIDER1_URL/PROVIDER2_URL) is never
- * sent to the client on any existing endpoint — the wire contract is
- * fixed for Phase 1 and this task adds no new one — so this screen cannot
- * show it even though "Base URL" is asked for in CONFIGURATION. Showing a
- * literal endpoint here would either be a lie (this client doesn't know
- * it) or a leak (of an infrastructure detail this repo's own sensitivity
- * audit already flagged as remotely sensitive for a similar case). Saying
- * so plainly is both accurate and the same read-only story the footer
- * below tells.
+ * Shown in the Base URL row when no cached status is available for this
+ * source (e.g. a deep link straight to /sources/<name> with no prior
+ * fetch this session) — there is nothing fabricated to show, so this
+ * screen says so plainly instead.
  * @const {string}
  * @private
  */
-funwithactivity.sources.SourceDetailComponent.BASE_URL_NOTE_ =
-    'Configured at deployment time — not exposed to the client.';
+funwithactivity.sources.SourceDetailComponent.BASE_URL_UNKNOWN_ =
+    'Unknown — no status reported yet this session.';
 
 
 /**
@@ -105,7 +100,7 @@ funwithactivity.sources.SourceDetailComponent.buildViewModel_ = function(
     return {
       name: name,
       type: Detail.TYPE_,
-      baseUrl: Detail.BASE_URL_NOTE_,
+      baseUrl: Detail.BASE_URL_UNKNOWN_,
       statusClass: 'unknown',
       statusLabel: 'no data',
       latencyDisplay: '—',
@@ -119,7 +114,7 @@ funwithactivity.sources.SourceDetailComponent.buildViewModel_ = function(
   return {
     name: status.name,
     type: Detail.TYPE_,
-    baseUrl: Detail.BASE_URL_NOTE_,
+    baseUrl: status.baseUrl || Detail.BASE_URL_UNKNOWN_,
     statusClass: classification,
     statusLabel: classification,
     // Latency renders '—' when zero, not '0 ms' — matches the Sources

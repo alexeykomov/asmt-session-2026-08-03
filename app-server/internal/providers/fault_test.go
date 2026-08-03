@@ -14,8 +14,14 @@ type stubProvider struct{ name string }
 
 func (s *stubProvider) Name() string              { return s.name }
 func (s *stubProvider) Requires() domain.FieldSet { return domain.Of(domain.FieldHeight) }
+func (s *stubProvider) BaseURL() string           { return "https://" + s.name + ".example.test" }
 func (s *stubProvider) Fetch(context.Context, domain.Measurements) ([]domain.Recommendation, error) {
 	return []domain.Recommendation{{Title: "real", Source: s.name, NormScore: 0.5}}, nil
+}
+
+func TestFaults_BaseURLPassesThroughToInner(t *testing.T) {
+	require.Equal(t, "https://s1.example.test",
+		WithFaults(&stubProvider{name: "s1"}).BaseURL())
 }
 
 func TestFaults_PassThroughWhenNoModeSet(t *testing.T) {

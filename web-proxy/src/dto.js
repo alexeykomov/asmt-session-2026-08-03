@@ -11,7 +11,7 @@
 
 const SLOTS = {
   Recommendation: { TITLE: 0, DETAILS: 1, SOURCE: 2, SCORE: 3 },
-  ProviderStatus: { NAME: 0, OK: 1, SKIPPED: 2, ERROR: 3, COUNT: 4, LATENCY_MS: 5 },
+  ProviderStatus: { NAME: 0, OK: 1, SKIPPED: 2, ERROR: 3, COUNT: 4, LATENCY_MS: 5, BASE_URL: 6 },
   RecommendationsResponse: { RECOMMENDATIONS: 0, STATUSES: 1 },
 };
 
@@ -32,6 +32,7 @@ function packProviderStatus(s) {
     s.error || '',
     Number(s.count || 0),
     Number(s.latencyMs || 0),
+    s.baseUrl || '',
   ];
 }
 

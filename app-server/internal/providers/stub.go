@@ -58,6 +58,11 @@ func NewService2Stub() *StubProvider {
 func (p *StubProvider) Name() string              { return p.name }
 func (p *StubProvider) Requires() domain.FieldSet { return p.requires }
 
+// BaseURL reports the stub's own identity, never a real vendor URL — a stub
+// claiming a real vendor endpoint would show fabricated configuration on
+// the Source detail screen, exactly what field 7 exists to end.
+func (p *StubProvider) BaseURL() string { return "stub:" + p.name }
+
 // Fetch returns the canned recommendations, honouring ctx cancellation so
 // the fault-injection wrapper and per-provider timeout still behave
 // correctly when a stub is wrapped in WithFaults.

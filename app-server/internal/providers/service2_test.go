@@ -18,6 +18,11 @@ func measurementsWithDOB() domain.Measurements {
 	return domain.Measurements{HeightCm: 184, WeightKg: 84, BirthDate: &dob}
 }
 
+func TestService2_BaseURLReturnsConfiguredEndpoint(t *testing.T) {
+	require.Equal(t, "https://example.test/service2",
+		NewService2("service2", "https://example.test/service2").BaseURL())
+}
+
 func TestService2_ConvertsUnitsAndSendsBirthDate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body struct {

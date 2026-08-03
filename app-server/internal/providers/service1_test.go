@@ -12,6 +12,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestService1_BaseURLReturnsConfiguredEndpoint(t *testing.T) {
+	require.Equal(t, "https://example.test/service1",
+		NewService1("service1", "https://example.test/service1").BaseURL())
+}
+
 func TestService1_ParsesArraySuccess(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body map[string]any

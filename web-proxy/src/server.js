@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const apiRouter = require('./routes/api-routes');
+const { xssiJson } = require('./xssi');
 
 function requestContext(req, res, next) {
   req.requestId = req.headers['x-request-id'] || crypto.randomUUID();
@@ -26,6 +27,12 @@ function buildApp({ getRecommendations }) {
   app.disable('x-powered-by');
   app.use(requestContext);
   app.use(helmet());
+  // Mounted before the body parser (not just before apiRouter) so the
+  // res.json() patch is already active if express.json() itself throws a
+  // SyntaxError on malformed input — that error is caught by the handler
+  // at the bottom of this file, and its response must carry the prefix
+  // too. Path-scoped to /api so /health and the SPA shell stay plain.
+  app.use('/api', xssiJson);
   app.use(express.json({ limit: '64kb' }));
   app.use(rateLimit({
     windowMs: 60 * 1000,

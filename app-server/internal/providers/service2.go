@@ -37,6 +37,9 @@ func NewService2(name, url string) *Service2 {
 
 func (p *Service2) Name() string { return p.name }
 
+// BaseURL returns the configured endpoint this adapter calls.
+func (p *Service2) BaseURL() string { return p.url }
+
 func (p *Service2) Requires() domain.FieldSet {
 	return domain.Of(domain.FieldHeight, domain.FieldWeight, domain.FieldBirthDate)
 }

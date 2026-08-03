@@ -22,6 +22,7 @@ type fakeProvider struct {
 
 func (f *fakeProvider) Name() string              { return f.name }
 func (f *fakeProvider) Requires() domain.FieldSet { return f.requires }
+func (f *fakeProvider) BaseURL() string           { return "https://" + f.name + ".example.test" }
 func (f *fakeProvider) Fetch(ctx context.Context, _ domain.Measurements) ([]domain.Recommendation, error) {
 	if f.delay > 0 {
 		select {
@@ -227,6 +228,22 @@ func TestAggregate_StubProvidersMergeAndRankInterleaved(t *testing.T) {
 	require.Equal(t, "service2-stub", got.Recommendations[1].Source)
 }
 
+func TestAggregate_StatusCarriesProviderBaseURL(t *testing.T) {
+	ok := &fakeProvider{name: "s1", requires: domain.Of(domain.FieldHeight),
+		recs: []domain.Recommendation{{Title: "Walk more", Source: "s1", NormScore: 0.4}}}
+	skipped := &fakeProvider{name: "s2",
+		requires: domain.Of(domain.FieldHeight, domain.FieldWeight, domain.FieldBirthDate)}
+
+	got, err := newAgg([]providers.Provider{ok, skipped}, time.Second).Aggregate(context.Background(), metric())
+	require.NoError(t, err)
+
+	byName := statusesByName(got.Statuses)
+	require.Equal(t, "https://s1.example.test", byName["s1"].BaseURL,
+		"a called provider's status must carry its configured endpoint")
+	require.Equal(t, "https://s2.example.test", byName["s2"].BaseURL,
+		"a skipped provider's status must still carry its configured endpoint")
+}
+
 func TestAggregate_RecoversFromPanickingProvider(t *testing.T) {
 	boom := &panicProvider{name: "boom", requires: domain.Of(domain.FieldHeight)}
 	good := &fakeProvider{name: "s2", requires: domain.Of(domain.FieldHeight),
@@ -254,6 +271,7 @@ type recoveringProvider struct {
 
 func (p *recoveringProvider) Name() string              { return p.name }
 func (p *recoveringProvider) Requires() domain.FieldSet { return p.requires }
+func (p *recoveringProvider) BaseURL() string           { return "https://" + p.name + ".example.test" }
 func (p *recoveringProvider) Fetch(context.Context, domain.Measurements) ([]domain.Recommendation, error) {
 	p.calls++
 	if p.calls <= p.failFor {
@@ -269,6 +287,7 @@ type panicProvider struct {
 
 func (p *panicProvider) Name() string              { return p.name }
 func (p *panicProvider) Requires() domain.FieldSet { return p.requires }
+func (p *panicProvider) BaseURL() string           { return "https://" + p.name + ".example.test" }
 func (p *panicProvider) Fetch(context.Context, domain.Measurements) ([]domain.Recommendation, error) {
 	panic("boom")
 }
@@ -280,6 +299,7 @@ type countingProvider struct {
 
 func (c *countingProvider) Name() string              { return c.inner.Name() }
 func (c *countingProvider) Requires() domain.FieldSet { return c.inner.Requires() }
+func (c *countingProvider) BaseURL() string           { return c.inner.BaseURL() }
 func (c *countingProvider) Fetch(ctx context.Context, m domain.Measurements) ([]domain.Recommendation, error) {
 	*c.calls++
 	return c.inner.Fetch(ctx, m)

@@ -21,6 +21,10 @@ type ProviderStatus struct {
 	Error     string
 	Count     int
 	LatencyMs int64
+	// BaseURL is the provider's configured endpoint, for display only. Set
+	// even when skipped: the provider's identity is known whether or not
+	// it was called this request.
+	BaseURL string
 }
 
 type Result struct {
@@ -95,6 +99,7 @@ func (a *Aggregator) Aggregate(ctx context.Context, m domain.Measurements) (Resu
 				Name:    p.Name(),
 				Skipped: true,
 				Error:   "required measurements not supplied",
+				BaseURL: p.BaseURL(),
 			}}
 			continue
 		}
@@ -111,7 +116,7 @@ func (a *Aggregator) Aggregate(ctx context.Context, m domain.Measurements) (Resu
 			defer func() {
 				if r := recover(); r != nil {
 					results[i] = providerResult{filled: true, status: ProviderStatus{
-						Name: p.Name(), OK: false, Error: fmt.Sprintf("panic: %v", r),
+						Name: p.Name(), OK: false, Error: fmt.Sprintf("panic: %v", r), BaseURL: p.BaseURL(),
 					}}
 				}
 			}()
@@ -123,7 +128,7 @@ func (a *Aggregator) Aggregate(ctx context.Context, m domain.Measurements) (Resu
 			recs, err := p.Fetch(pCtx, m)
 			latency := time.Since(start).Milliseconds()
 
-			st := ProviderStatus{Name: p.Name(), OK: err == nil, Count: len(recs), LatencyMs: latency}
+			st := ProviderStatus{Name: p.Name(), OK: err == nil, Count: len(recs), LatencyMs: latency, BaseURL: p.BaseURL()}
 			if err != nil {
 				st.Error = err.Error()
 			}

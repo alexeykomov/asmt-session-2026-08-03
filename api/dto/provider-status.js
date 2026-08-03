@@ -21,8 +21,11 @@ funwithactivity.dto.ProviderStatus = class {
    * @param {string} error Human-readable reason; set for skipped too.
    * @param {number} count Number of recommendations returned.
    * @param {number} latencyMs Round-trip time; 0 when skipped.
+   * @param {string=} baseUrl The provider's configured endpoint, for
+   *     display only. Set even when skipped. Optional so old callers /
+   *     fixtures that predate this field keep working.
    */
-  constructor(name, ok, skipped, error, count, latencyMs) {
+  constructor(name, ok, skipped, error, count, latencyMs, baseUrl) {
     /** @type {string} */
     this.name = name;
     /** @type {boolean} */
@@ -35,6 +38,8 @@ funwithactivity.dto.ProviderStatus = class {
     this.count = count;
     /** @type {number} */
     this.latencyMs = latencyMs;
+    /** @type {string} */
+    this.baseUrl = baseUrl || '';
   }
 
   /**
@@ -50,6 +55,7 @@ funwithactivity.dto.ProviderStatus = class {
       this.error,
       this.count,
       this.latencyMs,
+      this.baseUrl,
     ];
   }
 
@@ -66,7 +72,8 @@ funwithactivity.dto.ProviderStatus = class {
         !!arr[F.SKIPPED],
         String(arr[F.ERROR] || ''),
         Number(arr[F.COUNT] || 0),
-        Number(arr[F.LATENCY_MS] || 0));
+        Number(arr[F.LATENCY_MS] || 0),
+        String(arr[F.BASE_URL] || ''));
   }
 };
 
@@ -82,4 +89,5 @@ funwithactivity.dto.ProviderStatus.Fields = {
   ERROR: 3,
   COUNT: 4,
   LATENCY_MS: 5,
+  BASE_URL: 6,
 };

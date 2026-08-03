@@ -36,12 +36,15 @@ describe('DTOs', () => {
     // other and from everything else, or a swap between them is
     // undetectable. error is non-empty while skipped is true — that is
     // the exact combination this project has shipped four defects on.
-    const s = new dto.ProviderStatus('service2', false, true, 'no birth date', 3, 77);
-    assert.deepEqual(s.toJSON(), ['service2', 0, 1, 'no birth date', 3, 77]);
+    const s = new dto.ProviderStatus(
+        'service2', false, true, 'no birth date', 3, 77, 'https://service2.example/api');
+    assert.deepEqual(s.toJSON(),
+        ['service2', 0, 1, 'no birth date', 3, 77, 'https://service2.example/api']);
   });
 
-  it('ProviderStatus round-trips all six fields', () => {
-    const s = new dto.ProviderStatus('service2', false, true, 'no birth date', 3, 77);
+  it('ProviderStatus round-trips all seven fields', () => {
+    const s = new dto.ProviderStatus(
+        'service2', false, true, 'no birth date', 3, 77, 'https://service2.example/api');
     const back = dto.ProviderStatus.fromJSON(s.toJSON());
     assert.equal(back.name, 'service2');
     assert.strictEqual(back.ok, false);
@@ -49,6 +52,7 @@ describe('DTOs', () => {
     assert.equal(back.error, 'no birth date');
     assert.equal(back.count, 3);
     assert.equal(back.latencyMs, 77);
+    assert.equal(back.baseUrl, 'https://service2.example/api');
   });
 
   it('ProviderStatus.fromJSON tolerates a truncated array', () => {
@@ -59,13 +63,29 @@ describe('DTOs', () => {
     assert.equal(back.error, '');
     assert.equal(back.count, 0);
     assert.equal(back.latencyMs, 0);
+    assert.equal(back.baseUrl, '');
+  });
+
+  it('ProviderStatus.fromJSON decodes an old 6-element payload (pre-BASE_URL) unchanged', () => {
+    // A payload from a server that has not deployed field 7 yet — exactly
+    // the shape every existing client sends and receives today. Must
+    // decode identically to before, with baseUrl defaulting to ''.
+    const oldPayload = ['service1', 1, 0, '', 3, 90];
+    const back = dto.ProviderStatus.fromJSON(oldPayload);
+    assert.equal(back.name, 'service1');
+    assert.strictEqual(back.ok, true);
+    assert.strictEqual(back.skipped, false);
+    assert.equal(back.error, '');
+    assert.equal(back.count, 3);
+    assert.equal(back.latencyMs, 90);
+    assert.equal(back.baseUrl, '');
   });
 
   it('slot indices are the documented ones — reordering must fail here', () => {
     assert.deepEqual(dto.Recommendation.Fields,
         {TITLE: 0, DETAILS: 1, SOURCE: 2, SCORE: 3});
     assert.deepEqual(dto.ProviderStatus.Fields,
-        {NAME: 0, OK: 1, SKIPPED: 2, ERROR: 3, COUNT: 4, LATENCY_MS: 5});
+        {NAME: 0, OK: 1, SKIPPED: 2, ERROR: 3, COUNT: 4, LATENCY_MS: 5, BASE_URL: 6});
     assert.deepEqual(dto.RecommendationsResponse.Fields,
         {RECOMMENDATIONS: 0, STATUSES: 1});
   });
@@ -73,14 +93,14 @@ describe('DTOs', () => {
   it('RecommendationsResponse packs to a positional array in slot order', () => {
     // Full deepEqual of the whole envelope, not just a spot-check of one
     // nested field: a RECOMMENDATIONS/STATUSES slot swap would put a
-    // 6-slot ProviderStatus array where a 4-slot Recommendation array is
+    // 7-slot ProviderStatus array where a 4-slot Recommendation array is
     // expected (and vice versa), which this catches on shape alone.
     const resp = new dto.RecommendationsResponse(
         [new dto.Recommendation('T', '', 'service1', 0.9)],
-        [new dto.ProviderStatus('service1', true, false, 'why', 1, 30)]);
+        [new dto.ProviderStatus('service1', true, false, 'why', 1, 30, 'https://service1.example/api')]);
     assert.deepEqual(resp.toJSON(), [
       [['T', '', 'service1', 0.9]],
-      [['service1', 1, 0, 'why', 1, 30]],
+      [['service1', 1, 0, 'why', 1, 30, 'https://service1.example/api']],
     ]);
   });
 

@@ -19,6 +19,7 @@ func WithFaults(inner Provider) Provider { return &faultyProvider{inner: inner} 
 
 func (f *faultyProvider) Name() string              { return f.inner.Name() }
 func (f *faultyProvider) Requires() domain.FieldSet { return f.inner.Requires() }
+func (f *faultyProvider) BaseURL() string           { return f.inner.BaseURL() }
 
 func (f *faultyProvider) Fetch(ctx context.Context, m domain.Measurements) ([]domain.Recommendation, error) {
 	switch faults.For(ctx, f.inner.Name()) {
