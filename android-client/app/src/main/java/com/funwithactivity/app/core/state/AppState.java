@@ -36,13 +36,24 @@ public final class AppState {
     // service2 out of the response and shows the skipped banner.
     private static final double DEFAULT_HEIGHT_CM = 175.0;
     private static final double DEFAULT_WEIGHT_KG = 70.0;
-    /** 1990-01-01T00:00:00Z, matches the demo constant used elsewhere in this client. */
-    private static final long DEFAULT_BIRTH_DATE_UNIX = 631152000L;
 
     private double heightCm = DEFAULT_HEIGHT_CM;
     private double weightKg = DEFAULT_WEIGHT_KG;
-    /** 0 means "not supplied" — mirrors the proto's own sentinel. */
-    private long birthDateUnix = DEFAULT_BIRTH_DATE_UNIX;
+    /**
+     * 0 means "not supplied" — mirrors the proto's own sentinel.
+     *
+     * Unset by default, matching iOS (FWAAppState.m) and web
+     * (AppState.js). This default is load-bearing rather than incidental:
+     * the app opens with service2 already skipped, so supplying an age
+     * visibly UNLOCKS a provider instead of withholding one. Pre-filling a
+     * date here makes both providers succeed on launch and removes the
+     * data-minimisation story the product exists to demonstrate.
+     *
+     * Not to be confused with ProfileFragment.DEFAULT_PICKER_YEAR, which
+     * only positions the picker wheel when nothing is set. Positioning is
+     * not selecting.
+     */
+    private long birthDateUnix = 0L;
 
     /** Provider name -> fault mode ("error" | "timeout" | "malformed"). */
     private final Map<String, String> faults = new LinkedHashMap<>();
