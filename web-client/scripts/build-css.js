@@ -15,6 +15,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const postcss = require('postcss');
+const cssnano = require('cssnano');
 
 const ROOT = path.join(__dirname, '..');
 const GOOG_CSS = path.join(
@@ -66,9 +68,36 @@ if (!fs.existsSync(mainCssFile)) {
 parts.push('/* --- web-client/css/main.css --- */');
 parts.push(fs.readFileSync(mainCssFile, 'utf8').trim());
 
-fs.mkdirSync(path.dirname(OUT), {recursive: true});
-fs.writeFileSync(OUT, parts.join('\n\n') + '\n');
+const concatenated = parts.join('\n\n') + '\n';
 
-const bytes = fs.statSync(OUT).size;
-console.log('main.css ' + (bytes / 1024).toFixed(1) + ' KiB (' +
-            CLOSURE_SHEETS.length + ' Closure sheets + main.css)');
+fs.mkdirSync(path.dirname(OUT), {recursive: true});
+
+// PostCSS + cssnano. The edge already compresses (DigitalOcean App
+// Platform's ingress serves Brotli), and compression collapses most of
+// what minification removes — so this is the smaller of the two wins, not
+// a substitute for the other. It is worth having anyway: minify-then-
+// compress beats compress-alone, and the JS half of this build is already
+// ADVANCED-compiled, so shipping hand-formatted CSS beside it was the
+// inconsistent part.
+//
+// cssnano's default preset is deliberately conservative — it will not
+// merge or reorder rules in ways that change the cascade. That matters
+// more than usual here: 12 stock Closure stylesheets are concatenated
+// ahead of main.css, and this app's overrides depend on source order and
+// on several `!important` declarations to beat them.
+postcss([cssnano({preset: 'default'})])
+    .process(concatenated, {from: undefined})
+    .then((result) => {
+      fs.writeFileSync(OUT, result.css);
+      const bytes = fs.statSync(OUT).size;
+      const saved = concatenated.length - bytes;
+      console.log('main.css ' + (bytes / 1024).toFixed(1) + ' KiB minified (' +
+                  CLOSURE_SHEETS.length + ' Closure sheets + main.css, ' +
+                  (saved / 1024).toFixed(1) + ' KiB saved)');
+    })
+    .catch((err) => {
+      // Fail loudly rather than silently shipping unminified CSS: a build
+      // step that quietly degrades is worse than one that stops.
+      console.error('CSS minification failed: ' + err.message);
+      process.exit(1);
+    });

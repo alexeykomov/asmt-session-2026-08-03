@@ -325,7 +325,18 @@ main {
   display: flex;
   gap: 0.25rem;
   margin: 0;
-  padding: 0 2rem !important;
+  /*
+   * No horizontal padding of its own: `.fwa-tabbar-mount` already supplies
+   * the 2rem gutter, and `.screen-container` uses the same 2rem for screen
+   * content. Adding 2rem here as well put the tab labels at 4rem while
+   * everything beneath them sat at 2rem — the tabs were indented twice as
+   * far as the content they label, which reads as broken alignment rather
+   * than as missing padding.
+   *
+   * `!important` is required because the stock tab.css rule it overrides
+   * carries it; source order alone would not win.
+   */
+  padding: 0 !important;
   border: 0;
   border-bottom: 1px solid var(--color-border) !important;
   background: var(--color-bg);
@@ -397,6 +408,15 @@ main {
   justify-content: space-between;
   gap: 1rem;
   margin: 0 0 1.25rem;
+  /*
+   * Matches .screen-header-action-icon's height so the row is the same
+   * height whether or not a screen has an action. Without it, Recs and
+   * Sources (Refresh, +) rendered a taller header than Profile (no
+   * action), and the title — plus everything below it — shifted
+   * vertically as you moved between tabs. A layout that jumps on tab
+   * change reads as jitter even when nobody can say why.
+   */
+  min-height: 2.25rem;
 }
 
 .screen-header-title {
@@ -753,6 +773,13 @@ main {
 .add-source-form {
   display: grid;
   gap: 1rem;
+  /*
+   * `.screen-section` pads its ROWS, not arbitrary content — a row
+   * carries its own padding so the group's dividers can run edge to edge.
+   * Free-form content dropped into a section therefore has to supply its
+   * own, or it sits flush against the border, which is what this form did.
+   */
+  padding: 1.25rem;
 }
 
 /*
