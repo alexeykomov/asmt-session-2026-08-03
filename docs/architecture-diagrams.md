@@ -209,7 +209,8 @@ flowchart TD
     CH2[("ClickHouse #2 — Analytics plane<br/>pseudonymous product events<br/>small · wide audience")]
     PG[("Postgres<br/>state: profile, entitlements,<br/>stored recommendations")]
 
-    subgraph Worker["Refresh worker — Go, async"]
+    subgraph Worker["Refresh worker (Go)"]
+        Runtime["scheduled, never on a request<br/>K8s CronJob · ECS Scheduled Task · Cloud Run Jobs"]
         Gate["Data-minimisation gate<br/>Provider.Requires() vs. fields present"]
         Adapters["Outbound provider adapters<br/>cache + circuit breaker"]
     end
@@ -262,6 +263,9 @@ flowchart TD
     classDef groupAsync fill:#fbfaff,stroke:#8a5cf6,stroke-width:1px,color:#4c1d95;
     class Worker groupAsync;
 
+    classDef note fill:#ffffff,stroke:#8a5cf6,stroke-dasharray: 3 3,color:#4c1d95;
+    class Runtime note;
+
     classDef groupRead fill:#f7fdfa,stroke:#0b6e4f,stroke-width:1px,color:#0b6e4f;
     class AppServer groupRead;
 ```
@@ -270,9 +274,6 @@ Blue fill = the two stores, split by the nature of the data they hold, not by a
 size threshold. Purple outline = the asynchronous, provider-facing side — nothing
 here runs on a request. Green outline = the read path — nothing here calls a
 vendor.
-
-The refresh worker runs as scheduled containers, or as timer-triggered
-functions — the choice is a deployment detail, not an architectural one.
 
 **Two boxes are drawn inside a process, not beside it.** The
 data-minimisation gate is `Provider.Requires()` — a function call in the refresh
