@@ -106,6 +106,42 @@ discharge, in
 **[`docs/architecture-diagrams.md`](docs/architecture-diagrams.md)** — diagram 4
 and section 4a.
 
+### Where HIPAA and GDPR attach
+
+Nothing on the production diagram is labelled "compliance", so it is worth
+saying which controls are already load-bearing, which are designed but not
+drawn, and which an architecture diagram can never show.
+
+**Already in the design, doing real work:**
+
+| Control | Discharges |
+|---|---|
+| `Provider.Requires()` gate | Art. 5(1)(c) — a provider that does not need date of birth never receives it, and one that does is *skipped* rather than fed placeholder data |
+| ClickHouse #1 / #2 plane split | Art. 32, HIPAA §164.312(a) — the wide-audience store cannot physically contain health values |
+| Server-side pseudonymisation | Art. 4(5) — `analytics_id` is assigned where the real user id is known and can be stripped; a client cannot be trusted to do this |
+| No client writes to a store | §164.312(b) — auth, validation and audit have exactly two chokepoints |
+| No vendor call on the read path | No PHI leaves the boundary as a side effect of someone opening the app |
+
+**Designed, not drawn** — each would add a box to an already dense diagram:
+per-region cells (residency, the brief's pilot-then-global rollout and
+blast-radius containment, all from one decision); KMS and per-user keys for
+the erasure mechanism below; and an append-only consent/PHI-access audit log
+whose six-year retention **deliberately conflicts with Art. 17** — where
+erasure yields to retention is the customer's determination, not ours.
+
+**Not drawable at all, and not optional:** BAAs with the cloud provider and
+every vendor touching PHI, the DPIA that Art. 35 requires for profiling at
+scale, breach-notification runbooks, retention schedules, access review. A
+diagram shows where controls attach; it cannot show that anyone signed
+anything.
+
+Underneath all of it sits a question the customer has not answered: whether
+they are a HIPAA covered entity or business associate, or whether this is
+consumer wellness under FTC HBNR and GDPR Art. 9. The architecture is
+deliberately built so that answer changes configuration and contracts rather
+than topology. Full mapping in
+[`docs/architecture-diagrams.md`](docs/architecture-diagrams.md), section 4a.
+
 ### Erasure: why crypto-shredding rather than `DELETE`
 
 This one is worth stating in the README because it drives the storage design
