@@ -6,10 +6,16 @@
  * AddSourceComponent) matching the rest of this codebase's decorate
  * convention.
  *
+ * Uses the same shared screen header (title, no primary action here) and
+ * screenSection group chrome as every other screen, so the form reads as
+ * part of the same app rather than a bolted-on dialog.
+ *
  * Submitting never calls anything: Phase 1 has no way to add a real
  * provider (see `#add-source-explanation` below, filled in by JS) — the
  * form only validates that Name and Base URL are non-empty, then swaps
- * itself for that explanation.
+ * itself for that explanation. The explanation panel is rendered inside
+ * the same section as the form (not a separate group) since it replaces
+ * the form in place rather than appending alongside it.
  *
  * The auth token field exists to make the extensibility story concrete (a
  * real provider adapter would need one) but its value is NEVER read into
@@ -19,27 +25,35 @@
  */
 {template .screen}
   <section class="add-source-section">
-    <h2 class="sources-heading">Add source</h2>
-    <form id="add-source-form" class="add-source-form">
-      <div class="recs-field">
-        <label for="add-source-name">Name</label>
-        <input type="text" id="add-source-name" autocomplete="off">
-      </div>
-      <div class="recs-field">
-        <label for="add-source-url">Base URL</label>
-        <input type="text" id="add-source-url" autocomplete="off">
-      </div>
-      <div class="recs-field">
-        <label for="add-source-type-mount">Type</label>
-        <div id="add-source-type-mount" class="settings-select-mount"></div>
-      </div>
-      <div class="recs-field">
-        <label for="add-source-token">Auth token <span class="recs-optional">(optional — never stored)</span></label>
-        <input type="password" id="add-source-token" autocomplete="off">
-      </div>
-      <p id="add-source-error" class="add-source-error" hidden>Name and Base URL are both required.</p>
-      <button type="submit" id="add-source-submit" class="recs-submit">Add source</button>
-    </form>
-    <div id="add-source-explanation" class="add-source-explanation" hidden></div>
+    {call funwithactivity.components.screenHeader.header}
+      {param title: 'Add source' /}
+    {/call}
+
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Add source' /}
+      {param content kind="html"}
+        <form id="add-source-form" class="add-source-form">
+          <div class="recs-field">
+            <label for="add-source-name">Name</label>
+            <input type="text" id="add-source-name" autocomplete="off">
+          </div>
+          <div class="recs-field">
+            <label for="add-source-url">Base URL</label>
+            <input type="text" id="add-source-url" autocomplete="off">
+          </div>
+          <div class="recs-field">
+            <label for="add-source-type-mount">Type</label>
+            <div id="add-source-type-mount" class="settings-select-mount"></div>
+          </div>
+          <div class="recs-field">
+            <label for="add-source-token">Auth token <span class="recs-optional">(optional — never stored)</span></label>
+            <input type="password" id="add-source-token" autocomplete="off">
+          </div>
+          <p id="add-source-error" class="add-source-error" hidden>Name and Base URL are both required.</p>
+          <button type="submit" id="add-source-submit" class="recs-submit">Add source</button>
+        </form>
+        <div id="add-source-explanation" class="add-source-explanation" hidden></div>
+      {/param}
+    {/call}
   </section>
 {/template}

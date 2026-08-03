@@ -12,11 +12,13 @@ goog.require('goog.ui.Component');
 
 /**
  * Read-only detail screen for one source (`/sources/<name>`), styled with
- * the same settings-group inset markup and CSS as
- * funwithactivity.profile.ProfileComponent — see
- * ui-soy/components/source-detail-screen.soy, which reuses the profile
- * screen's `.settings-*` classes directly rather than inventing a second
- * style.
+ * the same shared screen header/section chrome as every other screen —
+ * see ui-soy/components/source-detail-screen.soy, which calls
+ * funwithactivity.components.screenSection.section (the same template
+ * funwithactivity.profile.ProfileComponent's screen uses) rather than
+ * inventing a second style. No row here carries the Sources list's
+ * disclosure chevron — every row on this screen is read-only, not
+ * navigable — see the doc on sources-screen.soy's `.list` template.
  *
  * Reads its data from funwithactivity.app.LastStatuses rather than
  * fetching: this screen exists to explain a status the presenter is
@@ -53,7 +55,7 @@ funwithactivity.sources.SourceDetailComponent.prototype.createDom =
       .buildViewModel_(this.name_, status);
 
   const el = goog.dom.createDom(
-      goog.dom.TagName.DIV, {'class': 'fwa-screen-source-detail'});
+      goog.dom.TagName.DIV, {'class': 'fwa-screen-source-detail screen-container'});
   this.setElementInternal(el);
   funwithactivity.render.element(
       el, funwithactivity.components.sourceDetailScreen.screen,

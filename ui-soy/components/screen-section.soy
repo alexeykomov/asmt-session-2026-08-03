@@ -1,0 +1,34 @@
+{namespace funwithactivity.components.screenSection}
+
+/**
+ * Shared "labelled inset group": an uppercase header label above a
+ * rounded, bordered content area. This is the settings-table look
+ * funwithactivity.profile.ProfileComponent originated for MEASUREMENTS/
+ * DEVELOPER (see the `.screen-section` doc in web-client/css/main.css for
+ * the exact visual contract — hairline row separators, rounded corners via
+ * overflow:hidden on the group rather than per-row radius), extracted here
+ * so Sources and Recommendations can present the same grouped-content look
+ * without re-deriving it, and so Profile and the source detail screen stop
+ * duplicating the group/header markup between them.
+ *
+ * `$content` is opaque to this template — a settings-row list (Profile,
+ * source detail), a list of `.sources-row` anchors (Sources), or a
+ * `<table>` (Recommendations) all work identically, since only the
+ * outer group chrome is shared, not any row-level markup.
+ *
+ * `heading` is typed with a bare question mark rather than string — see
+ * the identical note on funwithactivity.components.screenHeader.header
+ * for why: this project's vendored Soy compiler emits a goog.isString
+ * runtime check for primitively-typed params, and that function no
+ * longer exists in the pinned google-closure-library. `content` stays
+ * html-typed, matching funwithactivity.layout.base.render's own html
+ * content param — that type does not trigger the same check.
+ */
+{template .section}
+  {@param heading: ?}
+  {@param content: html}
+  <div class="screen-section">
+    <div class="screen-section-header">{$heading}</div>
+    {$content}
+  </div>
+{/template}

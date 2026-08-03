@@ -1,13 +1,19 @@
 {namespace funwithactivity.components.profileScreen}
 
 /**
- * Static structure for the Profile screen: two settings-table style
+ * Static structure for the Profile screen: a shared screen header (title
+ * only — Profile has no primary action) plus two settings-table style
  * sections (MEASUREMENTS, DEVELOPER), each row carrying a stable id.
  * funwithactivity.profile.ProfileComponent decorates these ids with
  * goog.ui widgets in enterDocument() rather than generating markup in
  * JS, matching the decorate convention the rest of this codebase uses
  * (funwithactivity.recs.RecsComponent#attachTableSorter_ decorates the
  * table the same way).
+ *
+ * The two sections are rendered via funwithactivity.components.
+ * screenSection.section — this screen is where that group/header look
+ * originated, and it is now extracted there rather than hand-authored
+ * here, so Sources and Recommendations can reuse the exact same markup.
  *
  * Height/weight stay native <input type="number"> — see the doc on
  * ProfileComponent for why. The birth date input is decorated by a
@@ -29,50 +35,56 @@
  */
 {template .screen}
   <section class="profile-section">
-    <div class="settings-group">
-      <div class="settings-group-header">Measurements</div>
+    {call funwithactivity.components.screenHeader.header}
+      {param title: 'Profile' /}
+    {/call}
 
-      <div class="settings-row">
-        <label class="settings-label" for="profile-height">Height (cm)</label>
-        <div class="settings-control">
-          <input type="number" id="profile-height" class="settings-number-input" min="0" step="0.1">
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Measurements' /}
+      {param content kind="html"}
+        <div class="settings-row">
+          <label class="settings-label" for="profile-height">Height (cm)</label>
+          <div class="settings-control">
+            <input type="number" id="profile-height" class="settings-number-input" min="0" step="0.1">
+          </div>
         </div>
-      </div>
 
-      <div class="settings-row">
-        <label class="settings-label" for="profile-weight">Weight (kg)</label>
-        <div class="settings-control">
-          <input type="number" id="profile-weight" class="settings-number-input" min="0" step="0.1">
+        <div class="settings-row">
+          <label class="settings-label" for="profile-weight">Weight (kg)</label>
+          <div class="settings-control">
+            <input type="number" id="profile-weight" class="settings-number-input" min="0" step="0.1">
+          </div>
         </div>
-      </div>
 
-      <div class="settings-row">
-        <label class="settings-label" for="profile-birth-date">Birth date</label>
-        <div class="settings-control settings-control-birth-date">
-          <input type="text" id="profile-birth-date" class="settings-date-input" placeholder="yyyy-mm-dd" autocomplete="off">
-          <button type="button" id="profile-birth-date-clear">Clear</button>
+        <div class="settings-row">
+          <label class="settings-label" for="profile-birth-date">Birth date</label>
+          <div class="settings-control settings-control-birth-date">
+            <input type="text" id="profile-birth-date" class="settings-date-input" placeholder="yyyy-mm-dd" autocomplete="off">
+            <button type="button" id="profile-birth-date-clear">Clear</button>
+          </div>
         </div>
-      </div>
-    </div>
+      {/param}
+    {/call}
 
-    <div class="settings-group">
-      <div class="settings-group-header">Developer</div>
-
-      <div class="settings-row">
-        <span class="settings-label">Service 1 fault</span>
-        <div class="settings-control settings-control-fault">
-          <span id="fault-service1"></span>
-          <div id="fault-service1-mode" class="settings-select-mount"></div>
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Developer' /}
+      {param content kind="html"}
+        <div class="settings-row">
+          <span class="settings-label">Service 1 fault</span>
+          <div class="settings-control settings-control-fault">
+            <span id="fault-service1"></span>
+            <div id="fault-service1-mode" class="settings-select-mount"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="settings-row">
-        <span class="settings-label">Service 2 fault</span>
-        <div class="settings-control settings-control-fault">
-          <span id="fault-service2"></span>
-          <div id="fault-service2-mode" class="settings-select-mount"></div>
+        <div class="settings-row">
+          <span class="settings-label">Service 2 fault</span>
+          <div class="settings-control settings-control-fault">
+            <span id="fault-service2"></span>
+            <div id="fault-service2-mode" class="settings-select-mount"></div>
+          </div>
         </div>
-      </div>
-    </div>
+      {/param}
+    {/call}
   </section>
 {/template}

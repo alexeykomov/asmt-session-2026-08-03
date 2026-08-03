@@ -52,8 +52,39 @@ body {
 }
 
 main {
-  padding: 1.5rem 2rem;
   max-width: 1200px;
+}
+
+/*
+ * Shared root wrapper every screen component's createDom() puts on its own
+ * top-level element (funwithactivity.recs.RecsComponent#createDom,
+ * funwithactivity.sources.SourcesComponent#createDom,
+ * funwithactivity.profile.ProfileComponent#createDom,
+ * funwithactivity.sources.SourceDetailComponent#createDom,
+ * funwithactivity.sources.AddSourceComponent#createDom), in place of the
+ * generic `main` tag selector this project used to lean on for that
+ * padding. Pairs with `.fwa-tabbar-mount` below — between them they
+ * reproduce exactly the horizontal/vertical padding `main` used to supply
+ * (2rem sides, 1.5rem top above the tab row, 1.5rem bottom below the
+ * screen), just made explicit and named instead of an accidental side
+ * effect of `main`'s own box model. This is the "nothing sits flush
+ * against the viewport edge" fix: every screen's actual content — the
+ * bare recs table included — now renders inside this padded box rather
+ * than directly inside `main`.
+ */
+.screen-container {
+  padding: 0 2rem 1.5rem;
+}
+
+/*
+ * Tab row's own padding, replacing the top/side share of `main`'s old
+ * padding — see the doc on .screen-container above. `.goog-tab-bar`
+ * itself still carries its own `padding: 0 2rem !important` (below) for
+ * the Tab labels; this is the padding between the tab bar and the
+ * viewport/header, not inside the tab bar itself.
+ */
+.fwa-tabbar-mount {
+  padding: 1.5rem 2rem 0;
 }
 
 /* Measurement + fault-injection form */
@@ -344,43 +375,83 @@ main {
 
 /*
  * .fwa-screen (#screen) intentionally carries no padding/max-width of its
- * own: it nests inside base.soy's #main-content, which the generic `main`
- * rule above already pads and constrains. Repeating those here would
- * double the indent.
+ * own: every screen component's own root element (rendered inside #screen)
+ * carries `.screen-container` instead — see that class's doc above. #screen
+ * itself is just the mount point Shell.prototype.mountScreen_ replaces
+ * wholesale on every navigation.
  */
 
-/* Recs screen (funwithactivity.recs.RecsComponent) */
-
-.recs-toolbar {
+/*
+ * Shared screen header — title (left) + one optional primary action
+ * (right), rendered by funwithactivity.components.screenHeader.header and
+ * used identically by every screen (Recommendations' Refresh,
+ * Sources' "+", and title-only on Profile/source detail/add-source).
+ * Before this extraction, Recs right-aligned a bare Refresh button with no
+ * title in its own `.recs-toolbar`, and Sources laid out "Sources" + "+"
+ * in a differently-shaped `.sources-toolbar` — see the removed rules this
+ * replaces in version control history.
+ */
+.screen-header {
   display: flex;
-  justify-content: flex-end;
-  margin: 0 0 1rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.25rem;
 }
 
-.recs-refresh {
+.screen-header-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+/*
+ * One shared outline-button look for every screen header's primary action.
+ * `.screen-header-action-icon` narrows it to a square icon affordance
+ * (Sources' "+") without duplicating the border/color/hover rules for a
+ * second button style.
+ */
+.screen-header-action {
   padding: 0.5rem 1.1rem;
   border: 1px solid var(--color-accent);
   border-radius: 4px;
   background: #fff;
   color: var(--color-accent);
   font-size: 0.9rem;
+  line-height: 1;
   cursor: pointer;
 }
 
-.recs-refresh:hover {
+.screen-header-action:hover {
   background: var(--color-bg-alt);
 }
 
+.screen-header-action-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  font-size: 1.2rem;
+}
+
 /*
- * Profile screen (funwithactivity.profile.ProfileComponent) — a system
- * settings-table look: grouped sections with an uppercase header label,
- * rows with a left label / right control split, a hairline separator
- * between rows but not after the last one, and rounded corners on the
- * whole group (via overflow:hidden clipping the header/last-row corners
- * to the group's own border-radius rather than rounding each row).
+ * Shared "labelled inset group" look — funwithactivity.components.
+ * screenSection.section's output. Originated on the Profile screen (a
+ * system settings-table look: grouped sections with an uppercase header
+ * label, rows with a left label / right control split, a hairline
+ * separator between rows but not after the last one, and rounded corners
+ * on the whole group via overflow:hidden clipping the header/last-row
+ * corners to the group's own border-radius rather than rounding each
+ * row) and renamed screen-neutral here since Sources (its list of
+ * `.sources-row` links), Recommendations (its results `<table>`), and
+ * source detail all reuse this same group/header chrome now — see each
+ * of those screens' .soy files. `.settings-row`/`.settings-label`/
+ * `.settings-control*`/`.settings-value*` below remain the row-level
+ * classes Profile and source detail use inside a section's content; they
+ * are unaffected by this rename since screenSection.section only ever
+ * emits the group/header wrapper, not row markup.
  */
 
-.settings-group {
+.screen-section {
   margin: 0 0 1.5rem;
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -388,9 +459,9 @@ main {
   background: var(--color-bg);
 }
 
-.settings-group:last-child { margin-bottom: 0; }
+.screen-section:last-child { margin-bottom: 0; }
 
-.settings-group-header {
+.screen-section-header {
   padding: 0.55rem 1rem;
   font-size: 0.72rem;
   font-weight: 600;
@@ -436,8 +507,8 @@ main {
 
 /*
  * The Clear button (goog.ui.Button, NativeButtonRenderer — a real
- * <button>) matches .recs-refresh's outline styling so both of this
- * screen's actionable controls read as the same affordance.
+ * <button>) matches .screen-header-action's outline styling so every
+ * actionable control in this app reads as the same affordance.
  */
 .settings-control-birth-date button {
   padding: 0.4rem 0.85rem;
@@ -539,48 +610,16 @@ main {
   background: var(--color-bg-alt);
 }
 
-/* Sources screen (funwithactivity.sources.SourcesComponent) */
-
-.sources-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 0 1rem;
-}
-
-.sources-heading {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
 /*
- * goog.ui.Button (NativeButtonRenderer — a real <button>) decorating
- * #sources-add. Sized as a small square "+" affordance rather than the
- * wider .recs-refresh/.settings-control-birth-date button treatment,
- * since this is an icon-only control.
+ * Sources screen (funwithactivity.sources.SourcesComponent). The screen
+ * header (title + the "+" action) and the rounded/bordered list container
+ * are now the shared `.screen-header`/`.screen-section` rules above — see
+ * ui-soy/components/sources-screen.soy. `.sources-add` (the old bespoke
+ * "+" button class) and `.sources-toolbar`/`.sources-heading` (the old
+ * bespoke title row, previously rendered OUTSIDE the bordered list — the
+ * exact inconsistency this task exists to fix) are gone; `#sources-add`
+ * now carries `.screen-header-action.screen-header-action-icon` instead.
  */
-.sources-add {
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 1px solid var(--color-accent);
-  border-radius: 6px;
-  background: #fff;
-  color: var(--color-accent);
-  font-size: 1.2rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.sources-add:hover {
-  background: var(--color-bg-alt);
-}
-
-.sources-list {
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--color-bg);
-}
 
 .sources-row {
   display: flex;
@@ -590,6 +629,7 @@ main {
   border-bottom: 1px solid var(--color-border);
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .sources-row:last-child {
@@ -598,6 +638,17 @@ main {
 
 .sources-row:hover {
   background: var(--color-bg-alt);
+}
+
+/*
+ * Real <a href> elements are natively focusable and Enter-activatable, so
+ * no tabindex/keydown handling is needed here — only making sure the
+ * default focus ring is never suppressed, since `.sources-row` already
+ * resets `text-decoration`/`color` for its own link styling.
+ */
+.sources-row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
 }
 
 .sources-row-name {
@@ -621,6 +672,21 @@ main {
   color: var(--color-muted);
 }
 
+/*
+ * Disclosure chevron — the affordance that says "this row navigates
+ * somewhere," matching iOS/Android's own disclosure indicator on the same
+ * rows. Reserved for genuinely navigable rows: see the doc on
+ * ui-soy/components/sources-screen.soy's `.list` template for why source
+ * detail's and Profile's rows must never get one.
+ */
+.sources-row-chevron {
+  flex: 0 0 auto;
+  margin-left: -0.25rem;
+  color: var(--color-muted);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
 .sources-empty {
   margin: 0;
   padding: 1.25rem;
@@ -630,7 +696,7 @@ main {
 
 /*
  * Source detail screen (funwithactivity.sources.SourceDetailComponent) —
- * reuses .settings-group/.settings-row/.settings-label from the Profile
+ * reuses .screen-section/.settings-row/.settings-label from the Profile
  * screen styling above verbatim; only the value-side classes below
  * (not present on Profile, which has no plain read-only rows) are new.
  */

@@ -1,0 +1,45 @@
+{namespace funwithactivity.components.screenHeader}
+
+/**
+ * Shared page-level header: a title plus an optional single primary
+ * action button, laid out identically on every screen (title left,
+ * action right, same vertical rhythm below it).
+ *
+ * Before this extraction, Recommendations right-aligned a bare Refresh
+ * button in its own `.recs-toolbar` with no title at all, and Sources put
+ * "Sources" + "+" in a differently-shaped `.sources-toolbar` — two
+ * distinct layouts for what is conceptually the same "title + primary
+ * action" control. This template only supplies that shared markup; it is
+ * inert on its own. Whichever screen calls it still owns all behaviour on
+ * `$actionId` exactly as before this extraction — see
+ * funwithactivity.recs.RecsComponent#enterDocument (native click listener
+ * on `#recs-refresh`) and funwithactivity.sources.SourcesComponent
+ * #enterDocument (decorates `#sources-add` as a goog.ui.Button). Neither
+ * of those call sites changed; only the surrounding markup moved here.
+ *
+ * Params are deliberately typed with a bare question mark rather than
+ * string/bool: this project's vendored Soy compiler (2016-vintage
+ * closure-templates) emits a soy.asserts.assertType(goog.isString(...) ||
+ * ..., ...) runtime check for any primitively-typed param, and
+ * goog.isString/goog.isBoolean were removed from the pinned
+ * google-closure-library (^20230802.0.0) — every other template in this
+ * codebase already avoids typed string/list params for the same reason
+ * (see e.g. sourcesScreen.list's untyped "rows" param); this template
+ * follows that same convention rather than reintroducing a call to a
+ * function that no longer exists.
+ */
+{template .header}
+  {@param title: ?}
+  {@param? actionId: ?}
+  {@param? actionLabel: ?}
+  {@param? actionTitle: ?}
+  {@param? actionIcon: ?}
+  <div class="screen-header">
+    <h1 class="screen-header-title">{$title}</h1>
+    {if $actionId}
+      <button type="button" id="{$actionId}"
+          class="screen-header-action{if $actionIcon} screen-header-action-icon{/if}"
+          title="{$actionTitle ?: ''}">{$actionLabel}</button>
+    {/if}
+  </div>
+{/template}

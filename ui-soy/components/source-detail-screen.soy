@@ -1,11 +1,16 @@
 {namespace funwithactivity.components.sourceDetailScreen}
 
 /**
- * Source detail screen (`/sources/<name>`): CONFIGURATION and STATUS,
- * rendered in the SAME settings-group inset markup and CSS as
- * ui-soy/components/profile-screen.soy (`.settings-group`,
- * `.settings-group-header`, `.settings-row`, `.settings-label`) — copied
- * rather than reinvented, per the Task 7 brief.
+ * Source detail screen (`/sources/<name>`): a shared screen header (title
+ * is the source's own name; no primary action — every source here is
+ * read-only, see below) plus CONFIGURATION and STATUS, each rendered via
+ * funwithactivity.components.screenSection.section — the same shared
+ * group/header template ui-soy/components/profile-screen.soy now calls,
+ * rather than the settings-group markup this screen used to duplicate by
+ * hand (`.settings-group`, `.settings-group-header`, `.settings-row`,
+ * `.settings-label` are still the row-level classes used inside each
+ * section's content; only the group/header wrapper itself moved into the
+ * shared template).
  *
  * Every source in this proof of concept is read-only (there is no code
  * path anywhere that lets a runtime-added source actually get called —
@@ -21,37 +26,45 @@
 {template .screen}
   {@param source: ?}
   <section class="source-detail-section">
-    <div class="settings-group">
-      <div class="settings-group-header">Configuration</div>
-      <div class="settings-row">
-        <span class="settings-label">Name</span>
-        <span class="settings-value">{$source.name}</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Type</span>
-        <span class="settings-value">{$source.type}</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Base URL</span>
-        <span class="settings-value settings-value-muted">{$source.baseUrl}</span>
-      </div>
-    </div>
+    {call funwithactivity.components.screenHeader.header}
+      {param title: $source.name /}
+    {/call}
 
-    <div class="settings-group">
-      <div class="settings-group-header">Status</div>
-      <div class="settings-row">
-        <span class="settings-label">Status</span>
-        <span class="status-pill status-pill-{$source.statusClass}">{$source.statusLabel}</span>
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">Latency</span>
-        <span class="settings-value">{$source.latencyDisplay}</span>
-      </div>
-      <div class="settings-row settings-row-error">
-        <span class="settings-label">Last error</span>
-        <span class="settings-value settings-value-mono">{$source.errorText}</span>
-      </div>
-    </div>
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Configuration' /}
+      {param content kind="html"}
+        <div class="settings-row">
+          <span class="settings-label">Name</span>
+          <span class="settings-value">{$source.name}</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Type</span>
+          <span class="settings-value">{$source.type}</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Base URL</span>
+          <span class="settings-value settings-value-muted">{$source.baseUrl}</span>
+        </div>
+      {/param}
+    {/call}
+
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Status' /}
+      {param content kind="html"}
+        <div class="settings-row">
+          <span class="settings-label">Status</span>
+          <span class="status-pill status-pill-{$source.statusClass}">{$source.statusLabel}</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Latency</span>
+          <span class="settings-value">{$source.latencyDisplay}</span>
+        </div>
+        <div class="settings-row settings-row-error">
+          <span class="settings-label">Last error</span>
+          <span class="settings-value settings-value-mono">{$source.errorText}</span>
+        </div>
+      {/param}
+    {/call}
 
     <p class="source-detail-footer">Built-in sources are configured at deployment time.</p>
   </section>

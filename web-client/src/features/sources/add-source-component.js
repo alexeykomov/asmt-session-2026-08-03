@@ -68,7 +68,7 @@ funwithactivity.sources.AddSourceComponent.EXPLANATION_ =
 /** @override */
 funwithactivity.sources.AddSourceComponent.prototype.createDom = function() {
   const el = goog.dom.createDom(
-      goog.dom.TagName.DIV, {'class': 'fwa-screen-add-source'});
+      goog.dom.TagName.DIV, {'class': 'fwa-screen-add-source screen-container'});
   this.setElementInternal(el);
   funwithactivity.render.element(
       el, funwithactivity.components.addSourceForm.screen, {});

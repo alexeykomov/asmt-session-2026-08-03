@@ -57,7 +57,7 @@ goog.inherits(funwithactivity.sources.SourcesComponent, goog.ui.Component);
 /** @override */
 funwithactivity.sources.SourcesComponent.prototype.createDom = function() {
   const el = goog.dom.createDom(
-      goog.dom.TagName.DIV, {'class': 'fwa-screen-sources'});
+      goog.dom.TagName.DIV, {'class': 'fwa-screen-sources screen-container'});
   this.setElementInternal(el);
   funwithactivity.render.element(
       el, funwithactivity.components.sourcesScreen.screen, {});

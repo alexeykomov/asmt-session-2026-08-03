@@ -1,12 +1,17 @@
 {namespace funwithactivity.components.recsScreen}
 
 /**
- * Static structure for the Recommendations screen: a refresh control, the
- * degradation-banner mount, and the results-table mount. Rendered exactly
- * once by funwithactivity.recs.RecsComponent#createDom; the banner and
- * table mounts are then rewritten in place (via funwithactivity.render)
- * on every fetch, so this template's own {call} below only supplies the
- * empty-state markup for the moment between mount and first fetch.
+ * Static structure for the Recommendations screen: the shared screen
+ * header (title + a Refresh action, laid out identically to Sources'
+ * title + "+"), the degradation-banner mount, and the results table
+ * inside a shared funwithactivity.components.screenSection group (heading
+ * "Recommendations", the same grouped-content chrome Profile and Sources
+ * use) — rather than the bare, un-contained table this screen rendered
+ * before. Rendered exactly once by funwithactivity.recs.RecsComponent
+ * #createDom; the banner and table mounts are then rewritten in place
+ * (via funwithactivity.render) on every fetch, so this template's own
+ * {call} below only supplies the empty-state markup for the moment
+ * between mount and first fetch.
  *
  * The refresh button forces a fetch regardless of AppState's dirty flag —
  * see RecsComponent.prototype.handleRefreshClick_ — for a presenter who
@@ -14,16 +19,23 @@
  */
 {template .screen}
   <section class="recs-section">
-    <div class="recs-toolbar">
-      <button type="button" id="recs-refresh" class="recs-refresh">Refresh</button>
-    </div>
+    {call funwithactivity.components.screenHeader.header}
+      {param title: 'Recommendations' /}
+      {param actionId: 'recs-refresh' /}
+      {param actionLabel: 'Refresh' /}
+    {/call}
 
     <div id="degradation-banner" role="alert"></div>
 
-    <div id="recs-table-mount">
-      {call funwithactivity.components.recommendationsTable.table}
-        {param recommendations: [] /}
-      {/call}
-    </div>
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Recommendations' /}
+      {param content kind="html"}
+        <div id="recs-table-mount">
+          {call funwithactivity.components.recommendationsTable.table}
+            {param recommendations: [] /}
+          {/call}
+        </div>
+      {/param}
+    {/call}
   </section>
 {/template}

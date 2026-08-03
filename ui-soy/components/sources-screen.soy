@@ -12,20 +12,31 @@
  * short phrase render here; the full text is reserved for the Source
  * detail screen's STATUS section, where an operator needs it.
  *
- * `.screen` renders the static shell (heading, the `+` button's decoration
- * target, and the list mount); funwithactivity.sources.SourcesComponent
- * populates `#sources-list-mount` via `.list` after every fetch/cache
- * read, mirroring the recs-screen.soy / recommendations-table.soy split
- * (static shell template + separate data-driven template re-rendered into
- * a mount element).
+ * `.screen` renders the static shell — the shared screen header (title +
+ * the `+` button's decoration target) and, inside a shared
+ * funwithactivity.components.screenSection group (heading "Sources", the
+ * same grouped-rows chrome Profile uses), the list mount.
+ * funwithactivity.sources.SourcesComponent populates `#sources-list-mount`
+ * via `.list` after every fetch/cache read, mirroring the recs-screen.soy
+ * / recommendations-table.soy split (static shell template + separate
+ * data-driven template re-rendered into a mount element).
  */
 {template .screen}
   <section class="sources-section">
-    <div class="sources-toolbar">
-      <h2 class="sources-heading">Sources</h2>
-      <button type="button" id="sources-add" class="sources-add" title="Add source">+</button>
-    </div>
-    <div id="sources-list-mount" class="sources-list">Loading source status…</div>
+    {call funwithactivity.components.screenHeader.header}
+      {param title: 'Sources' /}
+      {param actionId: 'sources-add' /}
+      {param actionLabel: '+' /}
+      {param actionTitle: 'Add source' /}
+      {param actionIcon: true /}
+    {/call}
+
+    {call funwithactivity.components.screenSection.section}
+      {param heading: 'Sources' /}
+      {param content kind="html"}
+        <div id="sources-list-mount">Loading source status…</div>
+      {/param}
+    {/call}
   </section>
 {/template}
 
@@ -34,6 +45,16 @@
  * funwithactivity.sources.SourcesComponent#toRow_ from a
  * funwithactivity.dto.ProviderStatus — see that method for the exact
  * shape (name, href, statusClass, statusLabel, reason, latencyDisplay).
+ *
+ * Every row here is a real `<a href>` to `/sources/<name>` (the source
+ * detail screen), so each one carries a trailing `.sources-row-chevron`
+ * disclosure glyph — muted, decorative (`aria-hidden`, since the row's own
+ * link semantics already say "navigates" to assistive tech), matching the
+ * disclosure indicator iOS and Android already show on these same rows.
+ * That chevron is reserved for genuinely navigable rows: the source
+ * detail screen's own CONFIGURATION/STATUS rows
+ * (source-detail-screen.soy) and every Profile row are plain, read-only
+ * or in-place-editable, and must never get one.
  */
 {template .list}
   {@param rows: list<?>}
@@ -46,6 +67,7 @@
         <span class="status-pill status-pill-{$row.statusClass}">{$row.statusLabel}</span>
         <span class="sources-row-reason">{$row.reason ?: ''}</span>
         <span class="sources-row-latency">{$row.latencyDisplay}</span>
+        <span class="sources-row-chevron" aria-hidden="true">›</span>
       </a>
     {/foreach}
   {/if}

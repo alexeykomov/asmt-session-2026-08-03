@@ -108,7 +108,7 @@ funwithactivity.recs.RecsComponent.Column_ = {
 /** @override */
 funwithactivity.recs.RecsComponent.prototype.createDom = function() {
   const el = goog.dom.createDom(
-      goog.dom.TagName.DIV, {'class': 'fwa-screen-recs'});
+      goog.dom.TagName.DIV, {'class': 'fwa-screen-recs screen-container'});
   this.setElementInternal(el);
   funwithactivity.render.element(
       el, funwithactivity.components.recsScreen.screen, {});

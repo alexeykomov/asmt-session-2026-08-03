@@ -130,7 +130,7 @@ goog.inherits(funwithactivity.profile.ProfileComponent, goog.ui.Component);
 /** @override */
 funwithactivity.profile.ProfileComponent.prototype.createDom = function() {
   const el = goog.dom.createDom(
-      goog.dom.TagName.DIV, {'class': 'fwa-screen-profile'});
+      goog.dom.TagName.DIV, {'class': 'fwa-screen-profile screen-container'});
   this.setElementInternal(el);
   funwithactivity.render.element(
       el, funwithactivity.components.profileScreen.screen, {});
