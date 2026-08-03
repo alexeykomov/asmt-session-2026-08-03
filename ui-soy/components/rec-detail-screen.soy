@@ -44,7 +44,7 @@
       {param heading: 'Provenance' /}
       {param content kind="html"}
         {foreach $p in $rec.providers}
-          <div class="settings-row">
+          <div class="settings-row settings-row-provenance">
             <span class="settings-label">{$p.name}</span>
             <span class="status-pill status-pill-{$p.statusClass}">{$p.statusLabel}</span>
             <span class="settings-value settings-value-muted">{$p.latencyDisplay}</span>

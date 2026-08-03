@@ -903,3 +903,16 @@ main {
   font-size: 0.85rem;
   line-height: 1.45;
 }
+
+/*
+ * Provenance rows carry three children (name, status pill, latency) inside a
+ * .settings-row, whose justify-content: space-between then parks the pill in
+ * the dead centre of the row — see the Sources list, where the same three
+ * values read correctly because .sources-row-name grows and pushes the pill
+ * and latency into a group on the right. Same mechanism here: let the name
+ * take the slack so the status group stays right-aligned, and the two
+ * screens agree.
+ */
+.settings-row-provenance .settings-label {
+  flex: 1 1 auto;
+}

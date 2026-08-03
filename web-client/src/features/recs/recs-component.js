@@ -47,6 +47,9 @@ funwithactivity.recs.shouldFetch = function(hasFetched, isDirty) {
  * ranked table and the degradation banner, and refetches on becoming
  * visible again only when shouldFetch() says to.
  * @param {!funwithactivity.app.AppState} state
+ * @param {!funwithactivity.app.Router} router Used to route row clicks to
+ *     the recommendation detail screen in-app, rather than letting the
+ *     anchor trigger a page load that would discard the cached response.
  * @constructor
  * @extends {goog.ui.Component}
  */
@@ -207,9 +210,40 @@ funwithactivity.recs.RecsComponent.prototype.maybeFetch_ = function(force) {
 
   if (!force && !funwithactivity.recs.shouldFetch(
       funwithactivity.recs.RecsComponent.hasFetched_, this.state_.isDirty())) {
+    this.renderFromCache_();
     return;
   }
   this.fetch_();
+};
+
+
+/**
+ * Repaints the last response without asking for a new one.
+ *
+ * The refetch-on-return policy answers "should we call the vendors again?",
+ * and for an unchanged profile the answer is no. But Shell.mountScreen_
+ * disposes and reconstructs this screen on every navigation, so skipping the
+ * fetch used to leave the freshly-built empty-state table on screen: return
+ * to Recommendations from Sources, Profile, or a recommendation's own detail
+ * screen and the results vanished, with no request in flight to bring them
+ * back. The data was never lost — funwithactivity.app.LastRecommendations
+ * still held it — it simply was not being drawn.
+ *
+ * So the two questions are now separated: whether to fetch (the policy) and
+ * what to draw (the cache). Nothing here mutates hasFetched_ or the dirty
+ * flag; this is a repaint, not a fetch.
+ * @private
+ */
+funwithactivity.recs.RecsComponent.prototype.renderFromCache_ = function() {
+  const recommendations = funwithactivity.app.LastRecommendations.get();
+  const statuses = funwithactivity.app.LastStatuses.get();
+  // Nothing cached yet (hasFetched_ true but the response was empty, or a
+  // deep link landed here first). The empty-state table already in the DOM
+  // says the right thing, so leave it rather than redrawing it as itself.
+  if (recommendations.length === 0 && statuses.length === 0) return;
+
+  this.renderTable_(recommendations);
+  this.renderBanner_(statuses, recommendations.length > 0);
 };
 
 
