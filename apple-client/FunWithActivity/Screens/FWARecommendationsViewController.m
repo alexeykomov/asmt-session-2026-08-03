@@ -101,7 +101,14 @@ typedef NS_ENUM(NSInteger, FWARecsSection) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"Recommendations";
+    // navigationItem.title, not `title`. UIViewController's -setTitle:
+    // propagates to tabBarItem.title, and -viewDidLoad runs lazily — after
+    // AppDelegate has configured the tab bar — so setting `title` here would
+    // silently relabel the tab back to "Recommendations", undoing the
+    // deliberately shorter "Recs" that keeps a four-item tab bar from
+    // clipping. navigationItem drives only the navigation bar, leaving the
+    // two independent.
+    self.navigationItem.title = @"Recommendations";
     self.view.backgroundColor = [UIColor systemBackgroundColor];
 
     self.tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleInsetGrouped];

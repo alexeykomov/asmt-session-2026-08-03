@@ -132,9 +132,9 @@ describe('POST /api/charts', () => {
     expect(res.body).to.not.contain('upstream down');
   });
 
-  it('serves the SPA shell for GET /charts so a reload or bookmark works', async () => {
+  it('serves the SPA shell for GET /trends so a reload or bookmark works', async () => {
     const app = appWith(async () => FAKE_CHARTS);
-    const res = await request(app).get('/charts');
+    const res = await request(app).get('/trends');
     expect(res.status).to.equal(200);
   });
 

@@ -35,4 +35,27 @@
     <color name="colorStatusDegradedTextOnSurface">#B3261E</color>
 
     <color name="colorDivider">#E0E0E0</color>
+
+    <!--
+      Chart palette. Keyed by the stable series key the wire sends, never by
+      a display label, so rewording a label cannot recolour a chart. Values
+      match web-client/css/main.css and the ChartXxx colour sets in the iOS
+      asset catalogue; docs/mobile/parity-matrix.md carries the row asserting
+      the three agree.
+
+      iOS gets dark-mode variants from its asset catalogue for free. This app
+      has no values-night/ resource set, so these are light-mode values used
+      in both — a real difference between the platforms rather than an
+      oversight, and the place to fix it if the app ever adopts dark mode.
+    -->
+    <color name="colorChartSteps">#2B6CB0</color>
+    <color name="colorChartSleepDeep">#2C5282</color>
+    <color name="colorChartSleepLight">#4299E1</color>
+    <color name="colorChartSleepRem">#9F7AEA</color>
+    <color name="colorChartSleepAwake">#CBD5E0</color>
+    <color name="colorChartActivityLight">#68D391</color>
+    <color name="colorChartActivityModerate">#38A169</color>
+    <color name="colorChartActivityVigorous">#22543D</color>
+    <!-- Any series key this build does not recognise: visible neutral. -->
+    <color name="colorChartUnknown">#A0AEC0</color>
 </resources>

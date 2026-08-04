@@ -8,6 +8,14 @@
         android:id="@+id/nav_sources"
         android:icon="@drawable/ic_tab_sources"
         android:title="@string/tab_sources" />
+    <!-- Charts sits between Sources and Profile: it and Sources are both
+         read-only views of what the system knows, while Profile is where
+         things change. MainActivity keys tabs by item id, not position, so
+         inserting here cannot repoint an index the way it did on iOS. -->
+    <item
+        android:id="@+id/nav_charts"
+        android:icon="@drawable/ic_tab_charts"
+        android:title="@string/tab_charts" />
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_tab_profile"

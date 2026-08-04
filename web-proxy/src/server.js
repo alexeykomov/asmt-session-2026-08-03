@@ -70,7 +70,7 @@ function buildApp({ getRecommendations, getHealthCharts }) {
   // path) and turn them into a confusing 200 HTML response instead of a
   // debuggable 404. Keep this list in sync with
   // funwithactivity.app.Router.normalize's routes.
-  const SPA_ROUTES = new Set(['/', '/recs', '/sources', '/sources/add', '/charts', '/profile']);
+  const SPA_ROUTES = new Set(['/', '/recs', '/sources', '/sources/add', '/trends', '/profile']);
   app.get(Array.from(SPA_ROUTES), (_req, res) => {
     res.sendFile(path.join(__dirname, '..', '..', 'web-client', 'public', 'index.html'));
   });

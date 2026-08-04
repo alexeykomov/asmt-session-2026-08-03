@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.funwithactivity.app.R;
+import com.funwithactivity.app.features.charts.ChartsFragment;
 import com.funwithactivity.app.features.profile.ProfileFragment;
 import com.funwithactivity.app.features.recommendations.RecommendationsFragment;
 import com.funwithactivity.app.features.sources.SourcesFragment;
@@ -32,10 +33,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG_RECOMMENDATIONS = "tab-recommendations";
     private static final String TAG_SOURCES = "tab-sources";
+    private static final String TAG_CHARTS = "tab-charts";
     private static final String TAG_PROFILE = "tab-profile";
 
     private Fragment recommendationsFragment;
     private Fragment sourcesFragment;
+    private Fragment chartsFragment;
     private Fragment profileFragment;
     private Fragment activeFragment;
 
@@ -52,10 +55,12 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             recommendationsFragment = new RecommendationsFragment();
             sourcesFragment = new SourcesFragment();
+            chartsFragment = new ChartsFragment();
             profileFragment = new ProfileFragment();
 
             FragmentTransaction tx = fm.beginTransaction();
             tx.add(R.id.fragment_container, profileFragment, TAG_PROFILE).hide(profileFragment);
+            tx.add(R.id.fragment_container, chartsFragment, TAG_CHARTS).hide(chartsFragment);
             tx.add(R.id.fragment_container, sourcesFragment, TAG_SOURCES).hide(sourcesFragment);
             tx.add(R.id.fragment_container, recommendationsFragment, TAG_RECOMMENDATIONS);
             tx.commitNow();
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
             // re-acquire the references.
             recommendationsFragment = fm.findFragmentByTag(TAG_RECOMMENDATIONS);
             sourcesFragment = fm.findFragmentByTag(TAG_SOURCES);
+            chartsFragment = fm.findFragmentByTag(TAG_CHARTS);
             profileFragment = fm.findFragmentByTag(TAG_PROFILE);
             activeFragment = resolveActiveFragment();
         }
@@ -82,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Fragment resolveActiveFragment() {
         if (sourcesFragment != null && !sourcesFragment.isHidden()) return sourcesFragment;
+        if (chartsFragment != null && !chartsFragment.isHidden()) return chartsFragment;
         if (profileFragment != null && !profileFragment.isHidden()) return profileFragment;
         return recommendationsFragment;
     }
@@ -93,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
             target = recommendationsFragment;
         } else if (id == R.id.nav_sources) {
             target = sourcesFragment;
+        } else if (id == R.id.nav_charts) {
+            target = chartsFragment;
         } else if (id == R.id.nav_profile) {
             target = profileFragment;
         } else {

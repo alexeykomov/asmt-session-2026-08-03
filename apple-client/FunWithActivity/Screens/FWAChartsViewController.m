@@ -40,7 +40,7 @@ static const CGFloat kChartHeight = 200;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"Charts";
+    self.title = @"Trends";
     self.view.backgroundColor = [UIColor systemGroupedBackgroundColor];
 
     self.scrollView = [[UIScrollView alloc] init];

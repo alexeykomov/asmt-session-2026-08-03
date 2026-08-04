@@ -3,7 +3,10 @@
     <string name="app_name">FunWithActivity</string>
 
     <!-- Bottom navigation tabs -->
-    <string name="tab_recommendations">Recommendations</string>
+    <!-- Bottom-navigation labels only. With four tabs "Recommendations"
+         truncates on a narrow screen, so the tab says "Recs" while the
+         screen itself keeps the full word. -->
+    <string name="tab_recommendations">Recs</string>
     <string name="tab_sources">Sources</string>
     <string name="tab_profile">Profile</string>
 
@@ -71,6 +74,14 @@
 
     <!-- Source detail screen: same grouped-card style as Profile. The two
          built-in sources are read-only; a footer explains why. -->
+    <!-- Charts tab -->
+    <string name="tab_charts">Trends</string>
+    <string name="charts_sample_data">Sample data — no device is connected in this build.</string>
+    <string name="charts_needs_measurements">Add your height and weight in Profile to see charts.</string>
+    <string name="charts_error">Unable to load charts — pull to refresh to try again.</string>
+    <string name="charts_empty">No charts returned.</string>
+    <string name="charts_unsupported_type">This chart type is not supported by this app version.</string>
+
     <!-- Recommendation detail (RecommendationDetailActivity) -->
     <string name="rec_detail_section_recommendation">RECOMMENDATION</string>
     <string name="rec_detail_section_provenance">PROVENANCE</string>

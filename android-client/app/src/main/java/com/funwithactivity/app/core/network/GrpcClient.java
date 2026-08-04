@@ -1,5 +1,7 @@
 package com.funwithactivity.app.core.network;
 
+import funwithactivity.recommendations.v1.Recommendations.GetHealthChartsRequest;
+import funwithactivity.recommendations.v1.Recommendations.HealthChartsResponse;
 import funwithactivity.recommendations.v1.Recommendations.GetRecommendationsRequest;
 import funwithactivity.recommendations.v1.Recommendations.GetRecommendationsResponse;
 import funwithactivity.recommendations.v1.RecommendationsServiceGrpc;
@@ -74,6 +76,26 @@ public class GrpcClient {
             stub = stub.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
         }
         return stub.getRecommendations(request);
+    }
+
+    /**
+     * Blocking — call from a background thread.
+     *
+     * <p>Separate call rather than a field on the recommendations response:
+     * charts call no vendor and cannot be degraded by one, so bundling them
+     * would tie a drawing feature's latency to two cold third-party Lambdas
+     * and make a vendor outage look like a chart failure.
+     */
+    public HealthChartsResponse getHealthCharts(GetHealthChartsRequest request) {
+        RecommendationsServiceGrpc.RecommendationsServiceBlockingStub stub =
+            RecommendationsServiceGrpc.newBlockingStub(channel)
+                .withDeadlineAfter(DEADLINE_SECONDS, TimeUnit.SECONDS);
+        if (authToken != null && !authToken.isEmpty()) {
+            Metadata headers = new Metadata();
+            headers.put(AUTHORIZATION_KEY, "Bearer " + authToken);
+            stub = stub.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
+        }
+        return stub.getHealthCharts(request);
     }
 
     public ManagedChannel getChannel() {

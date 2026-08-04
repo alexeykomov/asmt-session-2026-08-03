@@ -100,7 +100,7 @@ funwithactivity.app.Shell.TAB_DEFS_ = [
   // things change. Inserting rather than appending shifts Profile from
   // index 2 to 3 — safe here because tabsByRoute_ is keyed by route, not
   // position, but that had to be checked rather than assumed.
-  {route: 'charts', path: '/charts', label: 'Charts'},
+  {route: 'trends', path: '/trends', label: 'Trends'},
   {route: 'profile', path: '/profile', label: 'Profile'},
 ];
 
@@ -238,7 +238,7 @@ funwithactivity.app.Shell.prototype.createScreen_ = function(route) {
           this.state_, this.router_);
     case 'add-source':
       return new funwithactivity.sources.AddSourceComponent(this.router_);
-    case 'charts':
+    case 'trends':
       return new funwithactivity.charts.ChartsComponent(this.state_);
     case 'profile':
       return new funwithactivity.profile.ProfileComponent(this.state_);

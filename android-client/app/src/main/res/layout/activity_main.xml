@@ -25,10 +25,23 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <!--
+      labelVisibilityMode is pinned to "labeled" rather than left at the
+      default "auto". Auto shows every label while there are three or fewer
+      destinations and silently switches to selected-item-only at four — so
+      adding the Trends tab made three of the four labels disappear without
+      anything in the diff saying so.
+
+      That is Material's own answer to label overflow, and it is a reasonable
+      one, but the labels were shortened ("Recs") precisely so all four could
+      fit. Showing them all also keeps this tab bar consistent with the iOS
+      one, which always labels every item.
+    -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

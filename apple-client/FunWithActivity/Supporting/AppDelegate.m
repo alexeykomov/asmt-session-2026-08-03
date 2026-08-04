@@ -36,14 +36,18 @@
         [[FWAChartsViewController alloc] initWithGRPCClient:grpcClient appState:appState];
     FWAProfileViewController *profileVC = [[FWAProfileViewController alloc] initWithAppState:appState];
 
+    // Tab-bar labels only — each view controller sets its own `title`, which
+    // is what the large navigation bar shows, and those keep the full word.
+    // "Recommendations" is too long for a four-item tab bar: it collides with
+    // its neighbour and clips at the screen edge.
     UINavigationController *recommendationsNav = [self navigationControllerWrapping:recommendationsVC
-                                                                                 title:@"Recommendations"
+                                                                                 title:@"Recs"
                                                                              imageName:@"list.bullet.rectangle"];
     UINavigationController *sourcesNav = [self navigationControllerWrapping:sourcesVC
                                                                         title:@"Sources"
                                                                     imageName:@"server.rack"];
     UINavigationController *chartsNav = [self navigationControllerWrapping:chartsVC
-                                                                       title:@"Charts"
+                                                                       title:@"Trends"
                                                                    imageName:@"chart.bar"];
     UINavigationController *profileNav = [self navigationControllerWrapping:profileVC
                                                                         title:@"Profile"
@@ -225,9 +229,20 @@ typedef NS_ENUM(NSUInteger, FWATabIndex) {
                                                  imageName:(NSString *)imageName {
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:rootVC];
     nav.navigationBar.prefersLargeTitles = YES;
-    nav.tabBarItem = [[UITabBarItem alloc] initWithTitle:title
-                                                     image:[UIImage systemImageNamed:imageName]
-                                                       tag:0];
+    // The item goes on the ROOT view controller, not on the navigation
+    // controller. A UINavigationController derives its tabBarItem from its
+    // root, so an item assigned here is silently replaced the moment that
+    // root's -viewDidLoad sets `title` — which happens lazily, after this
+    // runs. Every tab looked correct while its label matched its title and
+    // only broke once they deliberately differed ("Recs" in the tab bar,
+    // "Recommendations" in the large title), which is exactly the case this
+    // wrapper exists to support.
+    //
+    // Assigning an explicit item on the root also stops `title` from
+    // overwriting it, so the two stay independent from here on.
+    rootVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:title
+                                                        image:[UIImage systemImageNamed:imageName]
+                                                          tag:0];
     return nav;
 }
 
