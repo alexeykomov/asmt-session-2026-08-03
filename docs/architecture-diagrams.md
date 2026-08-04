@@ -383,6 +383,43 @@ the server state that was the reason to avoid it, while still leaving a
 window. Refresh tokens remain useful for staying signed in; the credential
 presented on each call is separate from that.
 
+### Consent
+
+**Recorded as append-only events**, one row per grant or withdrawal, keyed to
+the session's user id:
+
+```
+consent_events            (append-only; nothing is updated or deleted)
+  user | purpose  | policy_version | granted | granted_at
+  u1   | sync     | 2026-01        | true    | ...
+  u1   | research | 2026-01        | false   | ...
+  u1   | sync     | 2026-01        | false   | ...   <- withdrawn
+```
+
+Current state is a view over the latest event per `(user, purpose)`.
+Withdrawal is a new row, never an update, so the table answers *what was
+agreed, when, and under which wording* — which is the question actually asked
+under challenge. Booleans on the profile cannot answer it, because the update
+destroys the prior state.
+
+It shares the PHI-access audit log's retention, so there is one immutable
+record rather than two with different rules.
+
+**Enforcement is deliberately not in `Provider.Requires()`.** That gate
+answers "did the user supply this field", and overloading it with "and may we
+use it" would conflate two different reasons a provider is skipped — one a
+data gap, the other a legal basis — behind a single `skipped` status that
+already means something specific to three clients. Consent is checked where a
+purpose is acted on: the refresh worker before it processes for that purpose,
+and the ingest path before a sample is stored.
+
+**HealthKit prefill is gated behind it.** iOS currently reads height, weight
+and date of birth on the OS permission prompt alone. That prompt is Apple's
+authorisation to access the store; it is not an Art. 9 legal basis, and the
+two are not interchangeable. The read moves behind our own recorded consent,
+with manual entry as the path when it is absent. Android is unaffected — its
+Health Connect read is already cut.
+
 ### The standard challenges, and where we stand
 
 The twelve challenges any health aggregator faces, answered for this system.
@@ -390,7 +427,7 @@ Three are gaps; the status column says which.
 
 | # | Challenge | Our answer | Status |
 |---|---|---|---|
-| 1 | Consent (Art. 9) | Per-purpose, revocable, before any HealthKit/Health Connect read, keyed to the session's user id. Today iOS relies on the OS prompt, which is not consent | **Gap** |
+| 1 | Consent (Art. 9) | Append-only consent events keyed to the user id; HealthKit prefill gated behind them (above) | Designed |
 | 2 | Erasure | Crypto-shred the identity linkage, not the samples — encrypting samples would break compression and cross-user queries | Designed |
 | 3 | Portability | Export endpoint over Postgres state plus the pseudonym's ClickHouse rows | **Gap** |
 | 4 | Device storage | Nothing persisted on any client, so nothing reaches OS backups | Built |
