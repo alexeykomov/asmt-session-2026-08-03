@@ -315,81 +315,46 @@ narrow: the recommendation pipeline sees current values, never raw samples.
 
 ## 4a. How we address HIPAA and GDPR
 
-Decisions taken so far. Each is a position we would defend, not a survey of
-options.
+Decisions, not options. Each is a position we would defend.
 
-### Identity and sessions
+**Identity** — Cognito user pool per region; we never store a credential.
+Cloud-native rather than a third-party IdP so identity adds no company to the
+Art. 28 chain. Azure equivalent: Entra External ID.
 
-Decided, because every other control keys off a user id.
+**Sessions** — OIDC once at login, then our own **opaque** token, looked up
+server-side on every request. Revocation is therefore immediate: withdrawal,
+erasure, lost device, offboarding all take effect on the next call. Affordable
+because the read path already queries Postgres. Web carries it as an httpOnly
+cookie, mobile in gRPC metadata. *Never cache the lookup — a 30-second cache
+restores the window it removed.*
 
-**Accounts:** the region's Cognito user pool. It owns credentials, MFA,
-lockout, reset and sign-in audit; we never store a password. Cloud-native
-rather than Auth0 so identity does not add a company to the Art. 28 chain —
-it is inside the BAA already signed. On Azure the equivalent is Entra
-External ID.
+**Consent** — append-only events `(user, purpose, policy_version, granted,
+at)`. Withdrawal is a new row, never an update, so the table answers *what was
+agreed, when, under which wording*. Booleans on a profile cannot. Enforced
+where a purpose is acted on, **not** in `Requires()` — that gate means "field
+absent", and adding "or not permitted" would collapse two different reasons
+into one `skipped` status three clients already read specifically.
 
-**Sessions:** ours, not the IdP's. OIDC runs once at login; `app-server` then
-mints an **opaque** session token.
+**HealthKit** — prefill moves behind recorded consent. The OS prompt is
+Apple's permission to read the store, not an Art. 9 legal basis.
 
-| Client | Carries it as | Stored in |
-|---|---|---|
-| Web | httpOnly, Secure, `SameSite=Lax` cookie, set by `web-proxy` | Nothing in browser JS |
-| iOS / Android | gRPC metadata, as the internal token already is | Keychain / Android Keystore |
+**Data held** — tiered: raw samples on a short partition TTL, rollups and
+latest values retained. Bounds raw PHI at any moment, and uses the one thing
+ClickHouse is good at — `DROP PARTITION` is metadata-only, where per-user
+deletion is not. The TTL needs a stated reason, which Art. 5(1)(e) requires
+anyway.
 
-**Every request looks the session up**, so revocation is immediate:
-withdrawal of consent, erasure, a lost device and staff offboarding all take
-effect on the next call. That costs one indexed read on a path that already
-queries Postgres for the entitlement check — not a new dependency.
+**Regulatory bar** — US **and** EU, so both regimes bind. Build to HIPAA
+safeguards and GDPR Art. 9 everywhere rather than maintaining two compliance
+variants of one codebase. If the covered-entity answer comes back "consumer
+wellness", nothing is wasted — FTC HBNR is largely a subset, and the
+B2B/provider path stays open.
 
-Two consequences worth stating:
-
-- **Do not cache the lookup.** A 30-second cache silently reinstates the
-  revocation window it was chosen to remove.
-- **Sessions are per-cell**, like the rest of a user's data, and the session
-  store inherits Postgres's availability target.
-
-Not a self-contained JWT: it cannot be revoked before it expires, and the
-usual mitigation — short TTL plus a revocable refresh token — reintroduces
-the server state that was the reason to avoid it, while still leaving a
-window. Refresh tokens remain useful for staying signed in; the credential
-presented on each call is separate from that.
-
-### Consent
-
-**Recorded as append-only events**, one row per grant or withdrawal, keyed to
-the session's user id:
-
-```
-consent_events            (append-only; nothing is updated or deleted)
-  user | purpose  | policy_version | granted | granted_at
-  u1   | sync     | 2026-01        | true    | ...
-  u1   | research | 2026-01        | false   | ...
-  u1   | sync     | 2026-01        | false   | ...   <- withdrawn
-```
-
-Current state is a view over the latest event per `(user, purpose)`.
-Withdrawal is a new row, never an update, so the table answers *what was
-agreed, when, and under which wording* — which is the question actually asked
-under challenge. Booleans on the profile cannot answer it, because the update
-destroys the prior state.
-
-It shares the PHI-access audit log's retention, so there is one immutable
-record rather than two with different rules.
-
-**Enforcement is deliberately not in `Provider.Requires()`.** That gate
-answers "did the user supply this field", and overloading it with "and may we
-use it" would conflate two different reasons a provider is skipped — one a
-data gap, the other a legal basis — behind a single `skipped` status that
-already means something specific to three clients. Consent is checked where a
-purpose is acted on: the refresh worker before it processes for that purpose,
-and the ingest path before a sample is stored.
-
-**HealthKit prefill is gated behind it.** iOS currently reads height, weight
-and date of birth on the OS permission prompt alone. That prompt is Apple's
-authorisation to access the store; it is not an Art. 9 legal basis, and the
-two are not interchangeable. The read moves behind our own recorded consent,
-with manual entry as the path when it is absent. Android is unaffected — its
-Health Connect read is already cut.
+**Residency** — one cell per region: own Postgres, own ClickHouse, own Cognito
+pool, users pinned home. No cross-border transfer means no SCCs and no
+Schrems II exposure to argue. Moving a user between cells is an explicit,
+consented, logged migration — never a routine flow. The cost is duplicated
+infrastructure, which is the price of the residency argument being simple.
 
 ## 5. What changes from PoC to production
 
