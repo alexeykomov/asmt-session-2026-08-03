@@ -6,14 +6,19 @@ third-party recommendation providers, merges and deduplicates what comes
 back, ranks the result, and renders it — the same backend, on **web, iOS,
 and Android**.
 
-The product is a three-tab app on all three clients:
+The product is a four-tab app on all three clients:
 
 - **Recommendations** — the ranked, merged table, fetched in the background
   and refreshed automatically when something relevant changed (a manual
-  Refresh control is also available).
+  Refresh control is also available). Each row drills into a detail screen
+  showing per-provider provenance and where it ranked.
 - **Sources** — the two providers with live status and latency, each
   drilling into a read-only detail screen; a `+` control shows the seam for
   adding a new provider.
+- **Trends** — a steps bar chart, a sleep-stage pie and a grouped bar of
+  active minutes, drawn with platform primitives only: raw SVG on web,
+  CoreGraphics on iOS, `Canvas` on Android. No charting library on any
+  platform.
 - **Profile** — height, weight, and a clearable birth date, plus a
   developer-only section of per-provider fault toggles used for demoing
   resilience.

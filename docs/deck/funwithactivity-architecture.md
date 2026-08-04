@@ -333,7 +333,7 @@ We are not going to let you find this gap yourselves.
 
 What you're about to see, in order: enter measurements → merged, ranked, deduplicated recommendations from both real vendors, with provenance visible per row. Clear the birth date → Service 2 is skipped, results still render, an informational banner explains why — GDPR data minimisation, executable. Tick the fault toggle → a provider dies mid-session, partial results still render, the banner degrades within about two seconds. Optionally, the same backend, the same session, viewed from an iOS or Android client over gRPC.
 
-Full run-of-show, including the warming procedure, is in `docs/demo-script-1.2.0.md` (the three-tab app). `docs/demo-script.md` covers the earlier single-form 1.1.1 build, kept as the deployed fallback.
+Full run-of-show, including the warming procedure, is in `docs/demo-script-1.2.0.md` (the tabbed app, now four tabs). `docs/demo-script.md` covers the earlier single-form 1.1.1 build, kept as the deployed fallback.
 
 **Speaker notes:** Hand off to whoever is driving. Confirm the warm-up (three calls hitting both providers) has already happened before this slide — it should have run silently during the cloud-recommendation or security discussion, not in front of the audience.
 

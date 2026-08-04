@@ -1,8 +1,8 @@
-# FunWithActivity — demo script (1.2.0, three-tab app)
+# FunWithActivity — demo script (tabbed app, 1.2.0 onward)
 
 **Audience:** C-level executives, in the room with PMs, an architect, and a tech lead. Five minutes. They do not read JSON — narrate outcomes, not payloads.
 
-**This is the 1.2.0 script.** The product changed from a single measurement-form-and-submit screen to a three-tab app (**Recommendations / Sources / Profile**) on all three clients — web, iOS, Android — on the same day this script was written. `docs/demo-script.md` is the earlier 1.1.1 script; it still describes the form-and-submit app, and that build is genuinely still deployed as the fallback if 1.2.0 is unavailable on the day. Don't delete it, don't confuse the two on stage.
+**This is the 1.2.0 script.** The product changed from a single measurement-form-and-submit screen to a tabbed app on all three clients — **Recommendations / Sources / Trends / Profile**, the Trends tab arriving in 1.3.0 — — web, iOS, Android — on the same day this script was written. `docs/demo-script.md` is the earlier 1.1.1 script; it still describes the form-and-submit app, and that build is genuinely still deployed as the fallback if 1.2.0 is unavailable on the day. Don't delete it, don't confuse the two on stage.
 
 ---
 
@@ -164,7 +164,7 @@ without first going and touching Profile.
 
 ### 4. Optional — same backend, three clients (≈30s)
 
-- If a rehearsed mobile device is available: open the same three tabs on iOS or Android
+- If a rehearsed mobile device is available: open the same tabs on iOS or Android
   and show the same ranked list, the same banners, the same Sources screen, rendering
   natively.
 - **Say:** "Same product, same backend, three clients — web, iOS, Android — all pointed
@@ -203,4 +203,4 @@ no-op themselves; naming both yourself is what keeps this from reading as decept
 
 ## One-line summary if asked to recap
 
-"Two independent, unreliable third-party services, merged, deduplicated and ranked into one answer, browsable through three tabs — Recommendations, Sources, Profile — that gracefully drops to partial results under both a data-minimisation decline and a live vendor outage, on the same backend across web, iOS and Android."
+"Two independent, unreliable third-party services, merged, deduplicated and ranked into one answer, browsable through four tabs — Recommendations, Sources, Trends, Profile — that gracefully drops to partial results under both a data-minimisation decline and a live vendor outage, on the same backend across web, iOS and Android."
