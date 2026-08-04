@@ -22,7 +22,7 @@ function requestContext(req, res, next) {
   next();
 }
 
-function buildApp({ getRecommendations }) {
+function buildApp({ getRecommendations, getHealthCharts }) {
   const app = express();
   app.disable('x-powered-by');
   app.use(requestContext);
@@ -56,7 +56,7 @@ function buildApp({ getRecommendations }) {
   app.use('/static', express.static(path.join(__dirname, '..', '..', 'web-client', 'css')));
   app.use(express.static(path.join(__dirname, '..', '..', 'web-client', 'public')));
 
-  app.use(apiRouter({ getRecommendations }));
+  app.use(apiRouter({ getRecommendations, getHealthCharts }));
 
   // web-client is a client-side-routed SPA (funwithactivity.app.Router,
   // Task 4): the browser can be pointed straight at /profile — a fresh
@@ -70,7 +70,7 @@ function buildApp({ getRecommendations }) {
   // path) and turn them into a confusing 200 HTML response instead of a
   // debuggable 404. Keep this list in sync with
   // funwithactivity.app.Router.normalize's routes.
-  const SPA_ROUTES = new Set(['/', '/recs', '/sources', '/sources/add', '/profile']);
+  const SPA_ROUTES = new Set(['/', '/recs', '/sources', '/sources/add', '/charts', '/profile']);
   app.get(Array.from(SPA_ROUTES), (_req, res) => {
     res.sendFile(path.join(__dirname, '..', '..', 'web-client', 'public', 'index.html'));
   });
@@ -118,10 +118,10 @@ function buildApp({ getRecommendations }) {
 }
 
 if (require.main === module) {
-  const { getRecommendations } = require('./grpc-client');
+  const { getRecommendations, getHealthCharts } = require('./grpc-client');
   const port = parseInt(process.env.PORT || '3000', 10);
 
-  const app = buildApp({ getRecommendations });
+  const app = buildApp({ getRecommendations, getHealthCharts });
   app.listen(port, () =>
     console.log(JSON.stringify({ level: 'info', msg: 'web-proxy listening', port })),
   );

@@ -1,5 +1,6 @@
 goog.provide('funwithactivity.features.recommendations.api');
 
+goog.require('funwithactivity.dto.HealthChartsResponse');
 goog.require('funwithactivity.dto.RecommendationsResponse');
 goog.require('goog.net.XhrIo');
 
@@ -44,6 +45,39 @@ funwithactivity.features.recommendations.api.fetch = function(payload) {
           const arr = xhr.getResponseJson(
               funwithactivity.features.recommendations.api.XSSI_PREFIX);
           resolve(funwithactivity.dto.RecommendationsResponse.fromJSON(
+              /** @type {!Array} */ (arr)));
+        },
+        'POST',
+        JSON.stringify(payload),
+        {'Content-Type': 'application/json'});
+  });
+};
+
+
+/**
+ * POSTs measurements and returns the health charts for that profile.
+ *
+ * Separate call, not a field added to the recommendations response: charts
+ * call no vendor and cannot be degraded by one, so bundling them would tie a
+ * drawing feature's latency to two cold third-party Lambdas and make a vendor
+ * outage look like a chart failure.
+ *
+ * @param {{heightCm: number, weightKg: number, birthDateUnix: number}} payload
+ * @return {!Promise<!funwithactivity.dto.HealthChartsResponse>}
+ */
+funwithactivity.features.recommendations.api.fetchCharts = function(payload) {
+  return new Promise(function(resolve, reject) {
+    goog.net.XhrIo.send(
+        '/api/charts',
+        function(e) {
+          const xhr = /** @type {!goog.net.XhrIo} */ (e.target);
+          if (!xhr.isSuccess()) {
+            reject(new Error('request failed: ' + xhr.getStatus()));
+            return;
+          }
+          const arr = xhr.getResponseJson(
+              funwithactivity.features.recommendations.api.XSSI_PREFIX);
+          resolve(funwithactivity.dto.HealthChartsResponse.fromJSON(
               /** @type {!Array} */ (arr)));
         },
         'POST',

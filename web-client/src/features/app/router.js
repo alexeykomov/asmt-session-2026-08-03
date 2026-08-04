@@ -83,6 +83,7 @@ funwithactivity.app.Router.normalize = function(path) {
     case '/sources': return 'sources';
     case '/profile': return 'profile';
     case '/recs': return 'recs';
+    case '/charts': return 'charts';
     default: {
       const match = funwithactivity.app.Router.SOURCE_DETAIL_RE_.exec(clean);
       if (match) {

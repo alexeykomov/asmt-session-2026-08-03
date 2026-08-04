@@ -916,3 +916,134 @@ main {
 .settings-row-provenance .settings-label {
   flex: 1 1 auto;
 }
+
+/* --- Charts tab --- */
+
+/*
+ * Series colours live here, keyed by the stable `key` the server sends —
+ * never by the display label, so rewording "Deep" to "Deep sleep" cannot
+ * silently recolour a slice. Nothing about colour crosses the wire, which is
+ * the same arrangement the provider status colours already use.
+ *
+ * These are the web half of a palette that iOS holds in Assets.xcassets and
+ * Android in colors.xml. The three must agree; docs/mobile/parity-matrix.md
+ * carries the row that says so.
+ */
+:root {
+  --chart-steps: #2b6cb0;
+
+  --chart-sleep-deep: #2c5282;
+  --chart-sleep-light: #4299e1;
+  --chart-sleep-rem: #9f7aea;
+  --chart-sleep-awake: #cbd5e0;
+
+  --chart-activity-light: #68d391;
+  --chart-activity-moderate: #38a169;
+  --chart-activity-vigorous: #22543d;
+
+  /* Any key the client does not recognise. A future server adding a series
+     must render as a visible neutral, never as invisible or a crash. */
+  --chart-unknown: #a0aec0;
+}
+
+.chart-card {
+  margin-bottom: 1.75rem;
+}
+
+.chart-title {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.chart-gridline {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.chart-axis-label {
+  fill: var(--color-muted);
+  font-size: 11px;
+  font-family: var(--font-sans, sans-serif);
+}
+
+.chart-bar {
+  /* Default fill for any series without its own rule below. */
+  fill: var(--chart-unknown);
+}
+
+.chart-slice {
+  fill: var(--chart-unknown);
+  stroke: var(--color-surface, #fff);
+  stroke-width: 2;
+}
+
+.chart-series-steps { fill: var(--chart-steps); }
+.chart-series-deep { fill: var(--chart-sleep-deep); }
+.chart-series-light { fill: var(--chart-sleep-light); }
+.chart-series-rem { fill: var(--chart-sleep-rem); }
+.chart-series-awake { fill: var(--chart-sleep-awake); }
+.chart-series-light_activity { fill: var(--chart-activity-light); }
+.chart-series-moderate { fill: var(--chart-activity-moderate); }
+.chart-series-vigorous { fill: var(--chart-activity-vigorous); }
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+/*
+ * The legend swatch is the one place a series colour has to apply to a plain
+ * HTML element rather than an SVG shape, so it needs background-color; the
+ * .chart-series-* rules above only set `fill`, which does nothing here.
+ */
+.chart-legend-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+  background-color: var(--chart-unknown);
+}
+
+.chart-legend-swatch.chart-series-steps { background-color: var(--chart-steps); }
+.chart-legend-swatch.chart-series-deep { background-color: var(--chart-sleep-deep); }
+.chart-legend-swatch.chart-series-light { background-color: var(--chart-sleep-light); }
+.chart-legend-swatch.chart-series-rem { background-color: var(--chart-sleep-rem); }
+.chart-legend-swatch.chart-series-awake { background-color: var(--chart-sleep-awake); }
+.chart-legend-swatch.chart-series-light_activity { background-color: var(--chart-activity-light); }
+.chart-legend-swatch.chart-series-moderate { background-color: var(--chart-activity-moderate); }
+.chart-legend-swatch.chart-series-vigorous { background-color: var(--chart-activity-vigorous); }
+
+.chart-empty {
+  margin: 1rem 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.charts-footnote {
+  margin: 0.5rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-style: italic;
+}

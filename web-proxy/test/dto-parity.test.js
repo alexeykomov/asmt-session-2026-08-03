@@ -37,4 +37,17 @@ describe('DTO slot parity between web-proxy and api/dto', () => {
     expect(SLOTS.RecommendationsResponse).to.deep.equal(
         readFieldsEnum('recommendations-response.js'));
   });
+
+  it('Series slots match', () => {
+    expect(SLOTS.Series).to.deep.equal(readFieldsEnum('series.js'));
+  });
+
+  it('Chart slots match', () => {
+    expect(SLOTS.Chart).to.deep.equal(readFieldsEnum('chart.js'));
+  });
+
+  it('HealthChartsResponse slots match', () => {
+    expect(SLOTS.HealthChartsResponse).to.deep.equal(
+        readFieldsEnum('health-charts-response.js'));
+  });
 });

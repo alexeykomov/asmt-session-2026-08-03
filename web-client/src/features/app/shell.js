@@ -4,6 +4,7 @@ goog.require('funwithactivity.app.AppState');
 goog.require('funwithactivity.app.Router');
 goog.require('funwithactivity.pages.shell');
 goog.require('funwithactivity.profile.ProfileComponent');
+goog.require('funwithactivity.charts.ChartsComponent');
 goog.require('funwithactivity.recs.RecDetailComponent');
 goog.require('funwithactivity.recs.RecsComponent');
 goog.require('funwithactivity.render');
@@ -94,6 +95,12 @@ goog.inherits(funwithactivity.app.Shell, goog.Disposable);
 funwithactivity.app.Shell.TAB_DEFS_ = [
   {route: 'recs', path: '/recs', label: 'Recommendations'},
   {route: 'sources', path: '/sources', label: 'Sources'},
+  // Charts sits between Sources and Profile: it and Sources are both
+  // read-only views of what the system knows, while Profile is where
+  // things change. Inserting rather than appending shifts Profile from
+  // index 2 to 3 — safe here because tabsByRoute_ is keyed by route, not
+  // position, but that had to be checked rather than assumed.
+  {route: 'charts', path: '/charts', label: 'Charts'},
   {route: 'profile', path: '/profile', label: 'Profile'},
 ];
 
@@ -231,6 +238,8 @@ funwithactivity.app.Shell.prototype.createScreen_ = function(route) {
           this.state_, this.router_);
     case 'add-source':
       return new funwithactivity.sources.AddSourceComponent(this.router_);
+    case 'charts':
+      return new funwithactivity.charts.ChartsComponent(this.state_);
     case 'profile':
       return new funwithactivity.profile.ProfileComponent(this.state_);
     default:

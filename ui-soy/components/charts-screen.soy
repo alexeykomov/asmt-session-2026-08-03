@@ -1,0 +1,37 @@
+{namespace funwithactivity.components.chartsScreen}
+
+/**
+ * Static structure for the Charts screen: the shared screen header (title +
+ * Refresh, laid out identically to Recommendations and Sources), a mount the
+ * charts are drawn into, and the sample-data footer.
+ *
+ * Rendered exactly once by funwithactivity.charts.ChartsComponent#createDom;
+ * `#charts-mount` is then rewritten in place on every fetch or repaint, so
+ * the empty-state paragraph below is only what shows between mount and the
+ * first paint.
+ *
+ * The footer is not decoration. This data is generated, not measured, and the
+ * rest of this project refuses to imply otherwise — stub providers name
+ * themselves `-stub`, and an unconfigured base URL renders as an honest
+ * placeholder rather than an invented endpoint. Charts that silently implied
+ * a connected wearable would be the one place it did.
+ */
+{template .screen}
+  <section class="charts-section">
+    {call funwithactivity.components.screenHeader.header}
+      {param title: 'Charts' /}
+      {param actionId: 'charts-refresh' /}
+      {param actionLabel: 'Refresh' /}
+    {/call}
+
+    <div id="charts-banner" role="alert"></div>
+
+    <div id="charts-mount">
+      <p class="chart-empty">Loading charts…</p>
+    </div>
+
+    <p class="charts-footnote">
+      Sample data — no device is connected in this build.
+    </p>
+  </section>
+{/template}

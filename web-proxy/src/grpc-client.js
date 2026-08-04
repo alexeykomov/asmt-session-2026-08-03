@@ -49,4 +49,17 @@ function getRecommendations(payload, requestId) {
   });
 }
 
-module.exports = { getRecommendations };
+// Charts call no vendor, so this needs nothing like the 20s deadline the
+// recommendation fan-out allows for two cold third-party Lambdas — it is a
+// pure in-process computation on the server.
+function getHealthCharts(payload, requestId) {
+  return new Promise((resolve, reject) => {
+    const deadline = new Date(Date.now() + 5000);
+    client.getHealthCharts(payload, buildMetadata(requestId), { deadline }, (err, resp) => {
+      if (err) return reject(err);
+      resolve(resp || { charts: [] });
+    });
+  });
+}
+
+module.exports = { getRecommendations, getHealthCharts };

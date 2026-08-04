@@ -1,12 +1,12 @@
 'use strict';
 
 const express = require('express');
-const { packRecommendationsResponse } = require('../dto');
+const { packRecommendationsResponse, packHealthChartsResponse } = require('../dto');
 
 const VALID_FAULT_MODES = new Set(['error', 'timeout', 'malformed']);
 
 // Factory so tests can inject a stub gRPC client.
-module.exports = function apiRouter({ getRecommendations }) {
+module.exports = function apiRouter({ getRecommendations, getHealthCharts }) {
   const router = express.Router();
 
   router.post('/api/recommendations', async (req, res) => {
@@ -26,6 +26,25 @@ module.exports = function apiRouter({ getRecommendations }) {
     } catch (err) {
       // No measurement values in the log line — request id only.
       req.log.error('get_recommendations_failed', { error: err.message });
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  });
+
+  router.post('/api/charts', async (req, res) => {
+    // Same measurement contract as /api/recommendations, and deliberately
+    // the same validator: the charts are seeded from these values, so a
+    // profile that is good enough to fetch recommendations for is exactly
+    // the profile that should produce charts.
+    const measurements = parseMeasurements(req.body);
+    if (!measurements) {
+      return res.status(400).json({ error: 'invalid_measurements' });
+    }
+
+    try {
+      const result = await getHealthCharts({ measurements }, req.requestId);
+      res.json(packHealthChartsResponse(result));
+    } catch (err) {
+      req.log.error('get_health_charts_failed', { error: err.message });
       res.status(502).json({ error: 'upstream_unavailable' });
     }
   });
