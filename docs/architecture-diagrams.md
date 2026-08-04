@@ -347,6 +347,42 @@ Each adds a box to a diagram already at its density limit.
   which conflicts with Art. 17. Where erasure yields to retention is the
   customer's call.
 
+### Identity and sessions
+
+Decided, because every other control keys off a user id.
+
+**Accounts:** the region's Cognito user pool. It owns credentials, MFA,
+lockout, reset and sign-in audit; we never store a password. Cloud-native
+rather than Auth0 so identity does not add a company to the Art. 28 chain —
+it is inside the BAA already signed. On Azure the equivalent is Entra
+External ID.
+
+**Sessions:** ours, not the IdP's. OIDC runs once at login; `app-server` then
+mints an **opaque** session token.
+
+| Client | Carries it as | Stored in |
+|---|---|---|
+| Web | httpOnly, Secure, `SameSite=Lax` cookie, set by `web-proxy` | Nothing in browser JS |
+| iOS / Android | gRPC metadata, as the internal token already is | Keychain / Android Keystore |
+
+**Every request looks the session up**, so revocation is immediate:
+withdrawal of consent, erasure, a lost device and staff offboarding all take
+effect on the next call. That costs one indexed read on a path that already
+queries Postgres for the entitlement check — not a new dependency.
+
+Two consequences worth stating:
+
+- **Do not cache the lookup.** A 30-second cache silently reinstates the
+  revocation window it was chosen to remove.
+- **Sessions are per-cell**, like the rest of a user's data, and the session
+  store inherits Postgres's availability target.
+
+Not a self-contained JWT: it cannot be revoked before it expires, and the
+usual mitigation — short TTL plus a revocable refresh token — reintroduces
+the server state that was the reason to avoid it, while still leaving a
+window. Refresh tokens remain useful for staying signed in; the credential
+presented on each call is separate from that.
+
 ### The standard challenges, and where we stand
 
 The twelve challenges any health aggregator faces, answered for this system.
@@ -354,7 +390,7 @@ Three are gaps; the status column says which.
 
 | # | Challenge | Our answer | Status |
 |---|---|---|---|
-| 1 | Consent (Art. 9) | Per-purpose, revocable, before any HealthKit/Health Connect read; proof stored. Today iOS relies on the OS prompt, which is not consent | **Gap** |
+| 1 | Consent (Art. 9) | Per-purpose, revocable, before any HealthKit/Health Connect read, keyed to the session's user id. Today iOS relies on the OS prompt, which is not consent | **Gap** |
 | 2 | Erasure | Crypto-shred the identity linkage, not the samples — encrypting samples would break compression and cross-user queries | Designed |
 | 3 | Portability | Export endpoint over Postgres state plus the pseudonym's ClickHouse rows | **Gap** |
 | 4 | Device storage | Nothing persisted on any client, so nothing reaches OS backups | Built |
@@ -364,7 +400,7 @@ Three are gaps; the status column says which.
 | 8 | Vendor chain / BAAs | No analytics, crash or push SDK ships; no measurement value is logged. BAA is a contract, not a control | Built |
 | 9 | Residency | Per-region cells, users pinned home | Designed |
 | 10 | Breach readiness | DPIA named as mandatory. Detection and incident process not built | **Gap** |
-| 11 | Sessions & access | No user auth at all — only a fail-closed internal token between tiers | **Gap** |
+| 11 | Sessions & access | Cognito accounts, our own opaque session, revoked server-side on every request (above) | Designed |
 | 12 | Applicability | Covered entity vs FTC HBNR is unanswered; we build to HIPAA either way | Open |
 
 Rows 4, 5, 6 and 8 were verified in the code, not asserted: no
