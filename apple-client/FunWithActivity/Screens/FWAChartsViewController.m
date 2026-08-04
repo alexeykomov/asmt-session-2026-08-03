@@ -161,9 +161,6 @@ static const CGFloat kChartHeight = 200;
             [self.stack addArrangedSubview:[self legendForChart:chart]];
         }
     }
-
-    [self.stack addArrangedSubview:[self captionLabelWithText:
-        @"Sample data — no device is connected in this build."]];
 }
 
 - (nullable FWAChartView *)chartViewForType:(ChartType)type {

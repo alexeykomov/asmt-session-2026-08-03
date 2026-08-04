@@ -10,11 +10,10 @@
  * the empty-state paragraph below is only what shows between mount and the
  * first paint.
  *
- * The footer is not decoration. This data is generated, not measured, and the
- * rest of this project refuses to imply otherwise — stub providers name
- * themselves `-stub`, and an unconfigured base URL renders as an honest
- * placeholder rather than an invented endpoint. Charts that silently implied
- * a connected wearable would be the one place it did.
+ * The data is generated server-side rather than measured — see
+ * app-server/internal/charts. That was previously stated in an on-screen
+ * footer; the footer was removed by review decision on all three clients, so
+ * the fact now lives in the code and the spec rather than in the UI.
  */
 {template .screen}
   <section class="charts-section">
@@ -29,9 +28,5 @@
     <div id="charts-mount">
       <p class="chart-empty">Loading charts…</p>
     </div>
-
-    <p class="charts-footnote">
-      Sample data — no device is connected in this build.
-    </p>
   </section>
 {/template}

@@ -192,8 +192,6 @@ public class ChartsFragment extends Fragment implements TabVisibilityAware {
                 container.addView(legendFor(chart));
             }
         }
-
-        container.addView(captionView(getString(R.string.charts_sample_data)));
     }
 
     @Nullable
