@@ -315,37 +315,8 @@ narrow: the recommendation pipeline sees current values, never raw samples.
 
 ## 4a. How we address HIPAA and GDPR
 
-For each requirement that binds this product: the mechanism, and where it
-sits. Split into what is load-bearing today, what is designed but not drawn,
-and what no architecture can discharge.
-
-### Already load-bearing, and visible on the diagram
-
-| Requirement | How we address it | Where |
-|---|---|---|
-| **GDPR Art. 5(1)(c)** — collect and share only what is necessary | A provider declares the fields it needs; the aggregator **skips** one whose fields are absent rather than calling it with placeholder data | `Provider.Requires()`, in the refresh worker |
-| **Art. 32 / HIPAA §164.312(a)** — access control proportionate to sensitivity | Two stores in separate accounts, so the wide-audience one physically cannot hold health values and a broad grant cannot drift onto PHI | ClickHouse #1 vs #2 |
-| **Art. 4(5)** — pseudonymisation | `analytics_id` is assigned server-side, at the one point where the real user id is known and can be stripped; a client cannot be trusted with this | `web-proxy` and `app-server`, on the way to CH #2 |
-| **§164.312(b)** — audit controls | No client writes to a store; every write passes a tier we operate, so auth, validation and audit have exactly two chokepoints | The two read-path tiers |
-| **Art. 28 / §164.308(b)** — limiting disclosure to processors | Vendors are never called on the read path, so no PHI leaves the boundary as a side effect of someone opening the app | `Entitlement → Postgres → API` |
-
-### Designed, not yet drawn
-
-Each adds a box to a diagram already at its density limit.
-
-- **Per-region cells** — own Postgres, own ClickHouse, own boundary, users
-  pinned home. One decision covering Art. 44 residency, the phased rollout and
-  blast-radius containment.
-- **KMS and per-user keys** — the erasure mechanism. Row deletion is the wrong
-  tool: `MergeTree` parts are immutable, so deleting one user rewrites nearly
-  every part, while key destruction also reaches backups and replicas and
-  leaves an auditable event. What is shredded is the identity linkage, not the
-  samples — encrypting samples per user would collapse columnar compression
-  and make population queries impossible. Whether the orphaned rows are then
-  anonymous under Art. 4(5) is a DPO determination, not ours.
-- **Consent and PHI-access audit log** — append-only, six-year retention,
-  which conflicts with Art. 17. Where erasure yields to retention is the
-  customer's call.
+Decisions taken so far. Each is a position we would defend, not a survey of
+options.
 
 ### Identity and sessions
 
@@ -419,44 +390,6 @@ authorisation to access the store; it is not an Art. 9 legal basis, and the
 two are not interchangeable. The read moves behind our own recorded consent,
 with manual entry as the path when it is absent. Android is unaffected — its
 Health Connect read is already cut.
-
-### The standard challenges, and where we stand
-
-The twelve challenges any health aggregator faces, answered for this system.
-Three are gaps; the status column says which.
-
-| # | Challenge | Our answer | Status |
-|---|---|---|---|
-| 1 | Consent (Art. 9) | Append-only consent events keyed to the user id; HealthKit prefill gated behind them (above) | Designed |
-| 2 | Erasure | Crypto-shred the identity linkage, not the samples — encrypting samples would break compression and cross-user queries | Designed |
-| 3 | Portability | Export endpoint over Postgres state plus the pseudonym's ClickHouse rows | **Gap** |
-| 4 | Device storage | Nothing persisted on any client, so nothing reaches OS backups | Built |
-| 5 | Platform health-API rules | OS store stays primary; iOS reads height/weight/DOB only, Android's read is cut | Built |
-| 6 | Web at rest | No PHI in the browser. Missing: `Cache-Control: no-store`, and there is no session yet | Partial |
-| 7 | Audit trail | Append-only PHI-access log, six-year retention — the one that conflicts with Art. 17 | Designed |
-| 8 | Vendor chain / BAAs | No analytics, crash or push SDK ships; no measurement value is logged. BAA is a contract, not a control | Built |
-| 9 | Residency | Per-region cells, users pinned home | Designed |
-| 10 | Breach readiness | DPIA named as mandatory. Detection and incident process not built | **Gap** |
-| 11 | Sessions & access | Cognito accounts, our own opaque session, revoked server-side on every request (above) | Designed |
-| 12 | Applicability | Covered entity vs FTC HBNR is unanswered; we build to HIPAA either way | Open |
-
-Rows 4, 5, 6 and 8 were verified in the code, not asserted: no
-`localStorage`/IndexedDB, no `SharedPreferences`/Room/SQLite, iOS
-`NSUserDefaults` only inside `#if DEBUG`, and dependency lists containing
-only gRPC, Protobuf and platform UI.
-
-### Not addressable by architecture at all
-
-BAAs with the cloud provider and every vendor touching PHI; the DPIA Art. 35
-requires for profiling at scale; breach-notification runbooks (§164.400,
-Art. 33/34); retention schedules; access review. A diagram shows where
-controls attach, not that anyone signed anything.
-
-Row 12 is the one that changes the others: covered-entity status decides
-retention and BAA obligations. The architecture is built so that answer
-changes configuration and contracts, not topology.
-
----
 
 ## 5. What changes from PoC to production
 
