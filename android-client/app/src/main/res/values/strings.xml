@@ -74,6 +74,12 @@
 
     <!-- Source detail screen: same grouped-card style as Profile. The two
          built-in sources are read-only; a footer explains why. -->
+    <!-- Developer: which endpoint this build resolved -->
+    <string name="profile_grpc_host">gRPC host</string>
+    <string name="profile_grpc_transport">Transport</string>
+    <string name="profile_transport_tls">TLS</string>
+    <string name="profile_transport_plaintext">plaintext</string>
+
     <!-- Charts tab -->
     <string name="tab_charts">Trends</string>
     <string name="charts_needs_measurements">Add your height and weight in Profile to see charts.</string>

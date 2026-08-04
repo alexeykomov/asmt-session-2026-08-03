@@ -5,6 +5,19 @@
 
 #import "FWAProfileViewController.h"
 #import "FWAAppState.h"
+#import "FWAServerConfig.h"
+
+/// Rows the DEVELOPER section shows before the per-provider fault toggles.
+/// The endpoint is here because it is baked in at build time from .env and
+/// cannot be inferred by looking at the app: the .env -> xcconfig -> pbxproj
+/// chain is only re-run by `make ios`, so an ordinary Xcode build happily
+/// ships a stale host. Showing the value it actually resolved removes the
+/// guesswork.
+typedef NS_ENUM(NSInteger, FWADeveloperRow) {
+    FWADeveloperRowHost = 0,
+    FWADeveloperRowTransport,
+    FWADeveloperRowFixedCount,
+};
 
 typedef NS_ENUM(NSInteger, FWAProfileSection) {
     FWAProfileSectionMeasurements = 0,
@@ -202,7 +215,7 @@ static NSString *const kFaultCellID = @"FaultCell";
     if (section == FWAProfileSectionMeasurements) {
         return self.birthDatePickerExpanded ? 4 : 3;
     }
-    return self.appState.providerNames.count;
+    return FWADeveloperRowFixedCount + self.appState.providerNames.count;
 }
 
 - (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
@@ -211,7 +224,7 @@ static NSString *const kFaultCellID = @"FaultCell";
 
 - (nullable NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if (section == FWAProfileSectionDeveloper) {
-        return @"Fault injection for the demo — not a product feature. Each toggle simulates that provider failing on the next fetch.";
+        return @"Endpoint is compiled in from .env — `make ios` is what refreshes it, not an Xcode build. Fault injection below is for the demo, not a product feature: each toggle simulates that provider failing on the next fetch.";
     }
     return nil;
 }
@@ -220,7 +233,36 @@ static NSString *const kFaultCellID = @"FaultCell";
     if (indexPath.section == FWAProfileSectionMeasurements) {
         return [self measurementCellForTableView:tableView atRow:indexPath.row];
     }
-    return [self faultCellForTableView:tableView atIndex:indexPath.row];
+    if (indexPath.row < FWADeveloperRowFixedCount) {
+        return [self connectionCellForTableView:tableView atRow:indexPath.row];
+    }
+    return [self faultCellForTableView:tableView
+                               atIndex:indexPath.row - FWADeveloperRowFixedCount];
+}
+
+/// Read-only endpoint rows. Deliberately shows host and transport and NOT the
+/// bearer token: this screen is reachable in any DEBUG build, and a token on
+/// screen is a token in a screenshot.
+- (UITableViewCell *)connectionCellForTableView:(UITableView *)tableView atRow:(NSInteger)row {
+    static NSString *const kID = @"FWAConnectionCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kID];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1
+                                      reuseIdentifier:kID];
+    }
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.detailTextLabel.textColor = [UIColor secondaryLabelColor];
+    cell.detailTextLabel.adjustsFontSizeToFitWidth = YES;
+    cell.detailTextLabel.minimumScaleFactor = 0.7;
+
+    if (row == FWADeveloperRowHost) {
+        cell.textLabel.text = @"gRPC host";
+        cell.detailTextLabel.text = [FWAServerConfig grpcHost];
+    } else {
+        cell.textLabel.text = @"Transport";
+        cell.detailTextLabel.text = [FWAServerConfig useTLS] ? @"TLS" : @"plaintext";
+    }
+    return cell;
 }
 
 - (UITableViewCell *)measurementCellForTableView:(UITableView *)tableView atRow:(NSInteger)row {
@@ -366,7 +408,9 @@ static NSString *const kFaultCellID = @"FaultCell";
 
 - (void)didToggleFaultSwitch:(UISwitch *)sender {
     [self.appState setFaultEnabled:sender.isOn atIndex:sender.tag];
-    [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:sender.tag
+    // sender.tag is a PROVIDER index; the section now has fixed rows above
+    // the fault rows, so it must be offset to reach the right row.
+    [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:sender.tag + FWADeveloperRowFixedCount
                                                                   inSection:FWAProfileSectionDeveloper]]
                             withRowAnimation:UITableViewRowAnimationNone];
 }

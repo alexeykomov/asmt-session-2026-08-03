@@ -147,6 +147,64 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- Endpoint the app actually resolved. Compiled in from .env
+                     via buildConfigField, so it cannot be inferred by looking
+                     at the app; showing it removes the guesswork about which
+                     server a given build is talking to. Host and transport
+                     only — never the bearer token, since this screen is
+                     reachable in any debug build and a token on screen is a
+                     token in a screenshot. -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_grpc_host"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+
+                    <TextView
+                        android:id="@+id/profile_grpc_host_value"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/colorTextMuted"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_grpc_transport"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+
+                    <TextView
+                        android:id="@+id/profile_grpc_transport_value"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/colorTextMuted"
+                        android:textAppearance="?attr/textAppearanceBody1" />
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="12dp"
+                    app:dividerColor="@color/colorDivider" />
+
                 <!-- service1 -->
                 <LinearLayout
                     android:layout_width="match_parent"

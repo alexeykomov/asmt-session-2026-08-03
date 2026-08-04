@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
+import com.funwithactivity.app.BuildConfig;
 import com.funwithactivity.app.FunWithActivityApplication;
 import com.funwithactivity.app.R;
 import com.funwithactivity.app.core.health.HealthConnectHelper;
@@ -115,6 +116,17 @@ public class ProfileFragment extends Fragment implements TabVisibilityAware {
         weightInput = view.findViewById(R.id.profile_weight);
         birthDateText = view.findViewById(R.id.profile_birth_date);
         healthConnectStatus = view.findViewById(R.id.profile_health_connect_status);
+
+        // Which endpoint this build resolved. Compiled in from .env via
+        // buildConfigField, so it is not inferable from the running app —
+        // and a stale build looks identical to a fresh one. Host and
+        // transport only: the token is deliberately never shown.
+        ((TextView) view.findViewById(R.id.profile_grpc_host_value))
+            .setText(BuildConfig.SERVER_HOST);
+        ((TextView) view.findViewById(R.id.profile_grpc_transport_value))
+            .setText(BuildConfig.SERVER_TLS
+                ? R.string.profile_transport_tls
+                : R.string.profile_transport_plaintext);
 
         service1Label = view.findViewById(R.id.profile_service1_label);
         service1Switch = view.findViewById(R.id.profile_service1_switch);
