@@ -8,6 +8,7 @@
 #import "FWAAppState.h"
 #import "FWARecommendationsViewController.h"
 #import "FWASourcesViewController.h"
+#import "FWAChartsViewController.h"
 #import "FWAProfileViewController.h"
 #import "FWAAddSourceViewController.h"
 #import "FWASourceDetailViewController.h"
@@ -31,6 +32,8 @@
     FWARecommendationsViewController *recommendationsVC =
         [[FWARecommendationsViewController alloc] initWithGRPCClient:grpcClient appState:appState];
     FWASourcesViewController *sourcesVC = [[FWASourcesViewController alloc] initWithAppState:appState];
+    FWAChartsViewController *chartsVC =
+        [[FWAChartsViewController alloc] initWithGRPCClient:grpcClient appState:appState];
     FWAProfileViewController *profileVC = [[FWAProfileViewController alloc] initWithAppState:appState];
 
     UINavigationController *recommendationsNav = [self navigationControllerWrapping:recommendationsVC
@@ -39,12 +42,20 @@
     UINavigationController *sourcesNav = [self navigationControllerWrapping:sourcesVC
                                                                         title:@"Sources"
                                                                     imageName:@"server.rack"];
+    UINavigationController *chartsNav = [self navigationControllerWrapping:chartsVC
+                                                                       title:@"Charts"
+                                                                   imageName:@"chart.bar"];
     UINavigationController *profileNav = [self navigationControllerWrapping:profileVC
                                                                         title:@"Profile"
                                                                     imageName:@"person.crop.circle"];
 
     UITabBarController *tabBarController = [[UITabBarController alloc] init];
-    tabBarController.viewControllers = @[recommendationsNav, sourcesNav, profileNav];
+    // Charts sits between Sources and Profile: it and Sources are both
+    // read-only views of what the system knows, while Profile is where
+    // things change. Inserting rather than appending moves Profile from
+    // index 2 to 3 — the DEBUG launch hooks below select tabs by index, so
+    // they were checked against this order rather than assumed unaffected.
+    tabBarController.viewControllers = @[recommendationsNav, sourcesNav, chartsNav, profileNav];
 
     self.window.rootViewController = tabBarController;
     [self.window makeKeyAndVisible];
@@ -60,6 +71,17 @@
 }
 
 #if DEBUG
+// Tab indices, named rather than written as literals at each use. Charts was
+// inserted third and moved Profile from 2 to 3; the literal `2` below then
+// still compiled and still selected *a* tab, just the wrong one — a failure
+// no build could catch and only a screenshot would reveal.
+typedef NS_ENUM(NSUInteger, FWATabIndex) {
+    FWATabIndexRecommendations = 0,
+    FWATabIndexSources = 1,
+    FWATabIndexCharts = 2,
+    FWATabIndexProfile = 3,
+};
+
 // DEBUG-only launch-argument hooks for headless simulator verification —
 // this project has no XCUITest/UI-automation harness (see
 // FWAResultsViewController's history), so demo states are driven this way
@@ -122,7 +144,7 @@
             // there for the pushed detail screen's back button — pushing
             // onto a tab's nav stack does not itself trigger that tab's
             // view to load if it has never been the selected tab.
-            tabBarController.selectedIndex = 1;
+            tabBarController.selectedIndex = FWATabIndexSources;
             NSArray<ProviderStatus *> *statuses = appState.lastStatuses;
             if (detailIndex >= 0 && detailIndex < (NSInteger)statuses.count) {
                 ProviderStatus *status = statuses[detailIndex];
@@ -178,9 +200,9 @@
                 [appState setFaultMode:faultModeOnReturn atIndex:faultIndexOnReturn];
                 [appState setFaultEnabled:YES atIndex:faultIndexOnReturn];
             }
-            tabBarController.selectedIndex = 2; // Profile — a real "leave the tab"
+            tabBarController.selectedIndex = FWATabIndexProfile; // a real "leave the tab"
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                tabBarController.selectedIndex = 0; // back to Recommendations — triggers -viewWillAppear:
+                tabBarController.selectedIndex = FWATabIndexRecommendations; // triggers -viewWillAppear:
 
                 NSInteger selectAfterRefetch = [defaults integerForKey:@"FWA_DEMO_SELECT_TAB_AFTER_REFETCH"];
                 if (selectAfterRefetch > 0 && selectAfterRefetch < (NSInteger)tabBarController.viewControllers.count) {

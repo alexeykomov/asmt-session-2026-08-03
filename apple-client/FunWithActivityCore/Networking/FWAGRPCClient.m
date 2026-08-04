@@ -27,16 +27,23 @@ static os_log_t FWANetworkLog(void) {
 
 @property (nonatomic, copy) void (^completionBlock)(GPBMessage *_Nullable response, NSError *_Nullable error);
 @property (nonatomic, strong, nullable) GPBMessage *receivedMessage;
+/// Which RPC this handler is serving, for the close log line. Added when a
+/// second call started sharing this class — without it every RPC's close was
+/// logged as "GetRecommendations", which is worse than no log at all.
+@property (nonatomic, copy) NSString *rpcName;
 
-- (instancetype)initWithCompletion:(void (^)(GPBMessage *_Nullable, NSError *_Nullable))completion;
+- (instancetype)initWithRPCName:(NSString *)rpcName
+                      completion:(void (^)(GPBMessage *_Nullable, NSError *_Nullable))completion;
 
 @end
 
 @implementation FWAUnaryResponseHandler
 
-- (instancetype)initWithCompletion:(void (^)(GPBMessage *_Nullable, NSError *_Nullable))completion {
+- (instancetype)initWithRPCName:(NSString *)rpcName
+                      completion:(void (^)(GPBMessage *_Nullable, NSError *_Nullable))completion {
     self = [super init];
     if (self) {
+        _rpcName = [rpcName copy];
         _completionBlock = [completion copy];
     }
     return self;
@@ -51,8 +58,8 @@ static os_log_t FWANetworkLog(void) {
 }
 
 - (void)didCloseWithTrailingMetadata:(NSDictionary *_Nullable)trailingMetadata error:(NSError *_Nullable)error {
-    os_log(FWANetworkLog(), "GetRecommendations closed — hasResponse=%d error=%{public}@",
-           self.receivedMessage != nil, error);
+    os_log(FWANetworkLog(), "%{public}@ closed — hasResponse=%d error=%{public}@",
+           self.rpcName, self.receivedMessage != nil, error);
     if (self.completionBlock) {
         self.completionBlock(self.receivedMessage, error);
     }
@@ -129,7 +136,8 @@ static const NSTimeInterval kFWAGRPCCallTimeoutSeconds = 10.0;
            [FWAServerConfig grpcHost], heightCm, weightKg, birthDateUnix != 0);
 
     FWAUnaryResponseHandler *handler = [[FWAUnaryResponseHandler alloc]
-        initWithCompletion:^(GPBMessage *_Nullable response, NSError *_Nullable error) {
+        initWithRPCName:@"GetRecommendations"
+             completion:^(GPBMessage *_Nullable response, NSError *_Nullable error) {
             if (completion) {
                 completion((GetRecommendationsResponse *)response, error);
             }
@@ -138,6 +146,35 @@ static const NSTimeInterval kFWAGRPCCallTimeoutSeconds = 10.0;
     GRPCUnaryProtoCall *call = [self.service getRecommendationsWithMessage:request
                                                             responseHandler:handler
                                                                 callOptions:[self callOptions]];
+    [call start];
+}
+
+- (void)getHealthChartsWithHeightCm:(double)heightCm
+                            weightKg:(double)weightKg
+                       birthDateUnix:(int64_t)birthDateUnix
+                          completion:(FWAGetHealthChartsBlock)completion {
+    Measurements *measurements = [[Measurements alloc] init];
+    measurements.heightCm = heightCm;
+    measurements.weightKg = weightKg;
+    measurements.birthDateUnix = birthDateUnix;
+
+    GetHealthChartsRequest *request = [[GetHealthChartsRequest alloc] init];
+    request.measurements = measurements;
+
+    os_log(FWANetworkLog(), "GetHealthCharts starting — host=%{public}@ heightCm=%.1f weightKg=%.1f",
+           [FWAServerConfig grpcHost], heightCm, weightKg);
+
+    FWAUnaryResponseHandler *handler = [[FWAUnaryResponseHandler alloc]
+        initWithRPCName:@"GetHealthCharts"
+             completion:^(GPBMessage *_Nullable response, NSError *_Nullable error) {
+            if (completion) {
+                completion((HealthChartsResponse *)response, error);
+            }
+        }];
+
+    GRPCUnaryProtoCall *call = [self.service getHealthChartsWithMessage:request
+                                                        responseHandler:handler
+                                                            callOptions:[self callOptions]];
     [call start];
 }
 

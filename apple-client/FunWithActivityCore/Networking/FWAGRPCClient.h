@@ -8,11 +8,15 @@
 #import <Foundation/Foundation.h>
 
 @class GetRecommendationsResponse;
+@class HealthChartsResponse;
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^FWAGetRecommendationsBlock)(GetRecommendationsResponse *_Nullable response,
                                             NSError *_Nullable error);
+
+typedef void (^FWAGetHealthChartsBlock)(HealthChartsResponse *_Nullable response,
+                                         NSError *_Nullable error);
 
 @interface FWAGRPCClient : NSObject
 
@@ -29,6 +33,20 @@ typedef void (^FWAGetRecommendationsBlock)(GetRecommendationsResponse *_Nullable
                           birthDateUnix:(int64_t)birthDateUnix
                                  faults:(nullable NSDictionary<NSString *, NSString *> *)faults
                              completion:(FWAGetRecommendationsBlock)completion;
+
+/// Calls RecommendationsService.GetHealthCharts for the Charts tab.
+///
+/// Separate call rather than a field on the recommendations response: charts
+/// call no vendor and cannot be degraded by one, so bundling them would tie a
+/// drawing feature's latency to two cold third-party Lambdas and make a
+/// vendor outage look like a chart failure.
+///
+/// Pass 0 for birthDateUnix when the user declined it — the charts are
+/// seeded from whatever is supplied and degrade to a baseline profile.
+- (void)getHealthChartsWithHeightCm:(double)heightCm
+                            weightKg:(double)weightKg
+                       birthDateUnix:(int64_t)birthDateUnix
+                          completion:(FWAGetHealthChartsBlock)completion;
 
 @end
 

@@ -77,22 +77,92 @@
 
 #pragma mark StreamVitals(StreamVitalsRequest) returns (stream VitalsSample)
 
+/**
+ * Reserved, not yet implemented: no server implementation exists and no
+ * client calls this. It stays declared on purpose as the intended shape
+ * for streaming vitals; the SSE vitals work (server-sent events, not
+ * gRPC streaming) is where that feature actually lands. Do not implement
+ * this rpc as part of that work — replace/remove this declaration only
+ * if the SSE design is deliberately superseded by gRPC streaming instead.
+ *
+ * This method belongs to a set of APIs that have been deprecated. Using the v2 API is recommended.
+ */
 - (void)streamVitalsWithRequest:(StreamVitalsRequest *)request eventHandler:(void(^)(BOOL done, VitalsSample *_Nullable response, NSError *_Nullable error))eventHandler{
   [[self RPCToStreamVitalsWithRequest:request eventHandler:eventHandler] start];
 }
 // Returns a not-yet-started RPC object.
+/**
+ * Reserved, not yet implemented: no server implementation exists and no
+ * client calls this. It stays declared on purpose as the intended shape
+ * for streaming vitals; the SSE vitals work (server-sent events, not
+ * gRPC streaming) is where that feature actually lands. Do not implement
+ * this rpc as part of that work — replace/remove this declaration only
+ * if the SSE design is deliberately superseded by gRPC streaming instead.
+ *
+ * This method belongs to a set of APIs that have been deprecated. Using the v2 API is recommended.
+ */
 - (GRPCProtoCall *)RPCToStreamVitalsWithRequest:(StreamVitalsRequest *)request eventHandler:(void(^)(BOOL done, VitalsSample *_Nullable response, NSError *_Nullable error))eventHandler{
   return [self RPCToMethod:@"StreamVitals"
             requestsWriter:[GRXWriter writerWithValue:request]
              responseClass:[VitalsSample class]
         responsesWriteable:[GRXWriteable writeableWithEventHandler:eventHandler]];
 }
+/**
+ * Reserved, not yet implemented: no server implementation exists and no
+ * client calls this. It stays declared on purpose as the intended shape
+ * for streaming vitals; the SSE vitals work (server-sent events, not
+ * gRPC streaming) is where that feature actually lands. Do not implement
+ * this rpc as part of that work — replace/remove this declaration only
+ * if the SSE design is deliberately superseded by gRPC streaming instead.
+ */
 - (GRPCUnaryProtoCall *)streamVitalsWithMessage:(StreamVitalsRequest *)message responseHandler:(id<GRPCProtoResponseHandler>)handler callOptions:(GRPCCallOptions *_Nullable)callOptions {
   return [self RPCToMethod:@"StreamVitals"
                    message:message
            responseHandler:handler
                callOptions:callOptions
              responseClass:[VitalsSample class]];
+}
+
+#pragma mark GetHealthCharts(GetHealthChartsRequest) returns (HealthChartsResponse)
+
+/**
+ * Health charts for the Charts tab. Additive: a new method alongside
+ * existing ones, so a 1.1.x binary that never calls it is unaffected.
+ * Deliberately not part of the recommendation fan-out — it calls no
+ * vendor and reports no provider status.
+ *
+ * This method belongs to a set of APIs that have been deprecated. Using the v2 API is recommended.
+ */
+- (void)getHealthChartsWithRequest:(GetHealthChartsRequest *)request handler:(void(^)(HealthChartsResponse *_Nullable response, NSError *_Nullable error))handler{
+  [[self RPCToGetHealthChartsWithRequest:request handler:handler] start];
+}
+// Returns a not-yet-started RPC object.
+/**
+ * Health charts for the Charts tab. Additive: a new method alongside
+ * existing ones, so a 1.1.x binary that never calls it is unaffected.
+ * Deliberately not part of the recommendation fan-out — it calls no
+ * vendor and reports no provider status.
+ *
+ * This method belongs to a set of APIs that have been deprecated. Using the v2 API is recommended.
+ */
+- (GRPCProtoCall *)RPCToGetHealthChartsWithRequest:(GetHealthChartsRequest *)request handler:(void(^)(HealthChartsResponse *_Nullable response, NSError *_Nullable error))handler{
+  return [self RPCToMethod:@"GetHealthCharts"
+            requestsWriter:[GRXWriter writerWithValue:request]
+             responseClass:[HealthChartsResponse class]
+        responsesWriteable:[GRXWriteable writeableWithSingleHandler:handler]];
+}
+/**
+ * Health charts for the Charts tab. Additive: a new method alongside
+ * existing ones, so a 1.1.x binary that never calls it is unaffected.
+ * Deliberately not part of the recommendation fan-out — it calls no
+ * vendor and reports no provider status.
+ */
+- (GRPCUnaryProtoCall *)getHealthChartsWithMessage:(GetHealthChartsRequest *)message responseHandler:(id<GRPCProtoResponseHandler>)handler callOptions:(GRPCCallOptions *_Nullable)callOptions {
+  return [self RPCToMethod:@"GetHealthCharts"
+                   message:message
+           responseHandler:handler
+               callOptions:callOptions
+             responseClass:[HealthChartsResponse class]];
 }
 
 @end

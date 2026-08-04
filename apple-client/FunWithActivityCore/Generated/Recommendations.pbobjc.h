@@ -29,11 +29,36 @@
 
 CF_EXTERN_C_BEGIN
 
+@class Chart;
 @class Measurements;
 @class ProviderStatus;
 @class Recommendation;
+@class Series;
 
 NS_ASSUME_NONNULL_BEGIN
+
+#pragma mark - Enum ChartType
+
+typedef GPB_ENUM(ChartType) {
+  /**
+   * Value used if any message's field encounters a value that is not defined
+   * by this enum. The message will also have C functions to get/set the rawValue
+   * of the field.
+   **/
+  ChartType_GPBUnrecognizedEnumeratorValue = kGPBUnrecognizedEnumeratorValue,
+  ChartType_ChartTypeUnspecified = 0,
+  ChartType_ChartTypeBar = 1,
+  ChartType_ChartTypePie = 2,
+  ChartType_ChartTypeGroupedBar = 3,
+};
+
+GPBEnumDescriptor *ChartType_EnumDescriptor(void);
+
+/**
+ * Checks to see if the given value is defined by the enum or was not known at
+ * the time this source was generated.
+ **/
+BOOL ChartType_IsValidValue(int32_t value);
 
 #pragma mark - RecommendationsRoot
 
@@ -210,6 +235,107 @@ GPB_FINAL @interface VitalsSample : GPBMessage
 @property(nonatomic, readwrite) double value;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *unit;
+
+@end
+
+#pragma mark - GetHealthChartsRequest
+
+typedef GPB_ENUM(GetHealthChartsRequest_FieldNumber) {
+  GetHealthChartsRequest_FieldNumber_Measurements = 1,
+};
+
+GPB_FINAL @interface GetHealthChartsRequest : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) Measurements *measurements;
+/** Test to see if @c measurements has been set. */
+@property(nonatomic, readwrite) BOOL hasMeasurements;
+
+@end
+
+#pragma mark - HealthChartsResponse
+
+typedef GPB_ENUM(HealthChartsResponse_FieldNumber) {
+  HealthChartsResponse_FieldNumber_ChartsArray = 1,
+};
+
+GPB_FINAL @interface HealthChartsResponse : GPBMessage
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<Chart*> *chartsArray;
+/** The number of items in @c chartsArray without causing the container to be created. */
+@property(nonatomic, readonly) NSUInteger chartsArray_Count;
+
+@end
+
+#pragma mark - Chart
+
+typedef GPB_ENUM(Chart_FieldNumber) {
+  Chart_FieldNumber_Id_p = 1,
+  Chart_FieldNumber_Title = 2,
+  Chart_FieldNumber_Type = 3,
+  Chart_FieldNumber_CategoriesArray = 4,
+  Chart_FieldNumber_SeriesArray = 5,
+};
+
+GPB_FINAL @interface Chart : GPBMessage
+
+/** Stable identifier: "steps" | "sleep" | "active_minutes". */
+@property(nonatomic, readwrite, copy, null_resettable) NSString *id_p;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *title;
+
+@property(nonatomic, readwrite) ChartType type;
+
+/** X-axis labels for bar charts; slice labels for pies. */
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<NSString*> *categoriesArray;
+/** The number of items in @c categoriesArray without causing the container to be created. */
+@property(nonatomic, readonly) NSUInteger categoriesArray_Count;
+
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<Series*> *seriesArray;
+/** The number of items in @c seriesArray without causing the container to be created. */
+@property(nonatomic, readonly) NSUInteger seriesArray_Count;
+
+@end
+
+/**
+ * Fetches the raw value of a @c Chart's @c type property, even
+ * if the value was not defined by the enum at the time the code was generated.
+ **/
+int32_t Chart_Type_RawValue(Chart *message);
+/**
+ * Sets the raw value of an @c Chart's @c type property, allowing
+ * it to be set to a value that was not defined by the enum at the time the code
+ * was generated.
+ **/
+void SetChart_Type_RawValue(Chart *message, int32_t value);
+
+#pragma mark - Series
+
+typedef GPB_ENUM(Series_FieldNumber) {
+  Series_FieldNumber_Key = 1,
+  Series_FieldNumber_Label = 2,
+  Series_FieldNumber_ValuesArray = 3,
+};
+
+GPB_FINAL @interface Series : GPBMessage
+
+/**
+ * Stable mapping handle: "deep" | "light" | "rem" | "awake" | "steps" |
+ * "light_activity" | "moderate" | "vigorous". Clients map THIS to a colour
+ * asset, never `label` — a copy edit to display text must not silently
+ * recolour a chart.
+ **/
+@property(nonatomic, readwrite, copy, null_resettable) NSString *key;
+
+/** Display text. Safe to change without affecting rendering. */
+@property(nonatomic, readwrite, copy, null_resettable) NSString *label;
+
+/**
+ * One value per entry in Chart.categories for bar charts; a single value
+ * per series for pies.
+ **/
+@property(nonatomic, readwrite, strong, null_resettable) GPBDoubleArray *valuesArray;
+/** The number of items in @c valuesArray without causing the container to be created. */
+@property(nonatomic, readonly) NSUInteger valuesArray_Count;
 
 @end
 

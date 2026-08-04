@@ -7,308 +7,334 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1504FCCFB6B8C46E461DD91C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3EFD69E5727E8E3A5138B793 /* Assets.xcassets */; };
-		1821BE6B3D14CFC3CF584A13 /* FWAGRPCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = CF2A9AD70750F8526F937A33 /* FWAGRPCClient.m */; };
-		1C578252FD4D7BC227A44414 /* FWARecommendationDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8490CC44FFDE73AAAD0FEAE5 /* FWARecommendationDetailViewController.m */; };
-		1C7FCB373E8A3EF118BA3527 /* FWAProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 10FF1753C00C2E103D16D14B /* FWAProfileViewController.m */; };
-		2256E29D6D4122B67D62806F /* Recommendations.pbrpc.m in Sources */ = {isa = PBXBuildFile; fileRef = C93F619C7FEC8CBD1BDD3725 /* Recommendations.pbrpc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		263008260D99AA0CA90FABD4 /* FWARecommendationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 812462493FB35759E30F7139 /* FWARecommendationsViewController.m */; };
-		2FB979394281713DD43E6E7E /* FWAProviderStatusPresentation.m in Sources */ = {isa = PBXBuildFile; fileRef = 24093DE97602797EB1C45891 /* FWAProviderStatusPresentation.m */; };
-		327417B0875B62E926F0A220 /* FWASourcesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D6284DEA1AC5486D3FAF72EE /* FWASourcesViewController.m */; };
-		699D041E27D888AC868B0AE4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C6DA99E4F4951FE9F34B840 /* AppDelegate.m */; };
-		7BBA9A992B06314A1E33DEF0 /* Recommendations.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = 19796D204DD1AEDC6DFEB75E /* Recommendations.pbobjc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		918F2C8105BA0A4D3E2D4248 /* Pods_FunWithActivityCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CF1CA8C06F5EA830C931CCC /* Pods_FunWithActivityCore.framework */; };
-		9DA1E3382733184BC0EEAA38 /* FWAAddSourceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DE04381BFB57E8ED1DC694BC /* FWAAddSourceViewController.m */; };
-		9E6E1B919B9A29F83D370D41 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5363E9DCC6D7E27DEB50BFA5 /* main.m */; };
-		9F69C7D8A9324F7C48C896E2 /* FWAHealthKitService.m in Sources */ = {isa = PBXBuildFile; fileRef = B29F0DBA95C7E1892F8BC84A /* FWAHealthKitService.m */; };
-		A9DE6663FD8E9662098F1ECD /* libFunWithActivityCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C68FB48753E0922EDC080D2 /* libFunWithActivityCore.a */; };
-		AA2B55E52CCE1C5E22D047C8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6955DFAD56FC9DBB52D5B221 /* Foundation.framework */; };
-		AD583530613256A8435DA7D0 /* libFunWithActivityCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C68FB48753E0922EDC080D2 /* libFunWithActivityCore.a */; };
-		AE199F35297C5D910EFDA782 /* Pods_FunWithActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0D4754019DD402ACC3EC016 /* Pods_FunWithActivity.framework */; };
-		B2A7AE966C577EF200C47EA9 /* FWAServerConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = A8EF18B71499D0B2FE0EB96E /* FWAServerConfig.m */; };
-		CB17C029D3C04552CDC343F2 /* Pods_FunWithActivityCoreTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5B512A15404CC61F8BAE1E3 /* Pods_FunWithActivityCoreTests.framework */; };
-		D1B514F2ACE2BDFB4ED155AD /* FWAProviderStatusPresentationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 295EA79260473FE4A155CE8D /* FWAProviderStatusPresentationTests.m */; };
-		D2E70AABD57AF497C8F46308 /* FWASourceDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ABC1026115AED0FBD8943043 /* FWASourceDetailViewController.m */; };
-		E09A2939CE217846641E9313 /* FWASourceStatusFormatting.m in Sources */ = {isa = PBXBuildFile; fileRef = 32FDBC40693175BDBA6ED76B /* FWASourceStatusFormatting.m */; };
-		F5493F0E7592746D1D29D9A2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6955DFAD56FC9DBB52D5B221 /* Foundation.framework */; };
-		F75FF16BB70FF2A8037A698A /* FWAAppState.m in Sources */ = {isa = PBXBuildFile; fileRef = 36DC5DB24F9EFAABBC3A5FBA /* FWAAppState.m */; };
+		093A9FAC0598B7202072A358 /* FWASourcesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02231E0030F48DDF18723982 /* FWASourcesViewController.m */; };
+		09BF58FD5916BE2707778D80 /* Pods_FunWithActivityCoreTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EE39740DF8D78DF6449CB0A /* Pods_FunWithActivityCoreTests.framework */; };
+		105EA71487EB140809224392 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 65A9D9A67E35CB8D6BD60AC9 /* AppDelegate.m */; };
+		2DBB88501617AFCB7B5DD551 /* FWARecommendationDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F35F19CBD0BA95F5CED20B5 /* FWARecommendationDetailViewController.m */; };
+		2F3BE40928B42B16383FB5AA /* FWAProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69E947B6A035B067496955F5 /* FWAProfileViewController.m */; };
+		3AD14FCEAC18F44B11CC7BDD /* FWAGRPCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 6573B8021F2CA8E994DB6354 /* FWAGRPCClient.m */; };
+		3E944F4B6F5897B6023C67E8 /* libFunWithActivityCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39C394AB779A009120E1C267 /* libFunWithActivityCore.a */; };
+		426684B26F1260F2C002A6C5 /* FWAProviderStatusPresentation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1095B460232126A405C70A /* FWAProviderStatusPresentation.m */; };
+		5E992314498A4958D45DC763 /* Pods_FunWithActivityCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BD0C76CEF4EA8D5C7FDBC9C /* Pods_FunWithActivityCore.framework */; };
+		5EED003A2087B605B640522B /* Recommendations.pbrpc.m in Sources */ = {isa = PBXBuildFile; fileRef = F40842AE206C2C09111F4A60 /* Recommendations.pbrpc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		61EBC55411E6DA75F1E48C26 /* FWASourceDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DC8D060F8C1BD164A6095299 /* FWASourceDetailViewController.m */; };
+		65CC56FDF3E76546AB533DB4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2AB6F5D4ECE19C9643A7C1F /* Foundation.framework */; };
+		8A7D9B32EE1777D02B0D61B8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D4E4C168ACA53A8F75A0ACB1 /* main.m */; };
+		8BD342E96886F6E12DC4495A /* FWAChartGeometry.m in Sources */ = {isa = PBXBuildFile; fileRef = A607A9E10611044F9A81E857 /* FWAChartGeometry.m */; };
+		967541FA686C9E4D22D3990B /* FWAAppState.m in Sources */ = {isa = PBXBuildFile; fileRef = CFD47DF50D1D06FEEE4AE2FC /* FWAAppState.m */; };
+		9CDFE1FAAFDD64DE7FA94FDD /* FWAChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = DC984202D93E52289B8E1D4F /* FWAChartView.m */; };
+		A3258AD534514B1CAB7270AD /* Pods_FunWithActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBBA0B457CCAF6E9706C5644 /* Pods_FunWithActivity.framework */; };
+		A60C75A0414A66EA58CED822 /* FWAChartsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 38FAF29A0C8CA40F4C40C739 /* FWAChartsViewController.m */; };
+		A76B526911A204CC526DCF40 /* FWAHealthKitService.m in Sources */ = {isa = PBXBuildFile; fileRef = BC3EAD07B125545712C669F7 /* FWAHealthKitService.m */; };
+		C754407077D57648B1197482 /* FWARecommendationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF5F4885533B9308F4C473F6 /* FWARecommendationsViewController.m */; };
+		CDBAFFC305A48B5585714C89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 40A80778602EF0D96F23089B /* Assets.xcassets */; };
+		CE51F2C5AE222CEF166EE2D2 /* FWAProviderStatusPresentationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C59F6188852625B927D2720A /* FWAProviderStatusPresentationTests.m */; };
+		D75D6D3154D0A09A1F2884A2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2AB6F5D4ECE19C9643A7C1F /* Foundation.framework */; };
+		D7957FA29E37A4D1B92E985D /* FWAAddSourceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E366728FD11CFBABEFC2F0D /* FWAAddSourceViewController.m */; };
+		EA4AB8347B07ED6A84A3BAF0 /* libFunWithActivityCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39C394AB779A009120E1C267 /* libFunWithActivityCore.a */; };
+		EBE84EA6F403801429B73C8E /* FWAServerConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B945B58740A7DBBAC710BA4 /* FWAServerConfig.m */; };
+		ED9421F9126FDB5F011B9D0A /* FWAChartGeometryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA9C6BFD28E18A2B26B3193 /* FWAChartGeometryTests.m */; };
+		EE5C2B7305A07278C7009D8D /* FWASourceStatusFormatting.m in Sources */ = {isa = PBXBuildFile; fileRef = 29A510D9C1C28ABED0AE4D27 /* FWASourceStatusFormatting.m */; };
+		EFA20462DA8950A2D875D7E9 /* Recommendations.pbobjc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1810C993D8850F8349898E03 /* Recommendations.pbobjc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		21707723F35536560E600367 /* PBXContainerItemProxy */ = {
+		8FD8521E0456D5942D5A692F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 5756F481819BE03335261441 /* Project object */;
+			containerPortal = 48BA7B86CA850E9E72427A7B /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4701C5FFA0B3BCB31A6CAB25;
+			remoteGlobalIDString = E596C5CE9CA0C39CBF0998B2;
 			remoteInfo = FunWithActivityCore;
 		};
-		6B368F5D49B525A999072646 /* PBXContainerItemProxy */ = {
+		F3868C5C7876F4B9D9BCF273 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 5756F481819BE03335261441 /* Project object */;
+			containerPortal = 48BA7B86CA850E9E72427A7B /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4701C5FFA0B3BCB31A6CAB25;
+			remoteGlobalIDString = E596C5CE9CA0C39CBF0998B2;
 			remoteInfo = FunWithActivityCore;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0701569E068BFAE28565CD04 /* Pods-FunWithActivityCoreTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivityCoreTests.release.xcconfig"; path = "Target Support Files/Pods-FunWithActivityCoreTests/Pods-FunWithActivityCoreTests.release.xcconfig"; sourceTree = "<group>"; };
-		09150711E8E906ECE94021D1 /* FWAServerConfig.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAServerConfig.h; path = ./FunWithActivityCore/Networking/FWAServerConfig.h; sourceTree = "<group>"; };
-		10FF1753C00C2E103D16D14B /* FWAProfileViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAProfileViewController.m; path = ./FunWithActivity/Screens/FWAProfileViewController.m; sourceTree = "<group>"; };
-		141E39E9FF721397AC2A3D35 /* FWARecommendationDetailViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWARecommendationDetailViewController.h; path = ./FunWithActivity/Screens/FWARecommendationDetailViewController.h; sourceTree = "<group>"; };
-		14B83E5C1DB6C9F23C92F941 /* Recommendations.pbrpc.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Recommendations.pbrpc.h; path = ./FunWithActivityCore/Generated/Recommendations.pbrpc.h; sourceTree = "<group>"; };
-		18B7250A69432426A72B6870 /* FWAProfileViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAProfileViewController.h; path = ./FunWithActivity/Screens/FWAProfileViewController.h; sourceTree = "<group>"; };
-		19796D204DD1AEDC6DFEB75E /* Recommendations.pbobjc.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = Recommendations.pbobjc.m; path = ./FunWithActivityCore/Generated/Recommendations.pbobjc.m; sourceTree = "<group>"; };
-		24093DE97602797EB1C45891 /* FWAProviderStatusPresentation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAProviderStatusPresentation.m; path = ./FunWithActivityCore/Models/FWAProviderStatusPresentation.m; sourceTree = "<group>"; };
-		295EA79260473FE4A155CE8D /* FWAProviderStatusPresentationTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAProviderStatusPresentationTests.m; path = ./FunWithActivityCoreTests/FWAProviderStatusPresentationTests.m; sourceTree = "<group>"; };
-		2EBB90723A9DD08EEF23308A /* Pods-FunWithActivityCoreTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivityCoreTests.debug.xcconfig"; path = "Target Support Files/Pods-FunWithActivityCoreTests/Pods-FunWithActivityCoreTests.debug.xcconfig"; sourceTree = "<group>"; };
-		32FDBC40693175BDBA6ED76B /* FWASourceStatusFormatting.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWASourceStatusFormatting.m; path = ./FunWithActivity/Screens/FWASourceStatusFormatting.m; sourceTree = "<group>"; };
-		36DC5DB24F9EFAABBC3A5FBA /* FWAAppState.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAAppState.m; path = ./FunWithActivityCore/State/FWAAppState.m; sourceTree = "<group>"; };
-		39DE08BDDCCDC0F508C80EF9 /* Pods-FunWithActivityCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivityCore.debug.xcconfig"; path = "Target Support Files/Pods-FunWithActivityCore/Pods-FunWithActivityCore.debug.xcconfig"; sourceTree = "<group>"; };
-		3EFD69E5727E8E3A5138B793 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ./FunWithActivity/Resources/Assets.xcassets; sourceTree = "<group>"; };
-		4CB53ACC60F677672950A7C9 /* Recommendations.pbobjc.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Recommendations.pbobjc.h; path = ./FunWithActivityCore/Generated/Recommendations.pbobjc.h; sourceTree = "<group>"; };
-		5363E9DCC6D7E27DEB50BFA5 /* main.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ./FunWithActivity/Supporting/main.m; sourceTree = "<group>"; };
-		559BB400D75A06830921161F /* FWAHealthKitService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAHealthKitService.h; path = ./FunWithActivityCore/Health/FWAHealthKitService.h; sourceTree = "<group>"; };
-		588A2A8A85507F0C994B11BF /* FWASourceStatusFormatting.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWASourceStatusFormatting.h; path = ./FunWithActivity/Screens/FWASourceStatusFormatting.h; sourceTree = "<group>"; };
-		6955DFAD56FC9DBB52D5B221 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		6A8D153902459C386E87ED7B /* FunWithActivityCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunWithActivityCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		6C68FB48753E0922EDC080D2 /* libFunWithActivityCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFunWithActivityCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		6CDAD750C971874CD3D78C3B /* FunWithActivity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunWithActivity.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6FE26BB293A490A674EFE3C5 /* FWAProviderStatusPresentation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAProviderStatusPresentation.h; path = ./FunWithActivityCore/Models/FWAProviderStatusPresentation.h; sourceTree = "<group>"; };
-		7406B0C859C2A38A1B5A7E6E /* AppDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ./FunWithActivity/Supporting/AppDelegate.h; sourceTree = "<group>"; };
-		751E88428BE53FB61624F89D /* FWAAddSourceViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAAddSourceViewController.h; path = ./FunWithActivity/Screens/FWAAddSourceViewController.h; sourceTree = "<group>"; };
-		774A05AB7A0999E533FE411F /* Pods-FunWithActivity.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivity.release.xcconfig"; path = "Target Support Files/Pods-FunWithActivity/Pods-FunWithActivity.release.xcconfig"; sourceTree = "<group>"; };
-		7C6DA99E4F4951FE9F34B840 /* AppDelegate.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ./FunWithActivity/Supporting/AppDelegate.m; sourceTree = "<group>"; };
-		7CF1CA8C06F5EA830C931CCC /* Pods_FunWithActivityCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunWithActivityCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		812462493FB35759E30F7139 /* FWARecommendationsViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWARecommendationsViewController.m; path = ./FunWithActivity/Screens/FWARecommendationsViewController.m; sourceTree = "<group>"; };
-		8490CC44FFDE73AAAD0FEAE5 /* FWARecommendationDetailViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWARecommendationDetailViewController.m; path = ./FunWithActivity/Screens/FWARecommendationDetailViewController.m; sourceTree = "<group>"; };
-		A8EF18B71499D0B2FE0EB96E /* FWAServerConfig.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAServerConfig.m; path = ./FunWithActivityCore/Networking/FWAServerConfig.m; sourceTree = "<group>"; };
-		AA372884C99F9B5A16DDB091 /* FWASourcesViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWASourcesViewController.h; path = ./FunWithActivity/Screens/FWASourcesViewController.h; sourceTree = "<group>"; };
-		ABC1026115AED0FBD8943043 /* FWASourceDetailViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWASourceDetailViewController.m; path = ./FunWithActivity/Screens/FWASourceDetailViewController.m; sourceTree = "<group>"; };
-		B29F0DBA95C7E1892F8BC84A /* FWAHealthKitService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAHealthKitService.m; path = ./FunWithActivityCore/Health/FWAHealthKitService.m; sourceTree = "<group>"; };
-		C0D4754019DD402ACC3EC016 /* Pods_FunWithActivity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunWithActivity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C5B512A15404CC61F8BAE1E3 /* Pods_FunWithActivityCoreTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunWithActivityCoreTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C93F619C7FEC8CBD1BDD3725 /* Recommendations.pbrpc.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = Recommendations.pbrpc.m; path = ./FunWithActivityCore/Generated/Recommendations.pbrpc.m; sourceTree = "<group>"; };
-		CBA7B20350C6BEB47161C64A /* FWAAppState.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAAppState.h; path = ./FunWithActivityCore/State/FWAAppState.h; sourceTree = "<group>"; };
-		CCA5BCEDACEF6BF68F23DC44 /* Pods-FunWithActivity.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivity.debug.xcconfig"; path = "Target Support Files/Pods-FunWithActivity/Pods-FunWithActivity.debug.xcconfig"; sourceTree = "<group>"; };
-		CF2A9AD70750F8526F937A33 /* FWAGRPCClient.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAGRPCClient.m; path = ./FunWithActivityCore/Networking/FWAGRPCClient.m; sourceTree = "<group>"; };
-		D6284DEA1AC5486D3FAF72EE /* FWASourcesViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWASourcesViewController.m; path = ./FunWithActivity/Screens/FWASourcesViewController.m; sourceTree = "<group>"; };
-		DE04381BFB57E8ED1DC694BC /* FWAAddSourceViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAAddSourceViewController.m; path = ./FunWithActivity/Screens/FWAAddSourceViewController.m; sourceTree = "<group>"; };
-		DEFCA85267654E478764C111 /* FWARecommendationsViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWARecommendationsViewController.h; path = ./FunWithActivity/Screens/FWARecommendationsViewController.h; sourceTree = "<group>"; };
-		ECA091EE18BA73B204E74B35 /* Pods-FunWithActivityCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivityCore.release.xcconfig"; path = "Target Support Files/Pods-FunWithActivityCore/Pods-FunWithActivityCore.release.xcconfig"; sourceTree = "<group>"; };
-		FB52DB7107F9080C916FC4DB /* FWASourceDetailViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWASourceDetailViewController.h; path = ./FunWithActivity/Screens/FWASourceDetailViewController.h; sourceTree = "<group>"; };
-		FC9068C00D26E2F8440ECBA6 /* FWAGRPCClient.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAGRPCClient.h; path = ./FunWithActivityCore/Networking/FWAGRPCClient.h; sourceTree = "<group>"; };
+		02231E0030F48DDF18723982 /* FWASourcesViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWASourcesViewController.m; path = ./FunWithActivity/Screens/FWASourcesViewController.m; sourceTree = "<group>"; };
+		0B1095B460232126A405C70A /* FWAProviderStatusPresentation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAProviderStatusPresentation.m; path = ./FunWithActivityCore/Models/FWAProviderStatusPresentation.m; sourceTree = "<group>"; };
+		0BF3282151EBFCFCB7B0B0BF /* FWASourcesViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWASourcesViewController.h; path = ./FunWithActivity/Screens/FWASourcesViewController.h; sourceTree = "<group>"; };
+		13C728AF2C9C181916BE7FE0 /* FWASourceDetailViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWASourceDetailViewController.h; path = ./FunWithActivity/Screens/FWASourceDetailViewController.h; sourceTree = "<group>"; };
+		1810C993D8850F8349898E03 /* Recommendations.pbobjc.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = Recommendations.pbobjc.m; path = ./FunWithActivityCore/Generated/Recommendations.pbobjc.m; sourceTree = "<group>"; };
+		29A510D9C1C28ABED0AE4D27 /* FWASourceStatusFormatting.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWASourceStatusFormatting.m; path = ./FunWithActivity/Screens/FWASourceStatusFormatting.m; sourceTree = "<group>"; };
+		2B945B58740A7DBBAC710BA4 /* FWAServerConfig.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAServerConfig.m; path = ./FunWithActivityCore/Networking/FWAServerConfig.m; sourceTree = "<group>"; };
+		30D4F46FB21DA597074F7FCB /* Recommendations.pbobjc.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Recommendations.pbobjc.h; path = ./FunWithActivityCore/Generated/Recommendations.pbobjc.h; sourceTree = "<group>"; };
+		38FAF29A0C8CA40F4C40C739 /* FWAChartsViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAChartsViewController.m; path = ./FunWithActivity/Screens/FWAChartsViewController.m; sourceTree = "<group>"; };
+		39C394AB779A009120E1C267 /* libFunWithActivityCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFunWithActivityCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3CFB1AC585D406A7D823C9B0 /* FWAHealthKitService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAHealthKitService.h; path = ./FunWithActivityCore/Health/FWAHealthKitService.h; sourceTree = "<group>"; };
+		3EE39740DF8D78DF6449CB0A /* Pods_FunWithActivityCoreTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunWithActivityCoreTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		40A80778602EF0D96F23089B /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ./FunWithActivity/Resources/Assets.xcassets; sourceTree = "<group>"; };
+		47D1B0F10025E1226A7B2FA3 /* Recommendations.pbrpc.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Recommendations.pbrpc.h; path = ./FunWithActivityCore/Generated/Recommendations.pbrpc.h; sourceTree = "<group>"; };
+		47E0082B0790D6F03308951C /* FWAChartView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAChartView.h; path = ./FunWithActivity/Screens/FWAChartView.h; sourceTree = "<group>"; };
+		4B5789AA4DD575BA70EDEFAC /* FunWithActivity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunWithActivity.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E366728FD11CFBABEFC2F0D /* FWAAddSourceViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAAddSourceViewController.m; path = ./FunWithActivity/Screens/FWAAddSourceViewController.m; sourceTree = "<group>"; };
+		4F35F19CBD0BA95F5CED20B5 /* FWARecommendationDetailViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWARecommendationDetailViewController.m; path = ./FunWithActivity/Screens/FWARecommendationDetailViewController.m; sourceTree = "<group>"; };
+		5CA9C6BFD28E18A2B26B3193 /* FWAChartGeometryTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAChartGeometryTests.m; path = ./FunWithActivityCoreTests/FWAChartGeometryTests.m; sourceTree = "<group>"; };
+		60A82126CDC5CAAAB85144EB /* FWAChartsViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAChartsViewController.h; path = ./FunWithActivity/Screens/FWAChartsViewController.h; sourceTree = "<group>"; };
+		632AE9BD72D206A8A2E4A6E6 /* AppDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ./FunWithActivity/Supporting/AppDelegate.h; sourceTree = "<group>"; };
+		6573B8021F2CA8E994DB6354 /* FWAGRPCClient.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAGRPCClient.m; path = ./FunWithActivityCore/Networking/FWAGRPCClient.m; sourceTree = "<group>"; };
+		65A9D9A67E35CB8D6BD60AC9 /* AppDelegate.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ./FunWithActivity/Supporting/AppDelegate.m; sourceTree = "<group>"; };
+		69E947B6A035B067496955F5 /* FWAProfileViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAProfileViewController.m; path = ./FunWithActivity/Screens/FWAProfileViewController.m; sourceTree = "<group>"; };
+		6BD0C76CEF4EA8D5C7FDBC9C /* Pods_FunWithActivityCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunWithActivityCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		78AC2FEEA8D9927CE5BBDDDE /* Pods-FunWithActivityCoreTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivityCoreTests.release.xcconfig"; path = "Target Support Files/Pods-FunWithActivityCoreTests/Pods-FunWithActivityCoreTests.release.xcconfig"; sourceTree = "<group>"; };
+		7FE7EDBA9193B8F573170E62 /* Pods-FunWithActivityCoreTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivityCoreTests.debug.xcconfig"; path = "Target Support Files/Pods-FunWithActivityCoreTests/Pods-FunWithActivityCoreTests.debug.xcconfig"; sourceTree = "<group>"; };
+		872703D6069E12F96AE4E37F /* FWAProfileViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAProfileViewController.h; path = ./FunWithActivity/Screens/FWAProfileViewController.h; sourceTree = "<group>"; };
+		89ABF10D2D4B495A27807E59 /* Pods-FunWithActivity.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivity.release.xcconfig"; path = "Target Support Files/Pods-FunWithActivity/Pods-FunWithActivity.release.xcconfig"; sourceTree = "<group>"; };
+		8A1B978D5A4FEC0DB0FB9FF3 /* FWAProviderStatusPresentation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAProviderStatusPresentation.h; path = ./FunWithActivityCore/Models/FWAProviderStatusPresentation.h; sourceTree = "<group>"; };
+		8B17D08B173DD51DE782C5CE /* FWAGRPCClient.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAGRPCClient.h; path = ./FunWithActivityCore/Networking/FWAGRPCClient.h; sourceTree = "<group>"; };
+		8B836D0E9F6A4908D5DE5E21 /* FWARecommendationsViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWARecommendationsViewController.h; path = ./FunWithActivity/Screens/FWARecommendationsViewController.h; sourceTree = "<group>"; };
+		A5E115D34E1DBB51DB9062EF /* FWAAddSourceViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAAddSourceViewController.h; path = ./FunWithActivity/Screens/FWAAddSourceViewController.h; sourceTree = "<group>"; };
+		A607A9E10611044F9A81E857 /* FWAChartGeometry.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAChartGeometry.m; path = ./FunWithActivityCore/Charts/FWAChartGeometry.m; sourceTree = "<group>"; };
+		BBBA0B457CCAF6E9706C5644 /* Pods_FunWithActivity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunWithActivity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC3EAD07B125545712C669F7 /* FWAHealthKitService.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAHealthKitService.m; path = ./FunWithActivityCore/Health/FWAHealthKitService.m; sourceTree = "<group>"; };
+		BC917A51BAB321B472C4794B /* FWAServerConfig.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAServerConfig.h; path = ./FunWithActivityCore/Networking/FWAServerConfig.h; sourceTree = "<group>"; };
+		BD47310A96B615887B335585 /* FunWithActivityCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunWithActivityCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2AB6F5D4ECE19C9643A7C1F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		C59F6188852625B927D2720A /* FWAProviderStatusPresentationTests.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAProviderStatusPresentationTests.m; path = ./FunWithActivityCoreTests/FWAProviderStatusPresentationTests.m; sourceTree = "<group>"; };
+		CDCCD750D4950BA8668AA34F /* FWASourceStatusFormatting.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWASourceStatusFormatting.h; path = ./FunWithActivity/Screens/FWASourceStatusFormatting.h; sourceTree = "<group>"; };
+		CFD47DF50D1D06FEEE4AE2FC /* FWAAppState.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAAppState.m; path = ./FunWithActivityCore/State/FWAAppState.m; sourceTree = "<group>"; };
+		D4E4C168ACA53A8F75A0ACB1 /* main.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ./FunWithActivity/Supporting/main.m; sourceTree = "<group>"; };
+		DAC9D55B9E21813B853C9CCE /* Pods-FunWithActivityCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivityCore.debug.xcconfig"; path = "Target Support Files/Pods-FunWithActivityCore/Pods-FunWithActivityCore.debug.xcconfig"; sourceTree = "<group>"; };
+		DB9911BD48EEFA912A287F03 /* FWAChartGeometry.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAChartGeometry.h; path = ./FunWithActivityCore/Charts/FWAChartGeometry.h; sourceTree = "<group>"; };
+		DC8D060F8C1BD164A6095299 /* FWASourceDetailViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWASourceDetailViewController.m; path = ./FunWithActivity/Screens/FWASourceDetailViewController.m; sourceTree = "<group>"; };
+		DC984202D93E52289B8E1D4F /* FWAChartView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWAChartView.m; path = ./FunWithActivity/Screens/FWAChartView.m; sourceTree = "<group>"; };
+		DED2EC9B7D868439E387F0A5 /* FWARecommendationDetailViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWARecommendationDetailViewController.h; path = ./FunWithActivity/Screens/FWARecommendationDetailViewController.h; sourceTree = "<group>"; };
+		E33B27F06B5E65A06D0AC49C /* Pods-FunWithActivity.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivity.debug.xcconfig"; path = "Target Support Files/Pods-FunWithActivity/Pods-FunWithActivity.debug.xcconfig"; sourceTree = "<group>"; };
+		E4F7B7F3C24DDE314A1FF95F /* Pods-FunWithActivityCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunWithActivityCore.release.xcconfig"; path = "Target Support Files/Pods-FunWithActivityCore/Pods-FunWithActivityCore.release.xcconfig"; sourceTree = "<group>"; };
+		EF5F4885533B9308F4C473F6 /* FWARecommendationsViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FWARecommendationsViewController.m; path = ./FunWithActivity/Screens/FWARecommendationsViewController.m; sourceTree = "<group>"; };
+		F40842AE206C2C09111F4A60 /* Recommendations.pbrpc.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = Recommendations.pbrpc.m; path = ./FunWithActivityCore/Generated/Recommendations.pbrpc.m; sourceTree = "<group>"; };
+		FB0A394C1BB0F808392D9C82 /* FWAAppState.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FWAAppState.h; path = ./FunWithActivityCore/State/FWAAppState.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		67ED7697B5AD14F892E3DD59 /* Frameworks */ = {
+		9E12F327A6083820CDBB49CC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA2B55E52CCE1C5E22D047C8 /* Foundation.framework in Frameworks */,
-				AD583530613256A8435DA7D0 /* libFunWithActivityCore.a in Frameworks */,
-				AE199F35297C5D910EFDA782 /* Pods_FunWithActivity.framework in Frameworks */,
+				5E992314498A4958D45DC763 /* Pods_FunWithActivityCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7AAF0E35B81AF1F934EF7B92 /* Frameworks */ = {
+		BFD4150880B85DFD73BFBB1E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				918F2C8105BA0A4D3E2D4248 /* Pods_FunWithActivityCore.framework in Frameworks */,
+				65CC56FDF3E76546AB533DB4 /* Foundation.framework in Frameworks */,
+				EA4AB8347B07ED6A84A3BAF0 /* libFunWithActivityCore.a in Frameworks */,
+				09BF58FD5916BE2707778D80 /* Pods_FunWithActivityCoreTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8D255AF89E10F3CBFDF7131B /* Frameworks */ = {
+		EC53B3536A0BDB01D8A9C5DC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5493F0E7592746D1D29D9A2 /* Foundation.framework in Frameworks */,
-				A9DE6663FD8E9662098F1ECD /* libFunWithActivityCore.a in Frameworks */,
-				CB17C029D3C04552CDC343F2 /* Pods_FunWithActivityCoreTests.framework in Frameworks */,
+				D75D6D3154D0A09A1F2884A2 /* Foundation.framework in Frameworks */,
+				3E944F4B6F5897B6023C67E8 /* libFunWithActivityCore.a in Frameworks */,
+				A3258AD534514B1CAB7270AD /* Pods_FunWithActivity.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		07AABABB570C81715C21BC6C = {
+		08C7633DD4AFE830EC3270FE /* FunWithActivityCore */ = {
 			isa = PBXGroup;
 			children = (
-				52EBB5D3E3C66ED2F19A9F6F /* Products */,
-				E467E0B337759401444C908C /* Frameworks */,
-				4AFEBD5D7A31B9A1D7E5120A /* FunWithActivityCore */,
-				197620A19CF33BDDF26F982F /* FunWithActivity */,
-				F784113E6D907F661196E236 /* FunWithActivityCoreTests */,
-				95ACEE2A3845A4744058983E /* Pods */,
-			);
-			sourceTree = "<group>";
-		};
-		0A96D4C9A29F80FF3A02235E /* Generated */ = {
-			isa = PBXGroup;
-			children = (
-				4CB53ACC60F677672950A7C9 /* Recommendations.pbobjc.h */,
-				19796D204DD1AEDC6DFEB75E /* Recommendations.pbobjc.m */,
-				14B83E5C1DB6C9F23C92F941 /* Recommendations.pbrpc.h */,
-				C93F619C7FEC8CBD1BDD3725 /* Recommendations.pbrpc.m */,
-			);
-			name = Generated;
-			sourceTree = "<group>";
-		};
-		197620A19CF33BDDF26F982F /* FunWithActivity */ = {
-			isa = PBXGroup;
-			children = (
-				F5BEC904EF6C76B186484D56 /* Screens */,
-				BE23B0E25F0FF7194A78132D /* Supporting */,
-				7B27F5ECCD81EF75D9812C87 /* Resources */,
-			);
-			name = FunWithActivity;
-			sourceTree = "<group>";
-		};
-		4AFEBD5D7A31B9A1D7E5120A /* FunWithActivityCore */ = {
-			isa = PBXGroup;
-			children = (
-				0A96D4C9A29F80FF3A02235E /* Generated */,
-				DCE508DE3562E1A3A7AC1274 /* Health */,
-				7627460F96DF3676527DCA47 /* Models */,
-				607DCF47D728798621D5670B /* Networking */,
-				7E2B412A151EE0ACFBFC30AB /* State */,
+				CBF728A978FFEB0550A0E125 /* Charts */,
+				F32ECB1F54D0D9A9D4BE04CF /* Generated */,
+				73FA5F3F258E442C488E2926 /* Health */,
+				4557515393FF74E99211E739 /* Models */,
+				9D9EBC0F4DFFD0D81FBA3BF6 /* Networking */,
+				DAD87BE173B790EAC855A302 /* State */,
 			);
 			name = FunWithActivityCore;
 			sourceTree = "<group>";
 		};
-		52EBB5D3E3C66ED2F19A9F6F /* Products */ = {
+		1041BF7D7D25F83B81CF488D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6C68FB48753E0922EDC080D2 /* libFunWithActivityCore.a */,
-				6CDAD750C971874CD3D78C3B /* FunWithActivity.app */,
-				6A8D153902459C386E87ED7B /* FunWithActivityCoreTests.xctest */,
+				39C394AB779A009120E1C267 /* libFunWithActivityCore.a */,
+				4B5789AA4DD575BA70EDEFAC /* FunWithActivity.app */,
+				BD47310A96B615887B335585 /* FunWithActivityCoreTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		607DCF47D728798621D5670B /* Networking */ = {
+		4557515393FF74E99211E739 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				FC9068C00D26E2F8440ECBA6 /* FWAGRPCClient.h */,
-				CF2A9AD70750F8526F937A33 /* FWAGRPCClient.m */,
-				09150711E8E906ECE94021D1 /* FWAServerConfig.h */,
-				A8EF18B71499D0B2FE0EB96E /* FWAServerConfig.m */,
-			);
-			name = Networking;
-			sourceTree = "<group>";
-		};
-		7627460F96DF3676527DCA47 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				6FE26BB293A490A674EFE3C5 /* FWAProviderStatusPresentation.h */,
-				24093DE97602797EB1C45891 /* FWAProviderStatusPresentation.m */,
+				8A1B978D5A4FEC0DB0FB9FF3 /* FWAProviderStatusPresentation.h */,
+				0B1095B460232126A405C70A /* FWAProviderStatusPresentation.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
 		};
-		7B27F5ECCD81EF75D9812C87 /* Resources */ = {
+		51086DF7EC4EC5399FA4FA06 = {
 			isa = PBXGroup;
 			children = (
-				3EFD69E5727E8E3A5138B793 /* Assets.xcassets */,
+				1041BF7D7D25F83B81CF488D /* Products */,
+				6A5E9C772E6D2E501FF4AB9E /* Frameworks */,
+				08C7633DD4AFE830EC3270FE /* FunWithActivityCore */,
+				9F05AF2B9DA17961D9D1BFD2 /* FunWithActivity */,
+				51839F51BA75F7D33D2D55EA /* FunWithActivityCoreTests */,
+				F8CD6444A452B2095EE361FC /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		51839F51BA75F7D33D2D55EA /* FunWithActivityCoreTests */ = {
+			isa = PBXGroup;
+			children = (
+				5CA9C6BFD28E18A2B26B3193 /* FWAChartGeometryTests.m */,
+				C59F6188852625B927D2720A /* FWAProviderStatusPresentationTests.m */,
+			);
+			name = FunWithActivityCoreTests;
+			sourceTree = "<group>";
+		};
+		6A5E9C772E6D2E501FF4AB9E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D6FF6C5D987991F4EA8B2A2F /* iOS */,
+				BBBA0B457CCAF6E9706C5644 /* Pods_FunWithActivity.framework */,
+				6BD0C76CEF4EA8D5C7FDBC9C /* Pods_FunWithActivityCore.framework */,
+				3EE39740DF8D78DF6449CB0A /* Pods_FunWithActivityCoreTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		73FA5F3F258E442C488E2926 /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				3CFB1AC585D406A7D823C9B0 /* FWAHealthKitService.h */,
+				BC3EAD07B125545712C669F7 /* FWAHealthKitService.m */,
+			);
+			name = Health;
+			sourceTree = "<group>";
+		};
+		9D9EBC0F4DFFD0D81FBA3BF6 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				8B17D08B173DD51DE782C5CE /* FWAGRPCClient.h */,
+				6573B8021F2CA8E994DB6354 /* FWAGRPCClient.m */,
+				BC917A51BAB321B472C4794B /* FWAServerConfig.h */,
+				2B945B58740A7DBBAC710BA4 /* FWAServerConfig.m */,
+			);
+			name = Networking;
+			sourceTree = "<group>";
+		};
+		9F05AF2B9DA17961D9D1BFD2 /* FunWithActivity */ = {
+			isa = PBXGroup;
+			children = (
+				A267AB6E7B0B02AA190C912C /* Screens */,
+				B2272F87AF68CEB0D0B55444 /* Supporting */,
+				C2E704A6719DB3E0E84E4CC6 /* Resources */,
+			);
+			name = FunWithActivity;
+			sourceTree = "<group>";
+		};
+		A267AB6E7B0B02AA190C912C /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				A5E115D34E1DBB51DB9062EF /* FWAAddSourceViewController.h */,
+				4E366728FD11CFBABEFC2F0D /* FWAAddSourceViewController.m */,
+				47E0082B0790D6F03308951C /* FWAChartView.h */,
+				DC984202D93E52289B8E1D4F /* FWAChartView.m */,
+				60A82126CDC5CAAAB85144EB /* FWAChartsViewController.h */,
+				38FAF29A0C8CA40F4C40C739 /* FWAChartsViewController.m */,
+				872703D6069E12F96AE4E37F /* FWAProfileViewController.h */,
+				69E947B6A035B067496955F5 /* FWAProfileViewController.m */,
+				DED2EC9B7D868439E387F0A5 /* FWARecommendationDetailViewController.h */,
+				4F35F19CBD0BA95F5CED20B5 /* FWARecommendationDetailViewController.m */,
+				8B836D0E9F6A4908D5DE5E21 /* FWARecommendationsViewController.h */,
+				EF5F4885533B9308F4C473F6 /* FWARecommendationsViewController.m */,
+				13C728AF2C9C181916BE7FE0 /* FWASourceDetailViewController.h */,
+				DC8D060F8C1BD164A6095299 /* FWASourceDetailViewController.m */,
+				CDCCD750D4950BA8668AA34F /* FWASourceStatusFormatting.h */,
+				29A510D9C1C28ABED0AE4D27 /* FWASourceStatusFormatting.m */,
+				0BF3282151EBFCFCB7B0B0BF /* FWASourcesViewController.h */,
+				02231E0030F48DDF18723982 /* FWASourcesViewController.m */,
+			);
+			name = Screens;
+			sourceTree = "<group>";
+		};
+		B2272F87AF68CEB0D0B55444 /* Supporting */ = {
+			isa = PBXGroup;
+			children = (
+				632AE9BD72D206A8A2E4A6E6 /* AppDelegate.h */,
+				65A9D9A67E35CB8D6BD60AC9 /* AppDelegate.m */,
+				D4E4C168ACA53A8F75A0ACB1 /* main.m */,
+			);
+			name = Supporting;
+			sourceTree = "<group>";
+		};
+		C2E704A6719DB3E0E84E4CC6 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				40A80778602EF0D96F23089B /* Assets.xcassets */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		7E2B412A151EE0ACFBFC30AB /* State */ = {
+		CBF728A978FFEB0550A0E125 /* Charts */ = {
 			isa = PBXGroup;
 			children = (
-				CBA7B20350C6BEB47161C64A /* FWAAppState.h */,
-				36DC5DB24F9EFAABBC3A5FBA /* FWAAppState.m */,
+				DB9911BD48EEFA912A287F03 /* FWAChartGeometry.h */,
+				A607A9E10611044F9A81E857 /* FWAChartGeometry.m */,
 			);
-			name = State;
+			name = Charts;
 			sourceTree = "<group>";
 		};
-		9457E8E6C427AA148F4A014D /* iOS */ = {
+		D6FF6C5D987991F4EA8B2A2F /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				6955DFAD56FC9DBB52D5B221 /* Foundation.framework */,
+				C2AB6F5D4ECE19C9643A7C1F /* Foundation.framework */,
 			);
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		95ACEE2A3845A4744058983E /* Pods */ = {
+		DAD87BE173B790EAC855A302 /* State */ = {
 			isa = PBXGroup;
 			children = (
-				774A05AB7A0999E533FE411F /* Pods-FunWithActivity.release.xcconfig */,
-				CCA5BCEDACEF6BF68F23DC44 /* Pods-FunWithActivity.debug.xcconfig */,
-				ECA091EE18BA73B204E74B35 /* Pods-FunWithActivityCore.release.xcconfig */,
-				39DE08BDDCCDC0F508C80EF9 /* Pods-FunWithActivityCore.debug.xcconfig */,
-				0701569E068BFAE28565CD04 /* Pods-FunWithActivityCoreTests.release.xcconfig */,
-				2EBB90723A9DD08EEF23308A /* Pods-FunWithActivityCoreTests.debug.xcconfig */,
+				FB0A394C1BB0F808392D9C82 /* FWAAppState.h */,
+				CFD47DF50D1D06FEEE4AE2FC /* FWAAppState.m */,
+			);
+			name = State;
+			sourceTree = "<group>";
+		};
+		F32ECB1F54D0D9A9D4BE04CF /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				30D4F46FB21DA597074F7FCB /* Recommendations.pbobjc.h */,
+				1810C993D8850F8349898E03 /* Recommendations.pbobjc.m */,
+				47D1B0F10025E1226A7B2FA3 /* Recommendations.pbrpc.h */,
+				F40842AE206C2C09111F4A60 /* Recommendations.pbrpc.m */,
+			);
+			name = Generated;
+			sourceTree = "<group>";
+		};
+		F8CD6444A452B2095EE361FC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				89ABF10D2D4B495A27807E59 /* Pods-FunWithActivity.release.xcconfig */,
+				E33B27F06B5E65A06D0AC49C /* Pods-FunWithActivity.debug.xcconfig */,
+				E4F7B7F3C24DDE314A1FF95F /* Pods-FunWithActivityCore.release.xcconfig */,
+				DAC9D55B9E21813B853C9CCE /* Pods-FunWithActivityCore.debug.xcconfig */,
+				78AC2FEEA8D9927CE5BBDDDE /* Pods-FunWithActivityCoreTests.release.xcconfig */,
+				7FE7EDBA9193B8F573170E62 /* Pods-FunWithActivityCoreTests.debug.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		BE23B0E25F0FF7194A78132D /* Supporting */ = {
-			isa = PBXGroup;
-			children = (
-				7406B0C859C2A38A1B5A7E6E /* AppDelegate.h */,
-				7C6DA99E4F4951FE9F34B840 /* AppDelegate.m */,
-				5363E9DCC6D7E27DEB50BFA5 /* main.m */,
-			);
-			name = Supporting;
-			sourceTree = "<group>";
-		};
-		DCE508DE3562E1A3A7AC1274 /* Health */ = {
-			isa = PBXGroup;
-			children = (
-				559BB400D75A06830921161F /* FWAHealthKitService.h */,
-				B29F0DBA95C7E1892F8BC84A /* FWAHealthKitService.m */,
-			);
-			name = Health;
-			sourceTree = "<group>";
-		};
-		E467E0B337759401444C908C /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				9457E8E6C427AA148F4A014D /* iOS */,
-				C0D4754019DD402ACC3EC016 /* Pods_FunWithActivity.framework */,
-				7CF1CA8C06F5EA830C931CCC /* Pods_FunWithActivityCore.framework */,
-				C5B512A15404CC61F8BAE1E3 /* Pods_FunWithActivityCoreTests.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		F5BEC904EF6C76B186484D56 /* Screens */ = {
-			isa = PBXGroup;
-			children = (
-				751E88428BE53FB61624F89D /* FWAAddSourceViewController.h */,
-				DE04381BFB57E8ED1DC694BC /* FWAAddSourceViewController.m */,
-				18B7250A69432426A72B6870 /* FWAProfileViewController.h */,
-				10FF1753C00C2E103D16D14B /* FWAProfileViewController.m */,
-				141E39E9FF721397AC2A3D35 /* FWARecommendationDetailViewController.h */,
-				8490CC44FFDE73AAAD0FEAE5 /* FWARecommendationDetailViewController.m */,
-				DEFCA85267654E478764C111 /* FWARecommendationsViewController.h */,
-				812462493FB35759E30F7139 /* FWARecommendationsViewController.m */,
-				FB52DB7107F9080C916FC4DB /* FWASourceDetailViewController.h */,
-				ABC1026115AED0FBD8943043 /* FWASourceDetailViewController.m */,
-				588A2A8A85507F0C994B11BF /* FWASourceStatusFormatting.h */,
-				32FDBC40693175BDBA6ED76B /* FWASourceStatusFormatting.m */,
-				AA372884C99F9B5A16DDB091 /* FWASourcesViewController.h */,
-				D6284DEA1AC5486D3FAF72EE /* FWASourcesViewController.m */,
-			);
-			name = Screens;
-			sourceTree = "<group>";
-		};
-		F784113E6D907F661196E236 /* FunWithActivityCoreTests */ = {
-			isa = PBXGroup;
-			children = (
-				295EA79260473FE4A155CE8D /* FWAProviderStatusPresentationTests.m */,
-			);
-			name = FunWithActivityCoreTests;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		367F858691170AAE62B317B4 /* Headers */ = {
+		9981817409D06A3165C46F1F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -318,34 +344,54 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		4445E8F0CFA72B4F48A0B790 /* FunWithActivity */ = {
+		1EB842A01D8B06342263FEA3 /* FunWithActivityCoreTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 095FEF406AE41CDF2D400FB7 /* Build configuration list for PBXNativeTarget "FunWithActivity" */;
+			buildConfigurationList = 26195B53931922F6B839D420 /* Build configuration list for PBXNativeTarget "FunWithActivityCoreTests" */;
 			buildPhases = (
-				D2FCE8C29FA1AFD63CDC6268 /* [CP] Check Pods Manifest.lock */,
-				D8D80A8068502751C999A8BB /* Sources */,
-				67ED7697B5AD14F892E3DD59 /* Frameworks */,
-				EAA35ECE56CA17A6DA6FB680 /* Resources */,
-				6280A7995912A23170FA7DF4 /* [CP] Embed Pods Frameworks */,
+				996AFCF75A910A5A5A319B21 /* [CP] Check Pods Manifest.lock */,
+				50495E4195F1A552EE54A866 /* Sources */,
+				BFD4150880B85DFD73BFBB1E /* Frameworks */,
+				BF9E47890029F90A9EB7E6F1 /* Resources */,
+				C25565C123B5BF9560B384DC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				92B44A5381789AF8773BAE96 /* PBXTargetDependency */,
+				9DE96E0620CBD9D007656880 /* PBXTargetDependency */,
+			);
+			name = FunWithActivityCoreTests;
+			productName = FunWithActivityCoreTests;
+			productReference = BD47310A96B615887B335585 /* FunWithActivityCoreTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A72E47C47970745B81736B94 /* FunWithActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F96D0ECC8FA99BCD30AD100A /* Build configuration list for PBXNativeTarget "FunWithActivity" */;
+			buildPhases = (
+				D9A3333DBD6513993C7E3724 /* [CP] Check Pods Manifest.lock */,
+				5E63662F9F99091F76C62FED /* Sources */,
+				EC53B3536A0BDB01D8A9C5DC /* Frameworks */,
+				C059DD8608D4B5EDB739C40E /* Resources */,
+				E6C4427D5E4FF45DFD596651 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FAD1410159A40C47867F1DDE /* PBXTargetDependency */,
 			);
 			name = FunWithActivity;
 			productName = FunWithActivity;
-			productReference = 6CDAD750C971874CD3D78C3B /* FunWithActivity.app */;
+			productReference = 4B5789AA4DD575BA70EDEFAC /* FunWithActivity.app */;
 			productType = "com.apple.product-type.application";
 		};
-		4701C5FFA0B3BCB31A6CAB25 /* FunWithActivityCore */ = {
+		E596C5CE9CA0C39CBF0998B2 /* FunWithActivityCore */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E963838891AD6D38943C8AAD /* Build configuration list for PBXNativeTarget "FunWithActivityCore" */;
+			buildConfigurationList = CE56B46A60CB78C3254CA0A3 /* Build configuration list for PBXNativeTarget "FunWithActivityCore" */;
 			buildPhases = (
-				2EA39125056AC04E9554D403 /* [CP] Check Pods Manifest.lock */,
-				367F858691170AAE62B317B4 /* Headers */,
-				94FBF900AB0D9028205160C7 /* Sources */,
-				7AAF0E35B81AF1F934EF7B92 /* Frameworks */,
+				7A6B587CA798769099F80DC8 /* [CP] Check Pods Manifest.lock */,
+				9981817409D06A3165C46F1F /* Headers */,
+				541F677790F3EB77BB69E4A1 /* Sources */,
+				9E12F327A6083820CDBB49CC /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -353,39 +399,19 @@
 			);
 			name = FunWithActivityCore;
 			productName = FunWithActivityCore;
-			productReference = 6C68FB48753E0922EDC080D2 /* libFunWithActivityCore.a */;
+			productReference = 39C394AB779A009120E1C267 /* libFunWithActivityCore.a */;
 			productType = "com.apple.product-type.library.static";
-		};
-		9BAD184E544AB93C921BB488 /* FunWithActivityCoreTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8E821349BE72A413B5ACB3AD /* Build configuration list for PBXNativeTarget "FunWithActivityCoreTests" */;
-			buildPhases = (
-				D325D06B64B45E26E2356696 /* [CP] Check Pods Manifest.lock */,
-				BFA9065D6E0CF57B7DD4A1FF /* Sources */,
-				8D255AF89E10F3CBFDF7131B /* Frameworks */,
-				F9AFBBA1FF27B4774B11663D /* Resources */,
-				28C73AF0AA0607C61776812E /* [CP] Embed Pods Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				775C225171A56342DADA6191 /* PBXTargetDependency */,
-			);
-			name = FunWithActivityCoreTests;
-			productName = FunWithActivityCoreTests;
-			productReference = 6A8D153902459C386E87ED7B /* FunWithActivityCoreTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		5756F481819BE03335261441 /* Project object */ = {
+		48BA7B86CA850E9E72427A7B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 			};
-			buildConfigurationList = 8C1117EE2B38605451BA9D80 /* Build configuration list for PBXProject "FunWithActivity" */;
+			buildConfigurationList = 05DBC4D949B207493BD92FDE /* Build configuration list for PBXProject "FunWithActivity" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -393,40 +419,84 @@
 				en,
 				Base,
 			);
-			mainGroup = 07AABABB570C81715C21BC6C;
+			mainGroup = 51086DF7EC4EC5399FA4FA06;
 			minimizedProjectReferenceProxies = 0;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 52EBB5D3E3C66ED2F19A9F6F /* Products */;
+			productRefGroup = 1041BF7D7D25F83B81CF488D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4701C5FFA0B3BCB31A6CAB25 /* FunWithActivityCore */,
-				4445E8F0CFA72B4F48A0B790 /* FunWithActivity */,
-				9BAD184E544AB93C921BB488 /* FunWithActivityCoreTests */,
+				E596C5CE9CA0C39CBF0998B2 /* FunWithActivityCore */,
+				A72E47C47970745B81736B94 /* FunWithActivity */,
+				1EB842A01D8B06342263FEA3 /* FunWithActivityCoreTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		EAA35ECE56CA17A6DA6FB680 /* Resources */ = {
+		BF9E47890029F90A9EB7E6F1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1504FCCFB6B8C46E461DD91C /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F9AFBBA1FF27B4774B11663D /* Resources */ = {
+		C059DD8608D4B5EDB739C40E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDBAFFC305A48B5585714C89 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		28C73AF0AA0607C61776812E /* [CP] Embed Pods Frameworks */ = {
+		7A6B587CA798769099F80DC8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-FunWithActivityCore-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		996AFCF75A910A5A5A319B21 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-FunWithActivityCoreTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C25565C123B5BF9560B384DC /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -456,7 +526,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FunWithActivityCoreTests/Pods-FunWithActivityCoreTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2EA39125056AC04E9554D403 /* [CP] Check Pods Manifest.lock */ = {
+		D9A3333DBD6513993C7E3724 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -471,14 +541,14 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-FunWithActivityCore-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-FunWithActivity-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6280A7995912A23170FA7DF4 /* [CP] Embed Pods Frameworks */ = {
+		E6C4427D5E4FF45DFD596651 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -508,112 +578,72 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FunWithActivity/Pods-FunWithActivity-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D2FCE8C29FA1AFD63CDC6268 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-FunWithActivity-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D325D06B64B45E26E2356696 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-FunWithActivityCoreTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		94FBF900AB0D9028205160C7 /* Sources */ = {
+		50495E4195F1A552EE54A866 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7BBA9A992B06314A1E33DEF0 /* Recommendations.pbobjc.m in Sources */,
-				2256E29D6D4122B67D62806F /* Recommendations.pbrpc.m in Sources */,
-				9F69C7D8A9324F7C48C896E2 /* FWAHealthKitService.m in Sources */,
-				2FB979394281713DD43E6E7E /* FWAProviderStatusPresentation.m in Sources */,
-				1821BE6B3D14CFC3CF584A13 /* FWAGRPCClient.m in Sources */,
-				B2A7AE966C577EF200C47EA9 /* FWAServerConfig.m in Sources */,
-				F75FF16BB70FF2A8037A698A /* FWAAppState.m in Sources */,
+				ED9421F9126FDB5F011B9D0A /* FWAChartGeometryTests.m in Sources */,
+				CE51F2C5AE222CEF166EE2D2 /* FWAProviderStatusPresentationTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BFA9065D6E0CF57B7DD4A1FF /* Sources */ = {
+		541F677790F3EB77BB69E4A1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1B514F2ACE2BDFB4ED155AD /* FWAProviderStatusPresentationTests.m in Sources */,
+				8BD342E96886F6E12DC4495A /* FWAChartGeometry.m in Sources */,
+				EFA20462DA8950A2D875D7E9 /* Recommendations.pbobjc.m in Sources */,
+				5EED003A2087B605B640522B /* Recommendations.pbrpc.m in Sources */,
+				A76B526911A204CC526DCF40 /* FWAHealthKitService.m in Sources */,
+				426684B26F1260F2C002A6C5 /* FWAProviderStatusPresentation.m in Sources */,
+				3AD14FCEAC18F44B11CC7BDD /* FWAGRPCClient.m in Sources */,
+				EBE84EA6F403801429B73C8E /* FWAServerConfig.m in Sources */,
+				967541FA686C9E4D22D3990B /* FWAAppState.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D8D80A8068502751C999A8BB /* Sources */ = {
+		5E63662F9F99091F76C62FED /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9DA1E3382733184BC0EEAA38 /* FWAAddSourceViewController.m in Sources */,
-				1C7FCB373E8A3EF118BA3527 /* FWAProfileViewController.m in Sources */,
-				1C578252FD4D7BC227A44414 /* FWARecommendationDetailViewController.m in Sources */,
-				263008260D99AA0CA90FABD4 /* FWARecommendationsViewController.m in Sources */,
-				D2E70AABD57AF497C8F46308 /* FWASourceDetailViewController.m in Sources */,
-				E09A2939CE217846641E9313 /* FWASourceStatusFormatting.m in Sources */,
-				327417B0875B62E926F0A220 /* FWASourcesViewController.m in Sources */,
-				699D041E27D888AC868B0AE4 /* AppDelegate.m in Sources */,
-				9E6E1B919B9A29F83D370D41 /* main.m in Sources */,
+				D7957FA29E37A4D1B92E985D /* FWAAddSourceViewController.m in Sources */,
+				9CDFE1FAAFDD64DE7FA94FDD /* FWAChartView.m in Sources */,
+				A60C75A0414A66EA58CED822 /* FWAChartsViewController.m in Sources */,
+				2F3BE40928B42B16383FB5AA /* FWAProfileViewController.m in Sources */,
+				2DBB88501617AFCB7B5DD551 /* FWARecommendationDetailViewController.m in Sources */,
+				C754407077D57648B1197482 /* FWARecommendationsViewController.m in Sources */,
+				61EBC55411E6DA75F1E48C26 /* FWASourceDetailViewController.m in Sources */,
+				EE5C2B7305A07278C7009D8D /* FWASourceStatusFormatting.m in Sources */,
+				093A9FAC0598B7202072A358 /* FWASourcesViewController.m in Sources */,
+				105EA71487EB140809224392 /* AppDelegate.m in Sources */,
+				8A7D9B32EE1777D02B0D61B8 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		775C225171A56342DADA6191 /* PBXTargetDependency */ = {
+		9DE96E0620CBD9D007656880 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = FunWithActivityCore;
-			target = 4701C5FFA0B3BCB31A6CAB25 /* FunWithActivityCore */;
-			targetProxy = 21707723F35536560E600367 /* PBXContainerItemProxy */;
+			target = E596C5CE9CA0C39CBF0998B2 /* FunWithActivityCore */;
+			targetProxy = 8FD8521E0456D5942D5A692F /* PBXContainerItemProxy */;
 		};
-		92B44A5381789AF8773BAE96 /* PBXTargetDependency */ = {
+		FAD1410159A40C47867F1DDE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = FunWithActivityCore;
-			target = 4701C5FFA0B3BCB31A6CAB25 /* FunWithActivityCore */;
-			targetProxy = 6B368F5D49B525A999072646 /* PBXContainerItemProxy */;
+			target = E596C5CE9CA0C39CBF0998B2 /* FunWithActivityCore */;
+			targetProxy = F3868C5C7876F4B9D9BCF273 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		19A2C921883487BBFA86B3BF /* Debug */ = {
+		44703DECEDC4A7AA9736BFF3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2EBB90723A9DD08EEF23308A /* Pods-FunWithActivityCoreTests.debug.xcconfig */;
+			baseConfigurationReference = 7FE7EDBA9193B8F573170E62 /* Pods-FunWithActivityCoreTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -640,38 +670,7 @@
 			};
 			name = Debug;
 		};
-		2319A370A21EFA207AC70494 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 39DE08BDDCCDC0F508C80EF9 /* Pods-FunWithActivityCore.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-					"FWA_GRPC_HOST=\\\"206.189.58.109.sslip.io:443\\\"",
-					"FWA_GRPC_TOKEN=\\\"465c91937694a37cc4b040d4577f3be253b94b4216314b26\\\"",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"./FunWithActivityCore/**",
-				);
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		54C1C93C5FE4883556F03351 /* Debug */ = {
+		4E2231D033A7A20257FB66C9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -732,39 +731,11 @@
 			};
 			name = Debug;
 		};
-		C46E2A5265592F193CBE2237 /* Release */ = {
+		72519CB3B529C6384A3B21AB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0701569E068BFAE28565CD04 /* Pods-FunWithActivityCoreTests.release.xcconfig */;
+			baseConfigurationReference = DAC9D55B9E21813B853C9CCE /* Pods-FunWithActivityCore.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"./FunWithActivityCore/**",
-				);
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.funwithactivity.ios.coretests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		D62D0DD36C0A96241763F948 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = CCA5BCEDACEF6BF68F23DC44 /* Pods-FunWithActivity.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -772,29 +743,28 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					"FWA_GRPC_HOST=\\\"206.189.58.109.sslip.io:443\\\"",
+					"FWA_GRPC_TOKEN=\\\"465c91937694a37cc4b040d4577f3be253b94b4216314b26\\\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"./FunWithActivityCore/**",
-					"./FunWithActivity/**",
 				);
-				INFOPLIST_FILE = "$(SRCROOT)/FunWithActivity/Supporting/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.funwithactivity.ios;
-				PRODUCT_NAME = FunWithActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		F0990BAE6B67F506FCAACFE7 /* Release */ = {
+		A1E95C1C9596B180AFBD8D5E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ECA091EE18BA73B204E74B35 /* Pods-FunWithActivityCore.release.xcconfig */;
+			baseConfigurationReference = E4F7B7F3C24DDE314A1FF95F /* Pods-FunWithActivityCore.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -823,7 +793,7 @@
 			};
 			name = Release;
 		};
-		F5F623C1A16FB98FF120791D /* Release */ = {
+		B70561B05CC79232DF5CA8F6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -877,9 +847,69 @@
 			};
 			name = Release;
 		};
-		FF9741C9557DB7338A06C12F /* Release */ = {
+		D3836F957680FB445FE065BE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 774A05AB7A0999E533FE411F /* Pods-FunWithActivity.release.xcconfig */;
+			baseConfigurationReference = 78AC2FEEA8D9927CE5BBDDDE /* Pods-FunWithActivityCoreTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"./FunWithActivityCore/**",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.funwithactivity.ios.coretests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D4C87A377D6141C63C36A416 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E33B27F06B5E65A06D0AC49C /* Pods-FunWithActivity.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"./FunWithActivityCore/**",
+					"./FunWithActivity/**",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/FunWithActivity/Supporting/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.funwithactivity.ios;
+				PRODUCT_NAME = FunWithActivity;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F798BFAF830D1D40DD784AE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 89ABF10D2D4B495A27807E59 /* Pods-FunWithActivity.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "";
@@ -911,43 +941,43 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		095FEF406AE41CDF2D400FB7 /* Build configuration list for PBXNativeTarget "FunWithActivity" */ = {
+		05DBC4D949B207493BD92FDE /* Build configuration list for PBXProject "FunWithActivity" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FF9741C9557DB7338A06C12F /* Release */,
-				D62D0DD36C0A96241763F948 /* Debug */,
+				4E2231D033A7A20257FB66C9 /* Debug */,
+				B70561B05CC79232DF5CA8F6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8C1117EE2B38605451BA9D80 /* Build configuration list for PBXProject "FunWithActivity" */ = {
+		26195B53931922F6B839D420 /* Build configuration list for PBXNativeTarget "FunWithActivityCoreTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				54C1C93C5FE4883556F03351 /* Debug */,
-				F5F623C1A16FB98FF120791D /* Release */,
+				D3836F957680FB445FE065BE /* Release */,
+				44703DECEDC4A7AA9736BFF3 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8E821349BE72A413B5ACB3AD /* Build configuration list for PBXNativeTarget "FunWithActivityCoreTests" */ = {
+		CE56B46A60CB78C3254CA0A3 /* Build configuration list for PBXNativeTarget "FunWithActivityCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C46E2A5265592F193CBE2237 /* Release */,
-				19A2C921883487BBFA86B3BF /* Debug */,
+				A1E95C1C9596B180AFBD8D5E /* Release */,
+				72519CB3B529C6384A3B21AB /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E963838891AD6D38943C8AAD /* Build configuration list for PBXNativeTarget "FunWithActivityCore" */ = {
+		F96D0ECC8FA99BCD30AD100A /* Build configuration list for PBXNativeTarget "FunWithActivity" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F0990BAE6B67F506FCAACFE7 /* Release */,
-				2319A370A21EFA207AC70494 /* Debug */,
+				F798BFAF830D1D40DD784AE2 /* Release */,
+				D4C87A377D6141C63C36A416 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 5756F481819BE03335261441 /* Project object */;
+	rootObject = 48BA7B86CA850E9E72427A7B /* Project object */;
 }
