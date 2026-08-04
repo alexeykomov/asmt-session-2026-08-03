@@ -329,8 +329,8 @@ is Apple's permission to read the store, not an Art. 9 legal basis. No
 third-party SDK to gate, because we ship none.
 
 **2. Erasure.** Telemetry lives under a pseudonym in ClickHouse; the
-pseudonym→person mapping is encrypted in Postgres with a per-user KMS key in
-the user's home cell. Erasure destroys the key.
+pseudonym→person mapping is encrypted in Postgres with a per-user KMS key.
+Erasure destroys the key.
 
 Backups are the reason it is done this way, and the managed-database detail
 matters:
@@ -349,8 +349,8 @@ matters:
   with Art. 17 by design. Where erasure yields to retention is the customer's
   determination.
 
-**3. Export (Art. 20).** Async job; bundle written to object storage in the
-home cell; short-lived signed URL. Contents: profile, consent history, latest
+**3. Export (Art. 20).** Async job; bundle written to object storage;
+short-lived signed URL. Contents: profile, consent history, latest
 values, rollups, machine-readable. The bundle is itself PHI — encrypted at
 rest, short expiry, access logged.
 
@@ -383,11 +383,30 @@ any client — verified, not asserted. No measurement value reaches a log line;
 only a propagated `request_id`. BAA with the cloud provider, and Cognito sits
 inside it, so identity adds no company to the Art. 28 chain.
 
-**9. Residency.** One cell per region, US and EU: own Postgres, ClickHouse,
-Cognito pool and object store, users pinned home. No cross-border transfer
-means no SCCs and no Schrems II argument to make. Moving a user between cells
-is explicit, consented and logged — never routine. The cost is duplicated
-infrastructure.
+**9. Residency.** Holding to both regimes everywhere is a *compliance
+posture*; residency is a separate, *transfer* question, and the second does
+not follow from the first. Art. 44+ restricts moving EU personal data to US
+infrastructure however well we comply elsewhere.
+
+GDPR does not require localisation — transfers are lawful today under the
+EU–US Data Privacy Framework. But that is the third such decision after Safe
+Harbour and Privacy Shield were struck down, and the SCC fallback for Art. 9
+data is an argument that has to keep being won.
+
+**Plan A — one EU region, both markets.** EU data never leaves; US users take
+the latency, which costs nothing on these paths. Half the infrastructure, and
+no routing to build.
+
+**Plan B — a cell per region.** Two of everything, plus the one part that
+cannot be regional: a **global directory**, keyed hash → home region. A
+returning user on a new device must be routed *before* they authenticate.
+Keyed because emails are low-entropy and a plain hash is reversible. Home
+region from self-declared country; changing it is a consented, logged
+migration.
+
+Either plan, residency covers backups, logs, metrics, export bundles and
+sub-processors — not just the database. Pinning Postgres while shipping logs
+to a US vendor reintroduces the transfer, which is what makes (8) load-bearing.
 
 **10. Breach readiness.** The audit log is the detection surface: alert on
 access-rate spikes, bulk reads and cross-cell access. Written incident runbook
