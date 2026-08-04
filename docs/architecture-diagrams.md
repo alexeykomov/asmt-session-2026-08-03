@@ -313,25 +313,33 @@ narrow: the recommendation pipeline sees current values, never raw samples.
 
 ---
 
-## 4a. Where HIPAA and GDPR actually live in this picture
+## 4a. How we address HIPAA and GDPR
 
-A fair criticism of the diagram above is that nothing on it says "compliance."
-Some of it is there and unlabelled, some belongs on the diagram and is not yet
-drawn, and some can never be drawn at all. Being explicit about which is which
-is more useful than a "secure & compliant" badge.
+Nothing on the diagram above says "compliance", which is a fair criticism to
+make of any architecture drawing. This section answers the obligation-side
+question instead — for each requirement that actually binds this product, what
+is the mechanism, and where does it sit — because "secure & compliant" as a
+badge is worth nothing and a named mechanism can be argued with.
 
-**Already in the diagram, just not labelled as compliance:**
+Three honest categories run through everything below: mechanisms already
+load-bearing in the design, mechanisms designed but not drawn (the diagram is
+at its density limit for one page), and obligations no diagram can discharge
+at all.
 
-| Control | Where it is | What it discharges |
+### Already load-bearing, and visible on the diagram
+
+| Requirement | How we address it | Where |
 |---|---|---|
-| Data-minimisation gate | `Provider.Requires()` in the refresh worker | GDPR Art. 5(1)(c) — a provider that does not need DOB never receives it; one that does is skipped rather than fed a placeholder |
-| Plane separation | ClickHouse #1 vs #2 | Art. 32 / HIPAA §164.312(a) — the wide-audience store physically cannot contain health values, so broad grants cannot drift onto PHI |
-| Server-side pseudonymisation | `web-proxy` and `app-server` on the way to CH #2 | Art. 4(5) — the `analytics_id` is assigned where the user id is known and stripped; a client cannot be trusted to do this |
-| No client touches a store | every write goes through a tier we operate | §164.312(b) — auth, validation and audit have exactly two chokepoints |
-| Vendors never called on the read path | `Entitlement → Postgres → API` | no PHI leaves the boundary as a side effect of someone opening the app |
+| **GDPR Art. 5(1)(c)** — collect and share only what is necessary | A provider declares the fields it needs; the aggregator **skips** one whose fields are absent rather than calling it with placeholder data | `Provider.Requires()`, in the refresh worker |
+| **Art. 32 / HIPAA §164.312(a)** — access control proportionate to sensitivity | Two stores in separate accounts, so the wide-audience one physically cannot hold health values and a broad grant cannot drift onto PHI | ClickHouse #1 vs #2 |
+| **Art. 4(5)** — pseudonymisation | `analytics_id` is assigned server-side, at the one point where the real user id is known and can be stripped; a client cannot be trusted with this | `web-proxy` and `app-server`, on the way to CH #2 |
+| **§164.312(b)** — audit controls | No client writes to a store; every write passes a tier we operate, so auth, validation and audit have exactly two chokepoints | The two read-path tiers |
+| **Art. 28 / §164.308(b)** — limiting disclosure to processors | Vendors are never called on the read path, so no PHI leaves the boundary as a side effect of someone opening the app | `Entitlement → Postgres → API` |
 
-**Drawable, and deliberately not on the diagram yet** — each adds a box, and the
-diagram is already at the density limit for one page. They belong in the build:
+### Designed, not yet drawn
+
+Each of these adds a box to a diagram already at its density limit, so they are
+stated here rather than crowded onto the page. They belong in the build.
 
 - **Per-region cells.** Own Postgres, own ClickHouse, own residency boundary,
   users pinned home. This is one decision that satisfies three requirements at
@@ -364,12 +372,14 @@ diagram is already at the density limit for one page. They belong in the build:
   conflict rather than hide it; where erasure yields to retention is a question
   for the customer, not an assumption for us.
 
-**Not drawable at all, and not optional:** a BAA with the cloud provider and
-with each vendor that touches PHI; a DPIA, which Art. 35 requires because this
-is profiling at scale; breach-notification runbooks under §164.400 and
-Art. 33/34; retention schedules; and periodic access review. An architecture
-diagram can show where the controls attach — it cannot show that anyone signed
-anything.
+### Not addressable by architecture at all
+
+These bind regardless, and no diagram discharges them: a BAA with the cloud
+provider and with each vendor that touches PHI; a DPIA, which Art. 35 requires
+because this is profiling at scale; breach-notification runbooks under
+§164.400 and Art. 33/34; retention schedules; and periodic access review. An
+architecture diagram can show where the controls attach — it cannot show that
+anyone signed anything.
 
 **The question underneath all of this is still open.** Whether the customer is a
 HIPAA covered entity or business associate, or whether this is consumer wellness

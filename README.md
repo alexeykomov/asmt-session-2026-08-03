@@ -106,21 +106,22 @@ discharge, in
 **[`docs/architecture-diagrams.md`](docs/architecture-diagrams.md)** — diagram 4
 and section 4a.
 
-### Where HIPAA and GDPR attach
+### How we address HIPAA and GDPR
 
-Nothing on the production diagram is labelled "compliance", so it is worth
-saying which controls are already load-bearing, which are designed but not
-drawn, and which an architecture diagram can never show.
+Nothing on the production diagram is labelled "compliance". This says, for
+each requirement that actually binds the product, what the mechanism is —
+split into what is already load-bearing, what is designed but not drawn, and
+what no architecture can discharge.
 
-**Already in the design, doing real work:**
+**Already load-bearing:**
 
-| Control | Discharges |
+| Requirement | How we address it |
 |---|---|
-| `Provider.Requires()` gate | Art. 5(1)(c) — a provider that does not need date of birth never receives it, and one that does is *skipped* rather than fed placeholder data |
-| ClickHouse #1 / #2 plane split | Art. 32, HIPAA §164.312(a) — the wide-audience store cannot physically contain health values |
-| Server-side pseudonymisation | Art. 4(5) — `analytics_id` is assigned where the real user id is known and can be stripped; a client cannot be trusted to do this |
-| No client writes to a store | §164.312(b) — auth, validation and audit have exactly two chokepoints |
-| No vendor call on the read path | No PHI leaves the boundary as a side effect of someone opening the app |
+| **Art. 5(1)(c)** — collect only what is necessary | `Provider.Requires()`: a provider that does not need date of birth never receives it, and one that does is *skipped* rather than fed placeholder data |
+| **Art. 32, HIPAA §164.312(a)** — access control | The ClickHouse #1 / #2 plane split, in separate accounts, so the wide-audience store cannot physically contain health values |
+| **Art. 4(5)** — pseudonymisation | `analytics_id` assigned server-side, where the real user id is known and can be stripped; a client cannot be trusted with this |
+| **§164.312(b)** — audit controls | No client writes to a store, so auth, validation and audit have exactly two chokepoints |
+| **Art. 28 / §164.308(b)** — limiting disclosure | No vendor call on the read path, so no PHI leaves the boundary as a side effect of someone opening the app |
 
 **Designed, not drawn** — each would add a box to an already dense diagram:
 per-region cells (residency, the brief's pilot-then-global rollout and

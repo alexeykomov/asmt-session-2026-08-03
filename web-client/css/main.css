@@ -363,6 +363,28 @@ main {
      selected one, so gaining/losing goog-tab-selected never shifts
      layout. */
   border-bottom: 3px solid transparent;
+  /*
+   * Fixed width, for the same reason the transparent border above exists:
+   * selection must not move anything. The underline was already handled,
+   * but the selected tab also goes from weight 500 to 700, which widened
+   * "Recommendations" from 132px to 138.1px and reflowed every tab after
+   * it on each switch.
+   *
+   * 172px is measured, not guessed: the widest label rendered at the BOLD
+   * weight is 138.1px, plus this rule's 2 x 1rem padding = 170.1px. 172
+   * leaves a little slack without looking padded.
+   *
+   * A uniform width rather than per-tab minimums, so the bar reads as a
+   * deliberate row rather than four differently sized boxes — and so a
+   * future label cannot quietly reintroduce the shift.
+   */
+  box-sizing: border-box;
+  min-width: 172px;
+  text-align: center;
+  /* Below ~4 x 172px of gutter-free space the row would overflow its
+     container; shrinking is preferable to a horizontal scrollbar, and the
+     labels still fit because the shrink only eats the slack. */
+  flex: 0 1 auto;
 }
 
 .goog-tab-hover {
