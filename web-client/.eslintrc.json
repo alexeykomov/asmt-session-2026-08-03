@@ -1,1 +1,45 @@
-{"extends": "google", "env": {"browser": true, "es2020": true}, "parserOptions": {"ecmaVersion": 2020, "sourceType": "script"}}
+{
+  "extends": "google",
+  "env": {
+    "browser": true,
+    "es2020": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "script"
+  },
+  "rules": {
+    "indent": [
+      "error",
+      2,
+      {
+        "CallExpression": {
+          "arguments": 2
+        },
+        "FunctionExpression": {
+          "body": 1,
+          "parameters": 2
+        },
+        "MemberExpression": 2,
+        "ignoredNodes": [
+          "AssignmentExpression > FunctionExpression > BlockStatement"
+        ],
+        "SwitchCase": 1
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "test/**/*.js",
+        "scripts/**/*.js"
+      ],
+      "rules": {
+        "max-len": "off",
+        "require-jsdoc": "off",
+        "valid-jsdoc": "off",
+        "one-var": "off"
+      }
+    }
+  ]
+}

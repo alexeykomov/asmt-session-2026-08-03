@@ -172,10 +172,10 @@ funwithactivity.recs.RecDetailComponent.buildViewModel_ = function(
   // product exists to perform, so it is stated rather than left for the
   // reader to infer from a comma in the source column.
   const provenanceNote = providers.length > 1 ?
-      ('Returned independently by ' + providers.length +
+    ('Returned independently by ' + providers.length +
        ' providers and merged into one entry. The highest-scoring instance ' +
        'won; any details only the other supplied were carried across.') :
-      'Returned by a single provider.';
+    'Returned by a single provider.';
 
   return {
     title: rec.title,

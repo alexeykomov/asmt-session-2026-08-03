@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build-css.js && node scripts/compile-soy.js && node scripts/compile.js",
-    "lint": "eslint src/**/*.js",
+    "lint": "eslint src test scripts",
     "test": "mocha test/**/*_test.js"
   },
   "dependencies": {

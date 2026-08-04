@@ -4,8 +4,10 @@ const {assert} = require('chai');
 const {loadClassifier} = require('./helpers/load-dtos');
 
 describe('provider status classification', () => {
-  let classify, shortReason, ProviderStatus;
-  before(() => { ({classify, shortReason, ProviderStatus} = loadClassifier()); });
+  let classify, ProviderStatus;
+  before(() => {
+    ({classify, ProviderStatus} = loadClassifier());
+  });
 
   it('ok status classifies as ok', () => {
     assert.equal(
@@ -38,7 +40,9 @@ describe('provider status classification', () => {
 
 describe('provider status shortReason', () => {
   let shortReason, ProviderStatus;
-  before(() => { ({shortReason, ProviderStatus} = loadClassifier()); });
+  before(() => {
+    ({shortReason, ProviderStatus} = loadClassifier());
+  });
 
   it('ok status has no reason to show', () => {
     assert.equal(

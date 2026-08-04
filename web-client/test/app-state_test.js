@@ -5,7 +5,9 @@ const {loadAppState} = require('./helpers/load-app-state');
 
 describe('AppState', () => {
   let AppState;
-  before(() => { AppState = loadAppState(); });
+  before(() => {
+    AppState = loadAppState();
+  });
 
   it('starts clean', () => {
     assert.isFalse(new AppState().isDirty());

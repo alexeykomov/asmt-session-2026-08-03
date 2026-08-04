@@ -21,7 +21,8 @@ goog.require('funwithactivity.dto.ProviderStatus');
  * @return {string} 'ok' | 'skipped' | 'degraded'
  */
 funwithactivity.features.recommendations.classify = function(status) {
-  // `ok && skipped` cannot happen: app-server/internal/aggregator/aggregator.go:93-97
+  // `ok && skipped` cannot happen — see
+  // app-server/internal/aggregator/aggregator.go:93-97
   // never sets OK on a skipped status. This invariant is server-guaranteed,
   // which is also why iOS and Android are free to order these two checks
   // differently from each other and from here.

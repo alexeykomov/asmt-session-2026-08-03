@@ -55,7 +55,8 @@ funwithactivity.sources.SourceDetailComponent.prototype.createDom =
       .buildViewModel_(this.name_, status);
 
   const el = goog.dom.createDom(
-      goog.dom.TagName.DIV, {'class': 'fwa-screen-source-detail screen-container'});
+      goog.dom.TagName.DIV,
+      {'class': 'fwa-screen-source-detail screen-container'});
   this.setElementInternal(el);
   funwithactivity.render.element(
       el, funwithactivity.components.sourceDetailScreen.screen,

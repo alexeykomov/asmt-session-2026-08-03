@@ -25,7 +25,7 @@ function loadClosureDtos() {
 
   // Order matters: the response DTO references the other two.
   for (const f of ['recommendation.js', 'provider-status.js',
-                   'recommendations-response.js']) {
+    'recommendations-response.js']) {
     vm.runInContext(fs.readFileSync(path.join(DTO_DIR, f), 'utf8'), sandbox, f);
   }
 
@@ -47,13 +47,13 @@ function loadClassifier() {
   };
   vm.createContext(sandbox);
   for (const f of ['recommendation.js', 'provider-status.js',
-                   'recommendations-response.js']) {
+    'recommendations-response.js']) {
     vm.runInContext(fs.readFileSync(path.join(DTO_DIR, f), 'utf8'), sandbox, f);
   }
   vm.runInContext(
       fs.readFileSync(path.join(__dirname,
           '../../src/features/recommendations/provider-status-presentation.js'),
-          'utf8'),
+      'utf8'),
       sandbox, 'provider-status-presentation.js');
 
   ns.ProviderStatus = sandbox.funwithactivity.dto.ProviderStatus;

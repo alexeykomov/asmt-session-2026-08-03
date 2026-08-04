@@ -5,7 +5,9 @@ const {loadClosureDtos} = require('./helpers/load-dtos');
 
 describe('DTOs', () => {
   let dto;
-  before(() => { dto = loadClosureDtos(); });
+  before(() => {
+    dto = loadClosureDtos();
+  });
 
   it('Recommendation round-trips through the wire format', () => {
     const r = new dto.Recommendation('Walk more', 'Do it daily', 'service1', 0.42);

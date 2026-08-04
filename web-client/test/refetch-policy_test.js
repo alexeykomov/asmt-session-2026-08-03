@@ -5,7 +5,9 @@ const {loadRefetchPolicy} = require('./helpers/load-refetch-policy');
 
 describe('refetch policy', () => {
   let shouldFetch;
-  before(() => { shouldFetch = loadRefetchPolicy(); });
+  before(() => {
+    shouldFetch = loadRefetchPolicy();
+  });
 
   it('fetches on first visit even when clean', () => {
     assert.isTrue(shouldFetch(false, false));

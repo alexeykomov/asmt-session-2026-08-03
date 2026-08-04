@@ -497,8 +497,8 @@ funwithactivity.recs.bannerMessages = function(statuses, hasResults) {
     } else if (classifications[i] == 'degraded') {
       messages.push({
         text: hasResults ?
-            status.name + ' unavailable — showing partial results' :
-            status.name + ' unavailable',
+          status.name + ' unavailable — showing partial results' :
+          status.name + ' unavailable',
         className: 'recs-banner-degraded',
       });
     }

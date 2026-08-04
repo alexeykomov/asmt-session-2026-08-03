@@ -80,7 +80,7 @@ funwithactivity.app.AppState.prototype.getMeasurements = function() {
   return {
     heightCm: this.heightCm_,
     weightKg: this.weightKg_,
-    birthDateUnix: this.birthDateUnix_
+    birthDateUnix: this.birthDateUnix_,
   };
 };
 
@@ -109,7 +109,10 @@ funwithactivity.app.AppState.prototype.setMeasurements = function(
 /** @return {!Object<string,string>} */
 funwithactivity.app.AppState.prototype.getFaults = function() {
   const copy = {};
-  for (const k in this.faults_) copy[k] = this.faults_[k];
+  const keys = Object.keys(this.faults_);
+  for (let i = 0; i < keys.length; i++) {
+    copy[keys[i]] = this.faults_[keys[i]];
+  }
   return copy;
 };
 

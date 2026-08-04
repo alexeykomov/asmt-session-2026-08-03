@@ -20,7 +20,7 @@
 
 'use strict';
 
-const { execSync } = require('child_process');
+const {execSync} = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -42,7 +42,7 @@ function checkSoyCompiler() {
 /** Recursively finds every .soy file under `dir`. */
 function findSoyFiles(dir) {
   const found = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       found.push(...findSoyFiles(full));
@@ -62,7 +62,7 @@ function compileSoyFile(soyFile) {
   const rel = path.relative(SOY_SOURCE_DIR, soyFile);
   const outputFile =
       path.join(SOY_OUTPUT_DIR, rel.replace(/\.soy$/, '.soy.js'));
-  fs.mkdirSync(path.dirname(outputFile), { recursive: true });
+  fs.mkdirSync(path.dirname(outputFile), {recursive: true});
 
   execSync(
       `java ` +
@@ -73,7 +73,7 @@ function compileSoyFile(soyFile) {
       `--shouldGenerateJsdoc ` +
       `--shouldProvideRequireSoyNamespaces ` +
       `"${soyFile}"`,
-      { stdio: 'inherit' },
+      {stdio: 'inherit'},
   );
 
   console.log(`  ✓ ${path.relative(ROOT, outputFile)}`);
@@ -83,9 +83,9 @@ function main() {
   checkSoyCompiler();
 
   if (fs.existsSync(SOY_OUTPUT_DIR)) {
-    fs.rmSync(SOY_OUTPUT_DIR, { recursive: true, force: true });
+    fs.rmSync(SOY_OUTPUT_DIR, {recursive: true, force: true});
   }
-  fs.mkdirSync(SOY_OUTPUT_DIR, { recursive: true });
+  fs.mkdirSync(SOY_OUTPUT_DIR, {recursive: true});
 
   const soyFiles = findSoyFiles(SOY_SOURCE_DIR);
   if (soyFiles.length === 0) {

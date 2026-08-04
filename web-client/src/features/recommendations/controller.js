@@ -90,7 +90,7 @@ funwithactivity.features.recommendations.Controller.Column_ = {
   RECOMMENDATION: 0,
   DETAILS: 1,
   SOURCE: 2,
-  SCORE: 3
+  SCORE: 3,
 };
 
 
@@ -118,9 +118,9 @@ funwithactivity.features.recommendations.Controller.prototype.decorate =
 funwithactivity.features.recommendations.Controller.prototype
     .bindFaultToggle_ = function(checkboxId, selectId) {
   const checkbox = /** @type {?HTMLInputElement} */ (
-      goog.dom.getElement(checkboxId));
+    goog.dom.getElement(checkboxId));
   const select = /** @type {?HTMLSelectElement} */ (
-      goog.dom.getElement(selectId));
+    goog.dom.getElement(selectId));
   if (!checkbox || !select) return;
   goog.events.listen(checkbox, goog.events.EventType.CHANGE, function() {
     select.disabled = !checkbox.checked;
@@ -160,17 +160,17 @@ funwithactivity.features.recommendations.Controller.prototype.handleSubmit_ =
 funwithactivity.features.recommendations.Controller.prototype.readPayload_ =
     function() {
   const heightEl =
-      /** @type {!HTMLInputElement} */ (goog.dom.getElement('height-cm'));
+  /** @type {!HTMLInputElement} */ (goog.dom.getElement('height-cm'));
   const weightEl =
-      /** @type {!HTMLInputElement} */ (goog.dom.getElement('weight-kg'));
+  /** @type {!HTMLInputElement} */ (goog.dom.getElement('weight-kg'));
   const birthEl =
-      /** @type {!HTMLInputElement} */ (goog.dom.getElement('birth-date'));
+  /** @type {!HTMLInputElement} */ (goog.dom.getElement('birth-date'));
 
   // Empty birth date is a deliberate GDPR Art. 5(1)(c) data-minimisation
   // choice, not missing data — the proto/API convention for "not supplied"
   // is 0, matching how web-proxy already treats an absent birthDateUnix.
   const birthDateUnix = birthEl.value ?
-      Math.floor(new Date(birthEl.value).getTime() / 1000) : 0;
+    Math.floor(new Date(birthEl.value).getTime() / 1000) : 0;
 
   return {
     'heightCm': Number(heightEl.value),
@@ -211,9 +211,9 @@ funwithactivity.features.recommendations.Controller.prototype.readFaults_ =
 funwithactivity.features.recommendations.Controller.prototype.readFault_ =
     function(faults, index, checkboxId, selectId) {
   const checkbox = /** @type {?HTMLInputElement} */ (
-      goog.dom.getElement(checkboxId));
+    goog.dom.getElement(checkboxId));
   const select = /** @type {?HTMLSelectElement} */ (
-      goog.dom.getElement(selectId));
+    goog.dom.getElement(selectId));
   const providerName = this.providerNames_[index];
   if (checkbox && checkbox.checked && select && providerName) {
     faults[providerName] = select.value;

@@ -64,14 +64,14 @@ function loadBannerMessages() {
   vm.runInContext(googShim, sandbox);
 
   for (const f of ['recommendation.js', 'provider-status.js',
-                   'recommendations-response.js']) {
+    'recommendations-response.js']) {
     vm.runInContext(
         fs.readFileSync(path.join(DTO_DIR, f), 'utf8'), sandbox, f);
   }
   vm.runInContext(
       fs.readFileSync(path.join(ROOT,
           'src/features/recommendations/provider-status-presentation.js'),
-          'utf8'),
+      'utf8'),
       sandbox, 'provider-status-presentation.js');
   vm.runInContext(
       fs.readFileSync(

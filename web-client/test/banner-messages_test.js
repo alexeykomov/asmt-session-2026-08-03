@@ -5,11 +5,13 @@ const {loadBannerMessages} = require('./helpers/load-banner-messages');
 
 describe('recommendations banner messages', () => {
   let bannerMessages, ProviderStatus;
-  before(() => { ({bannerMessages, ProviderStatus} = loadBannerMessages()); });
+  before(() => {
+    ({bannerMessages, ProviderStatus} = loadBannerMessages());
+  });
 
   const ok = (name) => new ProviderStatus(name, true, false, '', 3, 40);
   const degraded = (name) =>
-      new ProviderStatus(name, false, false, 'boom', 0, 2001);
+    new ProviderStatus(name, false, false, 'boom', 0, 2001);
   const skipped = (name) => new ProviderStatus(
       name, false, true, 'required measurements not supplied', 0, 0);
 

@@ -15,7 +15,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 
-fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+fs.mkdirSync(PUBLIC_DIR, {recursive: true});
 
 const options = {
   compilation_level: 'ADVANCED',
@@ -63,6 +63,11 @@ const options = {
   js_output_file: path.join(PUBLIC_DIR, 'main.min.js'),
 };
 
+// google-closure-compiler's export is a lowercase constructor; renaming it
+// is not ours to do, so the rule is silenced here rather than for every
+// script. The directive must be one comment — split across two lines it is
+// not a directive at all, just a comment that reads like one.
+// eslint-disable-next-line new-cap
 new compiler(options).run((exitCode, _stdout, stderr) => {
   if (stderr) process.stderr.write(stderr);
   if (exitCode !== 0) process.exit(exitCode);

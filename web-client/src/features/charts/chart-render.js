@@ -53,8 +53,9 @@ funwithactivity.charts.render.VIEW_ = {
 funwithactivity.charts.render.el_ = function(name, attrs) {
   const node = document.createElementNS(
       funwithactivity.charts.render.SVG_NS_, name);
-  for (const key in attrs) {
-    node.setAttribute(key, String(attrs[key]));
+  const names = Object.keys(attrs);
+  for (let i = 0; i < names.length; i++) {
+    node.setAttribute(names[i], String(attrs[names[i]]));
   }
   return node;
 };

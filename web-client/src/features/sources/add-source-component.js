@@ -68,7 +68,8 @@ funwithactivity.sources.AddSourceComponent.EXPLANATION_ =
 /** @override */
 funwithactivity.sources.AddSourceComponent.prototype.createDom = function() {
   const el = goog.dom.createDom(
-      goog.dom.TagName.DIV, {'class': 'fwa-screen-add-source screen-container'});
+      goog.dom.TagName.DIV,
+      {'class': 'fwa-screen-add-source screen-container'});
   this.setElementInternal(el);
   funwithactivity.render.element(
       el, funwithactivity.components.addSourceForm.screen, {});
@@ -114,9 +115,9 @@ funwithactivity.sources.AddSourceComponent.prototype.handleSubmit_ =
   e.preventDefault();
 
   const nameEl = /** @type {?HTMLInputElement} */ (
-      goog.dom.getElement('add-source-name'));
+    goog.dom.getElement('add-source-name'));
   const urlEl = /** @type {?HTMLInputElement} */ (
-      goog.dom.getElement('add-source-url'));
+    goog.dom.getElement('add-source-url'));
   const name = nameEl ? nameEl.value.trim() : '';
   const url = urlEl ? urlEl.value.trim() : '';
 
