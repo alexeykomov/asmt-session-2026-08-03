@@ -315,46 +315,104 @@ narrow: the recommendation pipeline sees current values, never raw samples.
 
 ## 4a. How we address HIPAA and GDPR
 
-Decisions, not options. Each is a position we would defend.
+The twelve challenges any health aggregator faces, each with the position we
+would defend. US and EU both in scope, so both regimes bind throughout.
 
-**Identity** — Cognito user pool per region; we never store a credential.
-Cloud-native rather than a third-party IdP so identity adds no company to the
-Art. 28 chain. Azure equivalent: Entra External ID.
+**1. Consent (Art. 9).** Append-only events —
+`(user, purpose, policy_version, granted, at)`. Withdrawal is a new row, never
+an update, so the table answers *what was agreed, when, under which wording*.
+Enforced where a purpose is acted on, **not** in `Provider.Requires()`: that
+gate means "field absent", and adding "or not permitted" would collapse two
+different reasons into one `skipped` status three clients already read
+specifically. HealthKit prefill moves behind recorded consent — the OS prompt
+is Apple's permission to read the store, not an Art. 9 legal basis. No
+third-party SDK to gate, because we ship none.
 
-**Sessions** — OIDC once at login, then our own **opaque** token, looked up
-server-side on every request. Revocation is therefore immediate: withdrawal,
-erasure, lost device, offboarding all take effect on the next call. Affordable
-because the read path already queries Postgres. Web carries it as an httpOnly
-cookie, mobile in gRPC metadata. *Never cache the lookup — a 30-second cache
-restores the window it removed.*
+**2. Erasure.** Telemetry lives under a pseudonym in ClickHouse; the
+pseudonym→person mapping is encrypted in Postgres with a per-user KMS key in
+the user's home cell. Erasure destroys the key.
 
-**Consent** — append-only events `(user, purpose, policy_version, granted,
-at)`. Withdrawal is a new row, never an update, so the table answers *what was
-agreed, when, under which wording*. Booleans on a profile cannot. Enforced
-where a purpose is acted on, **not** in `Requires()` — that gate means "field
-absent", and adding "or not permitted" would collapse two different reasons
-into one `skipped` status three clients already read specifically.
+Backups are the reason it is done this way, and the managed-database detail
+matters:
 
-**HealthKit** — prefill moves behind recorded consent. The OS prompt is
-Apple's permission to read the store, not an Art. 9 legal basis.
+- Encryption is **application-level**, so automated snapshots, PITR and any
+  `pg_dump` contain ciphertext. Destroying the key makes every one of those
+  copies unreadable — which row deletion can never do.
+- The managed database's **own** storage encryption does not provide this. One
+  CMK for the whole cluster is all-or-nothing: destroying it destroys the
+  database, not one user.
+- Anything erased by row deletion rather than key destruction needs a deletion
+  list re-applied after any restore, inside the documented backup window.
+- **No decrypted logical dumps.** A dump of decrypted data is a new PHI
+  location with its own retention, and it silently defeats the mechanism.
+- Consent and PHI-access logs are exempt: six-year retention, which conflicts
+  with Art. 17 by design. Where erasure yields to retention is the customer's
+  determination.
 
-**Data held** — tiered: raw samples on a short partition TTL, rollups and
-latest values retained. Bounds raw PHI at any moment, and uses the one thing
-ClickHouse is good at — `DROP PARTITION` is metadata-only, where per-user
-deletion is not. The TTL needs a stated reason, which Art. 5(1)(e) requires
+**3. Export (Art. 20).** Async job; bundle written to object storage in the
+home cell; short-lived signed URL. Contents: profile, consent history, latest
+values, rollups, machine-readable. The bundle is itself PHI — encrypted at
+rest, short expiry, access logged.
+
+**4. Device storage at rest.** Encrypted local cache for offline: Room +
+SQLCipher with a hardware-backed Keystore key on Android; Core Data with
+`NSFileProtectionComplete` plus Keychain on iOS; both excluded from iCloud and
+Google backups. **This deliberately gives up a property true today** — no
+client currently persists anything — in exchange for offline reading. The cost
+is PHI at rest on a device we do not control, plus a key lifecycle on each
+platform.
+
+**5. Platform health-API rules.** The OS store stays the system of record; we
+read on demand. Server-side retention is tiered: raw samples on a short
+partition TTL, rollups and latest values retained. That bounds raw PHI at any
+moment and uses the one deletion ClickHouse is good at — `DROP PARTITION` is
+metadata-only. The TTL needs a stated reason, which Art. 5(1)(e) requires
 anyway.
 
-**Regulatory bar** — US **and** EU, so both regimes bind. Build to HIPAA
-safeguards and GDPR Art. 9 everywhere rather than maintaining two compliance
-variants of one codebase. If the covered-entity answer comes back "consumer
-wellness", nothing is wasted — FTC HBNR is largely a subset, and the
-B2B/provider path stays open.
+**6. Web at rest.** No PHI in the browser — no `localStorage`, no IndexedDB,
+true today and verified. Plus `Cache-Control: no-store` on health responses
+and an httpOnly session cookie. The mobile-rich / web-thin asymmetry is stated
+rather than hidden.
 
-**Residency** — one cell per region: own Postgres, own ClickHouse, own Cognito
-pool, users pinned home. No cross-border transfer means no SCCs and no
-Schrems II exposure to argue. Moving a user between cells is an explicit,
-consented, logged migration — never a routine flow. The cost is duplicated
-infrastructure, which is the price of the residency argument being simple.
+**7. Audit trail.** `phi_access_log`, append-only, monthly partitions, beside
+`consent_events` in the home cell's Postgres. One store, one retention rule,
+expiry by partition drop. Writes sit on the read path, so it must stay cheap.
+
+**8. Vendor chain / BAAs.** No analytics, crash-reporting or push SDK ships on
+any client — verified, not asserted. No measurement value reaches a log line;
+only a propagated `request_id`. BAA with the cloud provider, and Cognito sits
+inside it, so identity adds no company to the Art. 28 chain.
+
+**9. Residency.** One cell per region, US and EU: own Postgres, ClickHouse,
+Cognito pool and object store, users pinned home. No cross-border transfer
+means no SCCs and no Schrems II argument to make. Moving a user between cells
+is explicit, consented and logged — never routine. The cost is duplicated
+infrastructure.
+
+**10. Breach readiness.** The audit log is the detection surface: alert on
+access-rate spikes, bulk reads and cross-cell access. Written incident runbook
+with the 72h clock and named roles. DPIA performed — mandatory here, since
+this is profiling at scale.
+
+**11. Sessions & access.** Cognito accounts per region; we never store a
+credential. OIDC once at login, then our own **opaque** session token looked
+up server-side on every request — so revocation is immediate for withdrawal,
+erasure, a lost device or offboarding. Affordable because the read path
+already queries Postgres. Idle timeout; biometric re-auth before PHI views on
+mobile. RBAC when staff-facing access exists — none today. *Never cache the
+session lookup: a 30-second cache restores the window it removed.*
+
+**12. Applicability.** Unanswered, and it is a question for the customer:
+covered entity or business associate, versus consumer wellness under FTC HBNR
+plus Art. 9. We build to HIPAA safeguards regardless — nothing is wasted if
+the answer is wellness, and the B2B/provider path stays open without
+re-architecture.
+
+**Cross-cutting.** Data is a liability with a lifecycle, not an asset to
+accumulate: know where every piece lives — device, server, analytics, logs,
+backups — why it is held, and be able to delete or produce it on demand.
+`Provider.Requires()` is that principle at its smallest scale, and it is
+already running.
 
 ## 5. What changes from PoC to production
 

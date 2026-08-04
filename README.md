@@ -108,40 +108,22 @@ and section 4a.
 
 ### How we address HIPAA and GDPR
 
-Nothing on the production diagram is labelled "compliance". This says, for
-each requirement that actually binds the product, what the mechanism is —
-split into what is already load-bearing, what is designed but not drawn, and
-what no architecture can discharge.
+Twelve decisions, one per standard compliance challenge, in
+[`docs/architecture-diagrams.md`](docs/architecture-diagrams.md) section 4a.
+The load-bearing ones:
 
-**Already load-bearing:**
+- **Identity** — a Cognito user pool per region; we never store a credential.
+- **Sessions** — our own opaque token, looked up server-side on every request,
+  so revocation is immediate. Never cached.
+- **Consent** — append-only events; withdrawal is a new row, never an update.
+- **Erasure** — crypto-shred a per-user key, so snapshots, PITR and any
+  `pg_dump` become unreadable too. Row deletion cannot reach a backup.
+- **Residency** — one cell per region (US, EU), users pinned home, no
+  cross-border transfer.
+- **Retention** — raw samples on a short partition TTL, rollups retained.
 
-| Requirement | How we address it |
-|---|---|
-| **Art. 5(1)(c)** — collect only what is necessary | `Provider.Requires()`: a provider that does not need date of birth never receives it, and one that does is *skipped* rather than fed placeholder data |
-| **Art. 32, HIPAA §164.312(a)** — access control | The ClickHouse #1 / #2 plane split, in separate accounts, so the wide-audience store cannot physically contain health values |
-| **Art. 4(5)** — pseudonymisation | `analytics_id` assigned server-side, where the real user id is known and can be stripped; a client cannot be trusted with this |
-| **§164.312(b)** — audit controls | No client writes to a store, so auth, validation and audit have exactly two chokepoints |
-| **Art. 28 / §164.308(b)** — limiting disclosure | No vendor call on the read path, so no PHI leaves the boundary as a side effect of someone opening the app |
-
-**Designed, not drawn** — each would add a box to an already dense diagram:
-per-region cells (residency, the brief's pilot-then-global rollout and
-blast-radius containment, all from one decision); KMS and per-user keys for
-the erasure mechanism below; and an append-only consent/PHI-access audit log
-whose six-year retention **deliberately conflicts with Art. 17** — where
-erasure yields to retention is the customer's determination, not ours.
-
-**Not drawable at all, and not optional:** BAAs with the cloud provider and
-every vendor touching PHI, the DPIA that Art. 35 requires for profiling at
-scale, breach-notification runbooks, retention schedules, access review. A
-diagram shows where controls attach; it cannot show that anyone signed
-anything.
-
-Underneath all of it sits a question the customer has not answered: whether
-they are a HIPAA covered entity or business associate, or whether this is
-consumer wellness under FTC HBNR and GDPR Art. 9. The architecture is
-deliberately built so that answer changes configuration and contracts rather
-than topology. Full mapping in
-[`docs/architecture-diagrams.md`](docs/architecture-diagrams.md), section 4a.
+Open, and a question for the customer: whether this is HIPAA-covered or
+consumer wellness under FTC HBNR. We build to HIPAA either way.
 
 ### Erasure: why crypto-shredding rather than `DELETE`
 
