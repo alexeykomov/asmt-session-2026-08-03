@@ -372,6 +372,51 @@ stated here rather than crowded onto the page. They belong in the build.
   conflict rather than hide it; where erasure yields to retention is a question
   for the customer, not an assumption for us.
 
+### The standard challenges, and where we actually stand
+
+The twelve challenges below are the ones that come up for any health
+aggregator. What follows is our position on each *for this system* — with a
+status, because several of them we have not solved and saying so is more
+useful than twelve confident answers.
+
+| # | Challenge | Our answer | Status |
+|---|---|---|---|
+| 1 | **Consent** — Art. 9 special-category data; SDKs firing before consent | Explicit, per-purpose, revocable consent **before** any HealthKit/Health Connect read, with proof (timestamp, policy version, scope) stored beside the audit log. We ship no third-party SDK, so there is nothing else to gate. Today iOS prefills on the OS permission prompt alone — and an OS prompt is not Art. 9 consent | **Gap** |
+| 2 | **Erasure** — soft deletes, backups and analytics stores defeat real deletion | Crypto-shred the **identity linkage, not the samples**: per-user-encrypted columns would collapse ClickHouse compression and make population queries impossible. Postgres cascades; a stated backup window whose restore re-applies deletions | **Designed** |
+| 3 | **Portability** — never built upfront | A "download my data" endpoint over Postgres state plus the CH #1 rows the pseudonym maps to. The pseudonym indirection that makes erasure work makes export work too | **Gap** |
+| 4 | **Device storage at rest** — PHI leaking into OS backups | Nothing to protect: neither mobile client persists anything. State lives in memory for the process's lifetime, so no PHI reaches iCloud or Google backups, and there is no local database to encrypt | **Built** |
+| 5 | **Platform health-API rules** — HealthKit/Health Connect policies on top of law | The OS store stays primary. iOS prefills height, weight and date of birth only and never uploads raw samples; Android's read is deliberately cut. Every uploaded metric widens PHI custody, which is why production ingest is drawn explicitly rather than assumed | **Built** (PoC scope) |
+| 6 | **Web at rest** — localStorage and IndexedDB are effectively unencrypted | The web client persists no PHI either — no localStorage, no IndexedDB, state in memory. Outstanding: `Cache-Control: no-store` on health responses, and there is no session to time out yet | **Partial** |
+| 7 | **Audit trail** — normal apps do not log PHI access | Append-only PHI-access log in Postgres, monthly partitions, six-year retention — the same log whose retention conflicts with Art. 17 | **Designed** |
+| 8 | **Vendor chain / BAAs** — analytics, crash reporting and push silently receive PHI | We ship no analytics, crash-reporting or push SDK at all. The internal analytics package is deliberately off the PHI path, and no measurement value is ever logged — only a propagated `request_id`. The cloud BAA is a contract, not a control | **Built**, BAA contractual |
+| 9 | **Residency** — EU data reaching US infrastructure by default | Per-region cells: own Postgres, own ClickHouse, own boundary, users pinned home. One decision that also gives the phased rollout and blast-radius containment | **Designed** |
+| 10 | **Breach readiness** — 72h notification needs detection, not just prevention | A DPIA is mandatory here (profiling at scale) and is named rather than assumed. Anomaly detection, alerting and a written incident process are not built | **Gap** |
+| 11 | **Sessions & access** — "stay logged in forever" defaults | The PoC has **no user authentication at all** — only a shared internal bearer token between tiers, which fails closed. Short timeouts, biometric re-auth for PHI views and staff-side RBAC are all outstanding | **Gap** |
+| 12 | **Applicability** — D2C wellness may fall outside HIPAA | Genuinely open, and it is our second question for you: covered entity or business associate, versus FTC HBNR plus Art. 9. We build to HIPAA standards regardless, which keeps the B2B and provider path open | **Open question** |
+
+Three of these are worth separating from the rest because they are
+*verifiable properties of the code today*, not intentions — and they were
+checked rather than asserted:
+
+- **No client persists anything (4, 6).** No `localStorage`, `sessionStorage`
+  or IndexedDB on web; no `SharedPreferences`, Room or SQLite on Android. iOS
+  reads `NSUserDefaults` only for host/TLS/token launch overrides, and all
+  three reads sit inside `#if DEBUG`, so a Release build does not touch it.
+- **No third-party SDK exists to leak PHI (8).** The dependency lists are
+  gRPC, Protobuf and platform UI only — no analytics, crash reporting or push
+  on any of the three clients.
+- **No measurement value is ever logged.** Log lines carry a propagated
+  `request_id` and nothing else.
+
+The rest are design positions, and three are outright gaps.
+
+The principle underneath all twelve: **data is a liability with a lifecycle,
+not an asset to accumulate.** Know where every piece lives — device, server,
+analytics, logs, backups, third parties — why it is held, and be able to
+delete or produce it on demand. `Provider.Requires()` is that principle made
+executable at the smallest scale we could find: a provider that does not need
+your date of birth never receives it.
+
 ### Not addressable by architecture at all
 
 These bind regardless, and no diagram discharges them: a BAA with the cloud
