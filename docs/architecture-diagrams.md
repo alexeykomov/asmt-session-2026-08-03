@@ -354,13 +354,13 @@ home cell; short-lived signed URL. Contents: profile, consent history, latest
 values, rollups, machine-readable. The bundle is itself PHI — encrypted at
 rest, short expiry, access logged.
 
-**4. Device storage at rest.** Encrypted local cache for offline: Room +
-SQLCipher with a hardware-backed Keystore key on Android; Core Data with
-`NSFileProtectionComplete` plus Keychain on iOS; both excluded from iCloud and
-Google backups. **This deliberately gives up a property true today** — no
-client currently persists anything — in exchange for offline reading. The cost
-is PHI at rest on a device we do not control, plus a key lifecycle on each
-platform.
+**4. Device storage at rest.** The PoC persists nothing on any client, so
+today there is nothing at rest to protect. For production, offline reading is
+worth an encrypted local cache: Room + SQLCipher with a hardware-backed
+Keystore key on Android; Core Data with `NSFileProtectionComplete` plus
+Keychain on iOS; both excluded from iCloud and Google backups. That accepts
+PHI at rest on a device we do not control, plus a key lifecycle per platform —
+the price of the app working without a connection.
 
 **5. Platform health-API rules.** The OS store stays the system of record; we
 read on demand. Server-side retention is tiered: raw samples on a short
