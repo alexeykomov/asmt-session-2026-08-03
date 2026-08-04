@@ -86,3 +86,17 @@ apple-client/**/xcuserdata/
 # Generated from the git-ignored repo-root .env by
 # apple-client/Config/generate-xcconfig.sh — can contain a real gRPC token.
 apple-client/Config/Generated.xcconfig
+
+# The Xcode project is generated in full by apple-client/generate_project.rb
+# (Xcodeproj::Project.new — nothing in it is hand-maintained) and the
+# workspace by `pod install`. Neither was ever a source file.
+#
+# They are ignored because generate_project.rb injects FWA_GRPC_TOKEN into
+# GCC_PREPROCESSOR_DEFINITIONS, so a tracked pbxproj carries the real gRPC
+# token into the repo — which is exactly what happened here: the token sat in
+# 55 commits of a public repo before anyone noticed, having routed straight
+# around Generated.xcconfig being ignored above.
+#
+# Regenerate with `make ios`, or `ruby generate_project.rb && pod install`.
+apple-client/FunWithActivity.xcodeproj/
+apple-client/FunWithActivity.xcworkspace/
