@@ -19,6 +19,11 @@ if (envFile.exists()) {
     if (envProps.containsKey('GRPC_HOST') && !project.hasProperty('serverHost')) {
         project.ext.serverHost = envProps.getProperty('GRPC_HOST')
     }
+    // TLS travels with the host: a local app-server speaks plaintext, so a
+    // .env pointing at one must also say so or the channel fails handshaking.
+    if (envProps.containsKey('GRPC_USE_TLS') && !project.hasProperty('serverTls')) {
+        project.ext.serverTls = envProps.getProperty('GRPC_USE_TLS')
+    }
     if (envProps.containsKey('INTERNAL_GRPC_TOKEN') && !project.hasProperty('serverToken')) {
         def token = envProps.getProperty('INTERNAL_GRPC_TOKEN')
         if (token) {

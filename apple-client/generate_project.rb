@@ -92,9 +92,15 @@ if File.exist?(GENERATED_XCCONFIG_PATH)
   xcconfig_contents = File.read(GENERATED_XCCONFIG_PATH)
   env_host = xcconfig_contents[/^FWA_ENV_GRPC_HOST\s*=\s*(.+)$/, 1]&.strip
   env_token = xcconfig_contents[/^FWA_ENV_GRPC_TOKEN\s*=\s*(.+)$/, 1]&.strip
+  # TLS travels with the host and must be injected with it. Omitting it left
+  # FWA_GRPC_USE_TLS at its header default of 1, so a .env pointing at a
+  # plaintext local server still built a TLS client — failing in the
+  # handshake, which reads as a network fault rather than a config one.
+  env_tls = xcconfig_contents[/^FWA_ENV_GRPC_USE_TLS\s*=\s*(.+)$/, 1]&.strip
   if env_host && !env_host.empty?
     generated_defines = ["FWA_GRPC_HOST=\\\"#{env_host}\\\""]
     generated_defines << "FWA_GRPC_TOKEN=\\\"#{env_token}\\\"" if env_token && !env_token.empty?
+    generated_defines << "FWA_GRPC_USE_TLS=#{env_tls}" if env_tls && !env_tls.empty?
   end
 end
 
